@@ -1,0 +1,261 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="summary.html">back</a> | <a href="started.html">next</a>  <br><hr>
+<a name="basics"></a><a name="sect3"></a>
+<h2>3<tt>&nbsp;&nbsp;</tt>Hugs for beginners</h2>
+This section covers the basics that you need to understand
+to start using Hugs.  Most of the points discussed here will
+be familiar to anyone with experience of previous
+versions of Hugs or Gofer.  To begin with, we need to start
+the interpreter; the usual way to do this is by using the
+command <tt>hugs</tt>, which produces a startup banner something
+like the following (On Windows 95/NT, the installation procedure normally
+adds Hugs to the start
+menu.  You can also start the interpreter by double clicking
+on a <tt>.hs</tt> or <tt>.lhs</tt> file.):
+
+<tt><br>
+&nbsp;__&nbsp;&nbsp;&nbsp;__&nbsp;__&nbsp;&nbsp;__&nbsp;&nbsp;____&nbsp;&nbsp;&nbsp;___&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_________________________________________<br>
+&nbsp;||&nbsp;&nbsp;&nbsp;||&nbsp;||&nbsp;&nbsp;||&nbsp;||&nbsp;&nbsp;||&nbsp;||__&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hugs&nbsp;98:&nbsp;Based&nbsp;on&nbsp;the&nbsp;Haskell&nbsp;98&nbsp;standard<br>
+&nbsp;||___||&nbsp;||__||&nbsp;||__||&nbsp;&nbsp;__||&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright&nbsp;(c)&nbsp;1994-1999<br>
+&nbsp;||---||&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;___||&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;World&nbsp;Wide&nbsp;Web:&nbsp;http://haskell.org/hugs<br>
+&nbsp;||&nbsp;&nbsp;&nbsp;||&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report&nbsp;bugs&nbsp;to:&nbsp;hugs-bugs@haskell.org<br>
+&nbsp;||&nbsp;&nbsp;&nbsp;||&nbsp;Version:&nbsp;September&nbsp;1999&nbsp;&nbsp;_________________________________________<br>
+&nbsp;<br>
+&nbsp;Haskell&nbsp;98&nbsp;mode:&nbsp;Restart&nbsp;with&nbsp;command&nbsp;line&nbsp;option&nbsp;-98&nbsp;to&nbsp;enable&nbsp;extensions<br>
+&nbsp;<br>
+&nbsp;Reading&nbsp;file&nbsp;"/Hugs/lib/Prelude.hs":<br>
+&nbsp;<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;Type&nbsp;:?&nbsp;for&nbsp;help<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>The file <tt>/Hugs/lib/Prelude.hs</tt> mentioned
+here contains standard definitions that are loaded into
+Hugs each time that the interpreter is started; the filename
+will vary from one installation to the next (If Hugs does not load correctly, and complains that it cannot find the
+prelude, then Hugs has not been installed correctly and you should look at
+the installation instructions.).
+You may notice a pause while the interpreter is initialized
+and the prelude definitions are loaded into the system.<a name="secexpr"></a><p>
+<a name="sect3.1"></a>
+<h3>3.1<tt>&nbsp;&nbsp;</tt>Expressions</h3>
+In essence, using Hugs is just like using a calculator; the interpreter
+simply evaluates each expression that is entered, printing the results
+as it goes.
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;(2+3)*8<br>
+&nbsp;40<br>
+
+
+
+
+<br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;[1..10]<br>
+&nbsp;55<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>The <tt>Prelude&gt;</tt> characters at the begining of the first, third
+and fifth lines here form the Hugs prompt.  This indicates
+that the system is ready to accept input from the user, and that it
+will use definitions from the <tt>Prelude</tt> module to evaluate
+each expression that is entered; The Hugs prelude is a special module
+that contains definitions for the built-in operations of Haskell,
+such as <tt>+</tt>, <tt>*</tt>, and <tt>sum</tt>.
+In response to the first prompt, the user entered the
+expression <tt>(2+3)*8</tt>, which was evaluated to produce the
+result <tt>40</tt>.  In response to the second prompt, the user typed the
+expression <tt>sum&nbsp;[1..10]</tt>.  The notation <tt>[1..10]</tt> represents
+the list of integers between 1 and 10 inclusive, and <tt>sum</tt> is a
+prelude function that calculates the sum of a list of numbers.  So the
+result obtained by Hugs is:
+
+<tt><br>
+&nbsp;1&nbsp;+&nbsp;2&nbsp;+&nbsp;3&nbsp;+&nbsp;4&nbsp;+&nbsp;5&nbsp;+&nbsp;6&nbsp;+&nbsp;7&nbsp;+&nbsp;8&nbsp;+&nbsp;9&nbsp;+&nbsp;10&nbsp;&nbsp;=&nbsp;&nbsp;55.<br>
+
+
+</tt>In fact, we could have typed this sum directly into Hugs:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;1&nbsp;+&nbsp;2&nbsp;+&nbsp;3&nbsp;+&nbsp;4&nbsp;+&nbsp;5&nbsp;+&nbsp;6&nbsp;+&nbsp;7&nbsp;+&nbsp;8&nbsp;+&nbsp;9&nbsp;+&nbsp;10<br>
+&nbsp;55<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>Unlike many calculators, however, Hugs is not limited to working with
+numbers; expressions can involve many different
+types of value, including numbers, booleans, characters, strings, lists,
+functions, and user-defined datatypes.  Some of these are illustrated
+in the following example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;(not&nbsp;True)&nbsp;||&nbsp;False<br>
+&nbsp;False<br>
+&nbsp;Prelude&gt;&nbsp;reverse&nbsp;"Hugs&nbsp;is&nbsp;cool"<br>
+&nbsp;"looc&nbsp;si&nbsp;sguH"<br>
+&nbsp;Prelude&gt;&nbsp;filter&nbsp;even&nbsp;[1..10]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;[2,&nbsp;4,&nbsp;6,&nbsp;8,&nbsp;10]<br>
+&nbsp;Prelude&gt;&nbsp;take&nbsp;10&nbsp;fibs&nbsp;where&nbsp;fibs&nbsp;=&nbsp;0:1:zipWith&nbsp;(+)&nbsp;fibs&nbsp;(tail&nbsp;fibs)<br>
+&nbsp;[0,&nbsp;1,&nbsp;1,&nbsp;2,&nbsp;3,&nbsp;5,&nbsp;8,&nbsp;13,&nbsp;21,&nbsp;34]<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>You cannot create new definitions at the command prompt---these must
+be placed in files and loaded, as described later.  The definition
+of <tt>fib</tt> in the last example above is local to that expression
+and will not be remembered for later use.  Also, the
+expressions entered must fit on a single line.<p>
+Hugs even allows whole programs to be used as values
+in calculations.
+For example, <tt>putStr&nbsp;"hello,&nbsp;"</tt> is a simple program that outputs the
+
+string <tt>"hello,&nbsp;"</tt>.  Combining this with a similar program to print
+the string <tt>"world"</tt>, gives:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;putStr&nbsp;"hello,&nbsp;"&nbsp;&gt;&gt;&nbsp;putStr&nbsp;"world"<br>
+&nbsp;hello,&nbsp;world<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Just as there are standard operations for dealing with numbers, so there
+are standard operations for dealing with programs.  For example,
+the <tt>&gt;&gt;</tt> operator used here constructs a new program from the programs
+supplied as its operands, running one after the other. 
+Normally, Hugs just prints the value of each expression entered.  But, as
+this example shows, if the expression evaluates to a program, then Hugs
+will run it instead.  Hugs distinguishes programs from other expressions
+by looking at the type of the expression entered.  For example, the
+expression <tt>putStr&nbsp;"world"</tt> has type <tt>IO&nbsp;()</tt>, which identifies
+it as a program to be executed rather than a value to be printed.<a name="seccommands"></a><p>
+<a name="sect3.2"></a>
+<h3>3.2<tt>&nbsp;&nbsp;</tt>Commands</h3>
+Each line that you enter in response to the Hugs prompt is
+treated as a command to the interpreter.  For example, when you
+enter an expression into Hugs, it is treated as
+a command to evaluate that expression, and
+to display the result.
+There are two commands that are particularly worth remembering:
+
+<UL><LI><tt>:q</tt> exits the interpreter.
+On most systems, you can also terminate Hugs by typing the
+end-of-file character.
+<LI><tt>:?</tt> prints a list of
+all the commands, which can be useful if you forget the name of
+the command that you want to use.
+</UL>
+Like most other commands in Hugs, these commands both start with
+a colon, <tt>:</tt>.<p>
+Note that the interrupt key (control-C or
+control-Break on most systems) can be used to abandon the process
+of compiling files or evaluating
+expressions.  When the interrupt is detected, Hugs prints 
+<tt>{Interrupted!}</tt> and returns to the prompt so that further
+commands can be entered.<a name="secscripts"></a><p>
+<a name="sect3.3"></a>
+<h3>3.3<tt>&nbsp;&nbsp;</tt>Programs</h3>
+Functions like <tt>sum</tt>, <tt>&gt;&gt;</tt> and <tt>take</tt>, used in the
+examples above, are all defined in the Hugs prelude; you can
+actually do quite a lot using just the types and operations provided
+by the prelude.
+But, in general, you will also want to define new types and operations,
+storing them in modules that can be loaded and used by Hugs.
+A module is simply a collection of definitions stored in a file. 
+For example, suppose we enter the following module:
+
+<tt><br>
+&nbsp;module&nbsp;Fact&nbsp;where<br>
+&nbsp;fact&nbsp;&nbsp;::&nbsp;Integer&nbsp;-&gt;&nbsp;Integer<br>
+&nbsp;fact&nbsp;n&nbsp;=&nbsp;product&nbsp;[1..n]<br>
+
+
+</tt>into a file called <tt>Fact.hs</tt>.  (By convention, Hugs modules are stored
+in files ending with the characters <tt>.hs</tt>.  The file name should
+match the name of the module it contains.)
+The <tt>product</tt> function used here is also defined in the prelude,
+and can be used to calculate the product of a list of numbers, just as
+you might use <tt>sum</tt> to calculate the corresponding sum.
+So the line above defines a function <tt>fact</tt> that takes an
+argument <tt>n</tt> and calculates its factorial.  In standard mathematical
+notation, <tt>fact&nbsp;n&nbsp;=&nbsp;n!</tt>, which is usually defined by an equation:
+
+<tt><br>
+&nbsp;n!&nbsp;=&nbsp;1&nbsp;*&nbsp;2&nbsp;*&nbsp;...&nbsp;*&nbsp;(n-1)&nbsp;*&nbsp;n<br>
+
+
+</tt>Once you become familiar with the notation, you will see
+that the Hugs definition is really very similar to this informal,
+mathematical version: the factorial of a
+number <tt>n</tt> is the product of the numbers from 1 to <tt>n</tt>.<p>
+Before we can use this definition in a Hugs session, we have to
+load <tt>Fact.hs</tt> into the interpreter.  One of the simplest ways to do
+this uses the <tt>:load</tt> command:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:load&nbsp;fact.hs&nbsp;<br>
+&nbsp;Reading&nbsp;file&nbsp;"fact.hs":<br>
+<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;Fact.hs<br>
+&nbsp;Fact&gt;&nbsp;<br>
+
+
+</tt>Notice the list of filenames displayed after <tt>Hugs&nbsp;session&nbsp;for:</tt>; this
+tells you which module files are currently being used by Hugs,
+the first of which is always the standard prelude.  The
+prompt is now <tt>Fact</tt> and evaluation will take place within this
+new module.  We can start to use
+the <tt>fact</tt> function that we have defined:
+
+<tt><br>
+&nbsp;Fact&gt;&nbsp;fact&nbsp;6<br>
+&nbsp;720<br>
+&nbsp;Fact&gt;&nbsp;fact&nbsp;6&nbsp;+&nbsp;fact&nbsp;7<br>
+&nbsp;5760<br>
+&nbsp;Fact&gt;&nbsp;fact&nbsp;7&nbsp;`div`&nbsp;fact&nbsp;6<br>
+&nbsp;7<br>
+&nbsp;Fact&gt;<br>
+
+
+</tt>As another example, the standard formula for the number of
+different ways of choosing <tt>r</tt> objects from a collection
+of <tt>n</tt> objects is n!/(r!(n-r)!).  A simple
+and direct (but otherwise not particularly good) definition for
+this function in Hugs is as follows:
+
+<tt><br>
+&nbsp;comb&nbsp;n&nbsp;r&nbsp;=&nbsp;fact&nbsp;n&nbsp;`div`&nbsp;(fact&nbsp;r&nbsp;*&nbsp;fact&nbsp;(n-r))<br>
+
+
+</tt>One way to use this function is to include its definition as part
+of an expression entered in directly to Hugs:
+
+<tt><br>
+&nbsp;Fact&gt;&nbsp;comb&nbsp;5&nbsp;2&nbsp;where&nbsp;comb&nbsp;n&nbsp;r&nbsp;=&nbsp;fact&nbsp;n&nbsp;`div`&nbsp;(fact&nbsp;r&nbsp;*&nbsp;fact&nbsp;(n-r))<br>
+&nbsp;10<br>
+&nbsp;Fact&gt;&nbsp;<br>
+
+
+</tt>The definition of <tt>comb</tt> here is local to this expression.  If we want
+to use <tt>comb</tt> several times, then it would be sensible
+to add its definition to the file <tt>Fact.hs</tt>.  Once this has been
+done, and the <tt>Fact.hs</tt> file has been reloaded, then we can use
+the <tt>comb</tt> function like any other built-in operator:
+
+<tt><br>
+&nbsp;Fact&gt;&nbsp;:reload<br>
+&nbsp;Reading&nbsp;file&nbsp;"fact.hs":<br>
+<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;Fact.hs<br>
+&nbsp;Fact&gt;&nbsp;comb&nbsp;5&nbsp;2<br>
+&nbsp;10<br>
+&nbsp;Fact&gt;<br>
+<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="summary.html">back</a> | <a href="started.html">next</a>  <br><font size=2>May 22, 1999</font>
+</tt>

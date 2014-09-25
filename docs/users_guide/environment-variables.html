@@ -1,0 +1,327 @@
+<HTML
+><HEAD
+><TITLE
+>Environment variables used by Hugs</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Changing the behaviour of Hugs"
+HREF="options.html"><LINK
+REL="PREVIOUS"
+TITLE="Changing the behaviour of Hugs"
+HREF="options.html"><LINK
+REL="NEXT"
+TITLE="Standalone programs"
+HREF="runhugs.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="options.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. Changing the behaviour of Hugs</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="runhugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ENVIRONMENT-VARIABLES"
+>3.2. Environment variables used by Hugs</A
+></H1
+><P
+>Hugs also consults a number of environment variables
+on systems that support them.
+The method for setting these varies with the system.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="EMACS"
+><TT
+CLASS="ENVAR"
+>EMACS</TT
+></A
+></DT
+><DD
+><P
+>(Windows only)
+If this variable is set, Hugs is assumed to be running in an Emacs subshell
+(with different line termination conventions on input).</P
+></DD
+><DT
+><A
+NAME="HOME"
+><TT
+CLASS="ENVAR"
+>HOME</TT
+></A
+></DT
+><DD
+><P
+>The user's home directory.
+This is substituted for <TT
+CLASS="LITERAL"
+>{Home}</TT
+> in the argument of the
+<A
+HREF="options.html#OPTION-SEARCH-PATH"
+><TT
+CLASS="OPTION"
+>-P</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-LOADING"
+>Section 3.1.2</A
+>),
+and for <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>~</TT
+>"</SPAN
+> in the argument of the
+<B
+CLASS="COMMAND"
+>:cd</B
+> command
+(see <A
+HREF="misc-commands.html"
+>Section 2.4</A
+>).</P
+></DD
+><DT
+><A
+NAME="HUGSFLAGS"
+><TT
+CLASS="ENVAR"
+>HUGSFLAGS</TT
+></A
+></DT
+><DD
+><P
+>Additional options for Hugs, processed before any given on the command line
+(see <A
+HREF="options.html#OPTIONS-LIST"
+>Section 3.1</A
+>).
+Within this string, options may be separated by whitespace.
+To include a literal space in an option, either precede it with a backslash
+or wrap the whole option in double quotes.
+The following example assumes a shell compatible with the Unix Bourne shell:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  HUGSFLAGS='+k -E"vi +%d"'
+  export HUGSFLAGS</PRE
+></TD
+></TR
+></TABLE
+>
+Double quoted options may also contain the escape sequences
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\ </TT
+>"</SPAN
+>,
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\"</TT
+>"</SPAN
+> and
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\\</TT
+>"</SPAN
+>.
+Other bachslashes are interpreted literally.</P
+></DD
+><DT
+><A
+NAME="HUGSDIR"
+><TT
+CLASS="ENVAR"
+>HUGSDIR</TT
+></A
+></DT
+><DD
+><P
+>The Hugs library directory.
+This is substituted for <TT
+CLASS="LITERAL"
+>{Hugs}</TT
+> in the argument of the
+<A
+HREF="options.html#OPTION-SEARCH-PATH"
+><TT
+CLASS="OPTION"
+>-P</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-LOADING"
+>Section 3.1.2</A
+>).</P
+></DD
+><DT
+><A
+NAME="IGNORE-USER-REGISTRY"
+><TT
+CLASS="ENVAR"
+>IGNORE_USER_REGISTRY</TT
+></A
+></DT
+><DD
+><P
+>(Windows only)
+If this variable is set, options are not read from the user portion of the
+Registry (see <A
+HREF="options.html#OPTIONS-LIST"
+>Section 3.1</A
+>).
+You might use this to recover if your registry settings get messed up
+somehow.</P
+></DD
+><DT
+><A
+NAME="SHELL"
+><TT
+CLASS="ENVAR"
+>SHELL</TT
+></A
+></DT
+><DD
+><P
+>The shell that is invoked by the <B
+CLASS="COMMAND"
+>:!</B
+> command
+(see <A
+HREF="misc-commands.html"
+>Section 2.4</A
+>).</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="options.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runhugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Changing the behaviour of Hugs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="options.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Standalone programs</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

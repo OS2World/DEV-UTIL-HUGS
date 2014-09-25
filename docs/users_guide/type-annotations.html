@@ -1,0 +1,245 @@
+<HTML
+><HEAD
+><TITLE
+>Type annotations in patterns</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"><LINK
+REL="PREVIOUS"
+TITLE="Quantified types"
+HREF="quantified-types.html"><LINK
+REL="NEXT"
+TITLE="Implicit parameters"
+HREF="implicit-parameters.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="quantified-types.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 5. Language extensions supported by Hugs and GHC</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="implicit-parameters.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TYPE-ANNOTATIONS"
+>5.4. Type annotations in patterns</A
+></H1
+><P
+>Haskell 98 allows expressions to be annotated with type signatures.
+With the <TT
+CLASS="OPTION"
+>-98</TT
+> option,
+these annotations are also allowed on patterns:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f (x::Int) = fromIntegral x :: Double</PRE
+></TD
+></TR
+></TABLE
+>
+Moreover type variables in pattern annotations are treated specially:
+unless the type variable is already bound (by another pattern annotation),
+it is universally quantified over the pattern and its scope, e.g.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  snoc (xs::[a]) (x::a) = xs++[x] :: [a]</PRE
+></TD
+></TR
+></TABLE
+>
+Occurrences of the type variable in type signatures within this scope
+are bound to this type variable.
+In the above example the second and third occurrences of <TT
+CLASS="LITERAL"
+>a</TT
+>
+are bound by the first.
+This permits locally defined variables to be given signatures in situations
+where it would be impossible in Haskell 98:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  sortImage :: Ord b =&#62; (a -&#62; b) -&#62; [a] -&#62; [a]
+  sortImage (f::a-&#62;b) = sortBy cmp
+      where
+          cmp :: a -&#62; a -&#62; Ordering
+          cmp x y = compare (f x) (f y)</PRE
+></TD
+></TR
+></TABLE
+>
+Note that the relationship between signature declarations and pattern
+annotations is asymmetrical: pattern annotations may capture type variables
+in signature declarations, but not vice versa.
+There is no connection between the type variables in the type signature
+of <TT
+CLASS="LITERAL"
+>sortImage</TT
+> and those in its definition,
+but the occurrence of <TT
+CLASS="LITERAL"
+>a</TT
+> in the signature of
+<TT
+CLASS="LITERAL"
+>cmp</TT
+> is bound by the pattern <TT
+CLASS="LITERAL"
+>(f::a-&#62;b)</TT
+>.</P
+><P
+>In GHC, type variables bound by pattern annotations are existentially
+quantified, and so may be instantiated.
+Thus the following is accepted by GHC but not Hugs:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  g (xs::[a]) = xs ++ "\n"</PRE
+></TD
+></TR
+></TABLE
+>
+GHC also allows <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>result type signatures</I
+></SPAN
+>,
+where a type signature is attached to the left side of a function definition,
+but Hugs does not.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="quantified-types.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="implicit-parameters.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Quantified types</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Implicit parameters</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

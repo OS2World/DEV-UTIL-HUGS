@@ -1,0 +1,213 @@
+<HTML
+><HEAD
+><TITLE
+>Hugs-specific language extensions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Implicit parameters"
+HREF="implicit-parameters.html"><LINK
+REL="NEXT"
+TITLE="Restricted type synonyms"
+HREF="restricted-synonyms.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="implicit-parameters.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="restricted-synonyms.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="HUGS-ONLY"
+>Chapter 6. Hugs-specific language extensions</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>6.1. <A
+HREF="hugs-only.html#TREX"
+>Typed extensible records</A
+></DT
+><DT
+>6.2. <A
+HREF="restricted-synonyms.html"
+>Restricted type synonyms</A
+></DT
+><DT
+>6.3. <A
+HREF="here-documents.html"
+>Here documents</A
+></DT
+><DT
+>6.4. <A
+HREF="observe.html"
+>Hugs debugging primitives</A
+></DT
+></DL
+></DIV
+><P
+>These experimental features are unique to Hugs.
+Except of the debugging primitives,
+they require the <TT
+CLASS="OPTION"
+>-98</TT
+> option.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TREX"
+>6.1. Typed extensible records</A
+></H1
+><P
+><TT
+CLASS="LITERAL"
+>Trex</TT
+> is a very powerful and flexible record system.
+See
+<A
+HREF="http://cvs.haskell.org/Hugs/pages/hugsman/exts.html#sect7.2"
+TARGET="_top"
+>Section 7.2 of the <I
+CLASS="CITETITLE"
+>Hugs 98 User Manual</I
+></A
+>
+for details.</P
+><P
+>To use equality and <TT
+CLASS="LITERAL"
+>show</TT
+> on extensible records,
+a module must import <TT
+CLASS="LITERAL"
+>Hugs.Trex</TT
+>.
+This module also defines an empty record value and type:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  emptyRec :: Rec EmptyRow</PRE
+></TD
+></TR
+></TABLE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="implicit-parameters.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="restricted-synonyms.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Implicit parameters</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Restricted type synonyms</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

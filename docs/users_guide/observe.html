@@ -1,0 +1,1000 @@
+<HTML
+><HEAD
+><TITLE
+>Hugs debugging primitives</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Hugs-specific language extensions"
+HREF="hugs-only.html"><LINK
+REL="PREVIOUS"
+TITLE="Here documents"
+HREF="here-documents.html"><LINK
+REL="NEXT"
+TITLE="Miscellaneous"
+HREF="miscellaneous.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="here-documents.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 6. Hugs-specific language extensions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="miscellaneous.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="OBSERVE"
+>6.4. Hugs debugging primitives</A
+></H1
+><P
+>This release of Hugs contains support for debugging by observations
+inspired by the Andy Gill's Hood library:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Andy Gill,
+<I
+CLASS="CITETITLE"
+>Debugging Haskell by Observing Intermediate Data Structures</I
+>,
+in <I
+CLASS="CITETITLE"
+>Draft Proceedings of the 2000 Haskell Workshop</I
+>.</P
+></LI
+><LI
+><P
+>The Haskell Object Observation Debugger
+<A
+HREF="http://www.haskell.org/hood/"
+TARGET="_top"
+>http://www.haskell.org/hood/</A
+>.</P
+></LI
+></OL
+><P
+>Hood is a portable Haskell library that implements the combinator
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  Observable a =&#62; observe :: String -&#62; a -&#62; a</PRE
+></TD
+></TR
+></TABLE
+>
+The partial application
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  observe tag</PRE
+></TD
+></TR
+></TABLE
+>
+behaves exactly like the identity function, but also records the value
+of data to which it is applied.
+Any observations made are reported at the end of the computation.
+The <TT
+CLASS="REPLACEABLE"
+><I
+>tag</I
+></TT
+> argument is used to label the
+observed value when it is reported. Non-strict semantics is preserved
+— <TT
+CLASS="LITERAL"
+>observe</TT
+> does not evaluate its second argument.</P
+><P
+>HugsHood uses the same observation model but differs in a number of ways.</P
+><P
+></P
+><UL
+><LI
+><P
+>It is much faster. This is because HugsHood is implemented within the
+Hugs evaluator and uses primitive builtin functions.
+Performance depends upon the volume of observations. More frequent
+observations incur a higher overhead. As a simple comparison, a
+test program which executed 1 million reductions and made 250
+observations incurred a 625 percent overhead when observations were made
+with the Hood library but just 10 percent when using HugsHood.</P
+><P
+>Caveat: When not using observations, the modifications to the evaluator
+to support HugsHood imposes an overhead of about 6 percent.</P
+></LI
+><LI
+><P
+>It is possible to easily observe arbitrary data structures.
+HugsHood implements the primitive
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  observe :: String -&#62; a -&#62; a</PRE
+></TD
+></TR
+></TABLE
+>
+which is unconstrained by the need to build instances of the
+<TT
+CLASS="LITERAL"
+>Observable</TT
+> class for each user defined data type
+whose values are being observed.
+HugsHood uses an internal primitive function to display observed values.
+This may be considered both an advantage and a disadvantage:
+one does not need to define how to observe values,
+but one cannot define special user views of data.</P
+></LI
+><LI
+><P
+>No modification to the program (apart from instrumentation with
+<TT
+CLASS="LITERAL"
+>observe</TT
+>) is required.
+The Hood library must be invoked using a special IO monadic combinator
+to ensure that observations are collected and displayed.</P
+></LI
+><LI
+><P
+>There are a number of minor differences in the display format which are
+a consequence of the Hugs implementation. These are described below.</P
+></LI
+></UL
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1457"
+>6.4.1. Using HugsHood</A
+></H2
+><P
+>Modules that use HugsHood combinators must import the module
+<TT
+CLASS="LITERAL"
+>Hugs.Observe</TT
+>.
+Its only role is to provide the necessary primitive definitions, namely:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  primitive observe :: String -&#62; a -&#62; a
+  primitive bkpt    :: String -&#62; a -&#62; a
+  primitive setBkpt :: String -&#62; Bool -&#62; IO ()</PRE
+></TD
+></TR
+></TABLE
+></P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1462"
+>6.4.1.1. Breakpoints</A
+></H3
+><P
+>HugsHood implements breakpoints. A program can be instrumented with the
+<TT
+CLASS="LITERAL"
+>bkpt</TT
+> function. The partial application
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  bkpt bkpt_name</PRE
+></TD
+></TR
+></TABLE
+>
+behaves exactly like the identity function, except that before it
+returns its argument it checks if <TT
+CLASS="REPLACEABLE"
+><I
+>bkpt_name</I
+></TT
+>
+is enabled, and if it is the user is presented with the opportunity to
+view observed data.
+A small set of commands is available when Hugs halts due to a breakpoint:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><P
+><B
+CLASS="COMMAND"
+>p</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>tag_name</I
+></TT
+>]</P
+></DT
+><DD
+><P
+>Print observations made since the computation began.
+If an observation tag is suppled then only the
+associated observations will be displayed. Otherwise
+all observations will be displayed.</P
+></DD
+><DT
+><P
+><B
+CLASS="COMMAND"
+>c</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>]</P
+></DT
+><DD
+><P
+>Continue with program evaluation. With no arguments,
+evaluation will continue until another active breakpoint
+is encountered. The optional numeric argument will skip
+<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> active breakpoints before stopping.</P
+></DD
+><DT
+><P
+><B
+CLASS="COMMAND"
+>s</B
+>   <TT
+CLASS="REPLACEABLE"
+><I
+>bkpt_name</I
+></TT
+> </P
+></DT
+><DD
+><P
+>Set a breakpoint.</P
+></DD
+><DT
+><P
+><B
+CLASS="COMMAND"
+>r</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>bkpt_name</I
+></TT
+>]</P
+></DT
+><DD
+><P
+>Reset a named breakpoint or, if no breakpoint name is
+supplied, reset all breakpoints.</P
+></DD
+></DL
+></DIV
+><P
+>A breakpoint is by default disabled. It can be enabled by using the
+<B
+CLASS="COMMAND"
+>s</B
+> command in the debug breakpoint dialogue,
+or by using the <TT
+CLASS="LITERAL"
+>setBkpt</TT
+> combinator.
+Clearly at least one breakpoint must be enabled
+using <TT
+CLASS="LITERAL"
+>setBkpt</TT
+> before a breakpoint dialogue can be triggered.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1506"
+>6.4.1.2. Breakpoint Example</A
+></H3
+><P
+>Here is a very simple program using the three combinators.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  import Hugs.Observe
+
+  prog n = do { setBkpt "fib" True; putStr $ show (observe "fun" f n) }
+  f 0 = 1
+  f n = n * (bkpt "fib" $ observe "fun" f (n-1))</PRE
+></TD
+></TR
+></TABLE
+>
+The following sample session shows how the <B
+CLASS="COMMAND"
+>p</B
+> and
+<B
+CLASS="COMMAND"
+>c</B
+> commands can be used.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Main&#62; prog 4
+  Break @ fib&#62; p
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  fun
+    { \ 4  -&#62; _
+    }
+
+  Break @ fib&#62; c
+  Break @ fib&#62; p
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  fun
+    { \ 4  -&#62; _
+    , \ 3  -&#62; _
+    }
+
+  Break @ fib&#62; c 2
+  Break @ fib&#62; p
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  fun
+    { \ 4  -&#62; _
+    , \ 3  -&#62; _
+    , \ 2  -&#62; _
+    , \ 1  -&#62; _
+    }
+
+  Break @ fib&#62; c
+  24
+  (98 reductions, 299 cells)
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  fun
+    { \ 4  -&#62; 24
+    , \ 3  -&#62; 6
+    , \ 2  -&#62; 2
+    , \ 1  -&#62; 1
+    , \ 0  -&#62; 1
+    }
+
+  10 observations recorded</PRE
+></TD
+></TR
+></TABLE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1513"
+>6.4.2. Differences from Hood</A
+></H2
+><P
+>HugsHood uses a similar style of display to Hood, though there are
+differences. One trivial difference is that Hood reports tags with a
+leading <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>--</TT
+>"</SPAN
+> while HugsHood does not.</P
+><P
+>Consider now more significant differences.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1519"
+>6.4.2.1. Observing character strings</A
+></H3
+><P
+>HugsHood (and Hood) reports lists using the cons operator.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Observe&#62; observe "list" [1..3]
+  [1,2,3]
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  list
+    (1 : 2 : 3 : [])</PRE
+></TD
+></TR
+></TABLE
+>
+This is too verbose for lists of characters, so HugsHood reports
+strings in the usual format:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Observe&#62; observe "string" ['a'..'d']
+  "abcd"
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  string
+    "abcd"</PRE
+></TD
+></TR
+></TABLE
+>
+If only the initial part of the string is evaluated,
+a trailing <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>...</TT
+>"</SPAN
+> is reported.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Observe&#62; take 2  $ observe "string" ['a'..'d']
+  "ab"
+
+  &#62;&#62;&#62;&#62;&#62;&#62;&#62; Observations &#60;&#60;&#60;&#60;&#60;&#60;
+
+  string
+    "ab..."</PRE
+></TD
+></TR
+></TABLE
+>
+This is clearly ambiguous, because evaluating the expression
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  observe "string" "ab..."</PRE
+></TD
+></TR
+></TABLE
+>
+will give the same result, but in practice the ambiguity
+should be easy to resolve.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1528"
+>6.4.2.2. Unevaluated expressions</A
+></H3
+><P
+>The <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>_</TT
+>"</SPAN
+> symbol is used to indicate
+an unevaluated expression.
+In Hood all unevaluated expressions will be displayed using
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>_</TT
+>"</SPAN
+>.
+In HugsHood, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>_</TT
+>"</SPAN
+> denotes an unevaluated
+expression, but not all unevaluated expressions are denoted
+by <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>_</TT
+>"</SPAN
+>.</P
+><P
+>For example the expression <TT
+CLASS="LITERAL"
+>fst $ observe "pair" (1,2)</TT
+> yields
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  -- pair
+    (1, _)</PRE
+></TD
+></TR
+></TABLE
+>
+in both Hugs and HugsHood.
+However, <TT
+CLASS="LITERAL"
+>fst $ observe "pair" ('a','b')</TT
+> yields
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  pair
+    ('a','b')</PRE
+></TD
+></TR
+></TABLE
+>
+in HugsHood, and <TT
+CLASS="LITERAL"
+>('a', _)</TT
+> in Hood.
+This is because HugsHood (unlike
+Hood) does not actually record evaluation steps. It merely maintains an
+internal pointer to that part of the heap representing the tagged
+expression. If the expression in not in weak head normal form, then it
+obviously has not been evaluated and so it is reported as just
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>_</TT
+>"</SPAN
+>;
+otherwise it displayed.  Integer constants like <TT
+CLASS="LITERAL"
+>1</TT
+> and
+<TT
+CLASS="LITERAL"
+>2</TT
+> are not in WHNF,
+as they must be coerced to the correct type when evaluated.
+Characters though are in WHNF so it is not possible to discern whether
+a character was evaluated.</P
+><P
+>Another consequence of the HugsHood implementation by pointers rather
+than Hood's implementation by tracing evaluation is that the strictness
+behaviour of a function can be masked. Consider the example:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  lazy pair = let x = observe "fst" fst pair
+		  y = snd pair
+	      in  (y,x)</PRE
+></TD
+></TR
+></TABLE
+>
+For the expression <TT
+CLASS="LITERAL"
+>lazy (1,2)</TT
+> Hood reports
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  -- fst
+    { \ (1, _)  -&#62; 1
+    }</PRE
+></TD
+></TR
+></TABLE
+>
+while HugsHood reports
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  fst
+    { \ (1,2)  -&#62; 1
+    }</PRE
+></TD
+></TR
+></TABLE
+>
+HugsHood should not be used to deduce the strictness behaviour of a function,
+or it should be done only with caution.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="OBSERVE-AND-ROOT-OPTIMISATION"
+>6.4.2.3. Interaction with the root optimisation</A
+></H3
+><P
+>The Hugs compiler uses an optimisation when generating code that builds
+expressions on the heap. If a function definition has the form
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f arg1 .. argN = ..... f arg1 .. argM .....</PRE
+></TD
+></TR
+></TABLE
+>
+where 1 = <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+>,
+then the expression graph for <TT
+CLASS="REPLACEABLE"
+><I
+>f arg1 .. argM</I
+></TT
+>
+is copied rather than rebuilt from individual application nodes.
+This interacts with the observation algorithm so that observing functions
+of the above form gives unexpected results.</P
+><P
+>For instance consider the expression
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  observe "fold" foldl (+) 0 [1..3]</PRE
+></TD
+></TR
+></TABLE
+>
+When the root optimisation is applied to the compilation
+of <TT
+CLASS="LITERAL"
+>foldl</TT
+>, we see
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  fold
+    { \ primPlusInteger 6 []  -&#62; 6
+    , \ { \ 3 3  -&#62; 6
+	} 3 (3 : [])  -&#62; 6
+    , \ { \ 1 2  -&#62; 3
+	} 1 (2 : 3 : [])  -&#62; 6
+    , \ { \ 0 1  -&#62; 1
+	} 0 (1 : 2 : 3 : [])  -&#62; 6</PRE
+></TD
+></TR
+></TABLE
+>
+instead of the expected
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  fold
+    { \ { \ 0 1  -&#62; 1
+	, \ 1 2  -&#62; 3
+	, \ 3 3  -&#62; 6
+	} 0 (1 : 2 : 3 : [])  -&#62; 6
+    }</PRE
+></TD
+></TR
+></TABLE
+>
+The first form reports the arguments at each application
+of <TT
+CLASS="LITERAL"
+>foldl</TT
+>,
+while the second reports the arguments for just the initial application
+(the one marked by <TT
+CLASS="LITERAL"
+>observe</TT
+>).</P
+><P
+>The root optimisation can be disabled using the
+<A
+HREF="options.html#OPTION-ROOT-OPTIMISATION"
+><TT
+CLASS="OPTION"
+>-R</TT
+></A
+> option.
+This can be done from the command line or by using
+<B
+CLASS="COMMAND"
+>:s</B
+> <TT
+CLASS="OPTION"
+>-R</TT
+> at the Hugs prompt.
+If you want to compile the prelude definitions without the root optimisation
+you must invoke Hugs with the <TT
+CLASS="OPTION"
+>-R</TT
+> option.</P
+><P
+>Testing of execution time with and without the root optimisation for a
+selection of 23 benchmarks from the nofib suite has been carried out.
+All but 5 tests resulted in an execution time penalty of less than 3%
+when running without root optimisation (some even showed a very minor
+speedup).</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1575"
+>6.4.2.4. Known problems</A
+></H3
+><P
+>Hugs can produce infinite (cyclic) dictionaries when implementing overloading.
+The observation reporting mechanism does not detect these at present, which
+leads to a non-terminating report. We plan to address this in a future
+release.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1578"
+>6.4.3. Reporting HugsHood bugs</A
+></H2
+><P
+>Please report bugs to Richard Watson, <TT
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:rwatson@usq.edu.au"
+>rwatson@usq.edu.au</A
+>&#62;</TT
+></P
+><P
+>In particular, if the message
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Warning: observation sanity counter &#62; 0</PRE
+></TD
+></TR
+></TABLE
+>
+appears, and your program has not terminated abnormally, please report
+the error situation.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="here-documents.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="miscellaneous.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Here documents</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Miscellaneous</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

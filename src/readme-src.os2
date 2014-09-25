@@ -1,0 +1,59 @@
+How to use the HUGS source files.
+
+Prerequisite: Innotek GCC 3.2.2 compiler, NMAKE32 from IBM OS/2 Toolkit,
+or some other compiler and make if you prefer them.
+
+I have made just enough changes to make the source compile using GCC for OS/2.
+I am not very literate about makefiles and build setup, so my modifications
+certainly leave room for improvement.
+
+
+
+
+To compile the sources for OS/2, I copied the files:
+
+src\djgpp2\config.h to src\config.h
+src\djgpp2\options.h to src\options.h
+
+and modified:
+
+machdep.c
+prelude.h
+config.h
+
+Modifications are marked "PJ"
+
+machdep.c and prelude.h
+Changed some declarations to comply with the standard C libraries.
+
+config.h
+Took away HAVE_STD_H definition
+Added MKDLL_CMD definition (empty for now)
+
+
+
+
+
+I also wrote a new Makefile, based on the existing ones.
+
+
+
+
+The file inno.cmd is used to set up the environment to find Innotek GCC 
+compiler and LINK386 linker from IBM OS/2 Toolkit.
+Edit as necessary.
+
+To compile:
+
+1) Open an OS/2 command window to the src (this) directory
+
+2) In the command window, type "inno"
+
+3) In the command window, type "nmake32"
+
+4) Move the new files hugs.exe and runhugs.exe to the hugs98 directory
+
+
+
+
+Please report any problems related to this port to me: per@johansson.name

@@ -1,0 +1,252 @@
+HUGS(1)                                                                HUGS(1)
+
+[1mNAME[0m
+       hugs, runhugs, ffihugs - Hugs 98, functional programming system
+
+[1mSYNOPSIS[0m
+       [1mhugs [22m[ [4moptions[24m ] [ [4mmodules[24m ]
+       [1mrunhugs [22m[ [4moptions[24m ] [4mmodule[24m [ [4margs[24m ]
+       [1mffihugs +G [22m[ [4moptions[24m ] [ [1m+L[4m[22marg[24m ] ...  [4mmodule[0m
+
+[1mDESCRIPTION[0m
+       Hugs  is  an  interpreter for Haskell, a standard non-strict functional
+       programming language.  Hugs implements almost all  of  the  Haskell  98
+       standard,  except  for  mutually recursive modules.  The name [1mHugs [22mis a
+       mnemonic for the [1mHaskell User's Gofer System[22m.
+
+       The interpreter is started using the [4mhugs[24m  command.   After  processing
+       options,  it  loads  the  standard module [1mPrelude [22mand any other modules
+       listed on the command line.
+
+       Each Haskell module is stored in a separate file.  When loading a  mod-
+       ule  [4mname[24m, [4mHugs[24m replaces each `[1m.[22m'  in [4mname[24m with a `[1m/[22m' and looks in each
+       of the directories on its search path (see [1m-P [22munder  [1mOPTIONS[22m)  for  the
+       files  [4mname[24m[1m.hs  [22mand  [4mname[24m[1m.lhs[22m.  (The recognized suffixes may be changed
+       using the [1m-S [22moption, described under [1mOPTIONS[22m.)  It also tries [4mname[24m as a
+       literal  filename.   Files  ending  in  "[1m.lhs[22m"  are treated as literate
+       scripts.
+
+[1mOPTIONS[0m
+       Some options are toggled with [1m+ [22mor [1m- [22mto turn them on  or  off,  respec-
+       tively.
+
+   [1mLanguage conformance[0m
+       [1m+98    [22mAccept  only Haskell 98 (cannot be changed within [4mHugs[24m; default:
+              on).  Turning this off enables several special Hugs  extensions,
+              which are described in the [4mHugs[24m [4m98[24m [4mUser[24m [4mManual[24m.
+
+       [1m+o     [22mAllow overlapping instances (a Hugs extension; default: off)
+
+       [1m+O     [22mAllow  unsafe  overlapping instances (a Hugs extension; default:
+              off)
+
+       [1m+H     [22mAllow `here documents' (a Hugs extension; default: off)
+
+   [1mModule loading[0m
+       [1m+l     [22mTreat files whose names end in neither `[1m.hs[22m' nor `[1m.lhs[22m' as  lit-
+              erate scripts (default: off)
+
+       [1m+.     [22mPrint dots to show progress while loading modules (default: off)
+
+       [1m+q     [22mPrint nothing to show progress while loading  modules  (default:
+              on)
+
+       [1m+w     [22mAlways show which files are loaded (default: off)
+
+   [1mExpression evaluation[0m
+       [1m+s     [22mPrint number of reductions/cells after each evaluation (default:
+              off)
+
+       [1m+t     [22mPrint type after each evaluation (default: off)
+
+       [1m+T     [22mApply  the  Haskell  defaulting  rules  before  printing   types
+              (default: off)
+
+       [1m+g     [22mPrint  number  of  cells recovered after each garbage collection
+              (default: off)
+
+       [1m+Q     [22mQualify names when printing (default: off)
+
+       [1m+k     [22mShow kind errors in full (default: off)
+
+       [1m+u     [22mUse "[1mshow[22m" to display results (default: on)
+
+       [1m+I     [22mDisplay results of IO programs (default: off)
+
+   [1mParameters[0m
+       Other options (in which [1m- [22mcould be replaced by [1m+[22m, the choice making  no
+       difference) are:
+
+       [1m-h[4m[22mnum[24m  Set heap size (cannot be changed within [4mHugs[24m; default: 250K)
+
+       [1m-p[4m[22mstr[24m  Set  prompt  string  to  [4mstr[24m  (default:  `[1m%s> [22m').  Any [1m%s [22min the
+              prompt will be replaced by the current module name.
+
+       [1m-r[4m[22mstr[24m  Set repeat last expression string to [4mstr[24m (default: [1m$$[22m).
+
+       [1m-P[4m[22mstr[24m  Set search path for source files  to  [4mstr[24m,  which  should  be  a
+              colon-separated  list of directories.  A null entry in this list
+              will be replaced by the previous search path; a null  [4mstr[24m  means
+              the  default  path.   Any occurrence of [1m{Hugs} [22min this string is
+              expanded    to    the    Hugs    library    directory,    namely
+              [1m/usr/local/lib/hugs[22m.  Similarly, [1m{Home} [22mis expanded to your home
+              directory (the value of  the  [1mHOME  [22menvironment  variable).   An
+              entry  of  the form `[4mdirectory[24m[1m/*[22m' means all the immediate subdi-
+              rectories of [4mdirectory[24m.  The default value is
+
+                     [1m.:{Hugs}/libraries:{Hugs}/oldlib[0m
+
+       [1m-S[4m[22mstr[24m  Set the colon-separated list of  source  file  suffixes  to  [4mstr[0m
+              (default: [1m.hs:.lhs[22m).  A null entry in this list will be replaced
+              by the previous suffix list; a null [4mstr[24m means the default  list.
+
+       [1m-E[4m[22mstr[24m  Use  editor setting given by [4mstr[24m (default: the value of the [1mEDI-[0m
+              [1mTOR [22menvironment variable).  Any occurrences of [1m%d [22mand [1m%s [22min  the
+              editor option are replaced by the start line number and the name
+              of the file to be edited, respectively.  A common setting is "[4mvi[0m
+              [4m+%d[24m [4m%s[24m".
+
+       [1m-c[4m[22mnum[24m  Set constraint cutoff limit in the type checker to [4mnum[24m (default:
+              40).
+
+       [1m-F[4m[22mcmd[24m  Set preprocessor filter  for  source  files  to  [4mcmd[24m  (unset  by
+              default).   Instead of reading a source file directly, [4mHugs[24m will
+              read the standard output of [4mcmd[24m run with the source file name as
+              argument.
+
+[1mCOMMANDS[0m
+       Once the interpreter has been loaded, the following commands are avail-
+       able:
+
+       [1m:load [22m[[4mmodules[24m]   clear all modules except the prelude,  and  load  the
+                         specified modules.
+
+       [1m:also [4m[22mmodules[24m     read additional modules.
+
+       [1m:reload           [22mrepeat last [1mload [22mcommand.
+
+       [1m:edit [4m[22mfile[24m        edit [4mfile[24m.
+
+       [1m:edit             [22medit last file.
+
+       [1m:module [4m[22mmodule[24m    set module for evaluating expressions.
+
+       [4mexpr[24m              evaluate expression.
+
+       [1m:type [4m[22mexpr[24m        print type of expression.
+
+       [1m:?                [22mdisplay this list of commands.
+
+       [1m:set [4m[22moptions[24m      set command line options.
+
+       [1m:set              [22mhelp on command line options.
+
+       [1m:names [22m[[4mpatterns[24m] list  names  currently  in  scope matching any of the
+                         shell-style patterns.
+
+       [1m:info [4m[22mnames[24m       describe named objects.
+
+       [1m:browse [4m[22mmodules[24m   browse names exported by [4mmodules[24m.
+
+       [1m:find [4m[22mname[24m        edit file containing definition of [4mname[24m.
+
+       [1m:![4m[22mcommand[24m         shell escape.
+
+       [1m:cd [4m[22mdir[24m           change directory.
+
+       [1m:gc               [22mforce garbage collection.
+
+       [1m:version          [22mprint Hugs version.
+
+       [1m:quit             [22mexit Hugs interpreter.
+
+       Any command may be abbreviated to [1m:[4m[22mc[24m where [4mc[24m is the first character  in
+       the  full name.  On most systems, you can also exit from [4mHugs[24m by typing
+       the end-of-file character (^D).
+
+       Note that the interrupt key (^C on most systems) can  be  used  at  any
+       time  whilst using [4mHugs[24m to abandon the process of reading in a file  of
+       function definitions or the evaluation  of  an  expression.   When  the
+       interrupt  is  detected,  [4mHugs[24m  prints  the string "[1m{Interrupted!}[22m" and
+       prints the prompt so that further commands can be entered.
+
+[1mSTANDALONE PROGRAMS[0m
+       The [4mrunhugs[24m command is an interpreter for an  executable  Hugs  script,
+       which  must contain a Haskell [1mMain [22mmodule.  For example, the executable
+       file [1mhello [22mmight contain the lines
+
+              [1m#!/usr/local/bin/runhugs +l[0m
+
+              [1m> module Main where[0m
+              [1m> main = putStr "Hello, World\n"[0m
+
+       When this file is executed, [4mrunhugs[24m will invoke the [1mmain [22mfunction.  Any
+       arguments  given on the command line will be available through getArgs[1m.[0m
+
+[1mC INTERFACE[0m
+       On architectures that support dynamic linking, [4mHugs[24m implements the part
+       of  the [4mHaskell[24m [4m98[24m [4mForeign[24m [4mFunction[24m [4mInterface[24m (FFI) that allows Haskell
+       functions to call C routines.  (On the x86, PowerPC and Sparc architec-
+       tures, all [1mforeign import [22mare supported; on others, only [1mstatic [22mimports
+       are provided.)  Modules containing such [1mforeign  [22mdeclarations  must  be
+       compiled  using  the  [4mffihugs[24m  command  with the [1m+G [22moption.  Additional
+       arguments for the C compiler may be  supplied  with  [1m+L  [22moptions.   For
+       example,  suppose you have some C functions in [1mtest.c [22mand some FFI dec-
+       larations for those functions in [1mTest.hs [22mand the code in  [1mtest.c  [22mneeds
+       to  be  compiled  with [1m-lm[22m.  Then you would compile the module with the
+       command
+
+              [1mffihugs +G +L"test.c" +L"-lm" Test.hs[0m
+
+       which generates an object file [1mTest.so[22m.  Then when [4mhugs[24m loads  [1mTest.hs[22m,
+       it will also load [1mTest.so[22m.
+
+[1mENVIRONMENT[0m
+       [1mHUGSFLAGS[0m
+              Additional  options  for [4mhugs[24m, processed before any given on the
+              command line.
+
+       [1mHUGSDIR[0m
+              The Hugs library directory (default: [1m/usr/local/lib/hugs[22m).
+
+       [1mEDITOR [22mThe default editor, if [1m-E [22mis not given.
+
+       [1mSHELL  [22mUsed to specify the shell that is invoked by the [1m:! [22mcommand.
+
+[1mFILES[0m
+       [4m/usr/local/bin/hugs[0m
+              executable binary.
+
+       [4m/usr/local/lib/hugs[0m
+              directory containing support files.
+
+[1mWEB REFERENCES[0m
+       [4mhttp://www.haskell.org/hugs/[0m
+              The Hugs home page.
+
+       [4mhttp://www.haskell.org/[0m
+              The Haskell home page, including the language definition,  vari-
+              ous mailing lists and much more.
+
+[1mSEE ALSO[0m
+       Mark P. Jones et al. [4mHugs[24m [4m98[24m [4mUser[24m [4mManual[24m, June 1999.
+
+       [4mHugs[24m [4m98[24m [4mUser's[24m [4mGuide[24m (distributed with Hugs).
+
+       Paul  Hudak  & Joseph H. Fasel.  A gentle introduction to Haskell.  [4mACM[0m
+       [4mSIGPLAN[24m [4mNotices[24m, 27(5), May 1992.
+
+       S. Peyton Jones (editor).   [4mHaskell[24m  [4m98[24m  [4mLanguage[24m  [4mand[24m  [4mLibraries:[24m  [4mThe[0m
+       [4mRevised[24m [4mReport[24m.  December 2002.
+
+       Manuel  Chakravarty  et al.  [4mHaskell[24m [4m98[24m [4mForeign[24m [4mFunction[24m [4mInterface[24m [4m1.0[24m,
+       [4mAddendum[24m [4mto[24m [4mthe[24m [4mHaskell[24m [4mReport[24m, September 2003.
+
+[1mAUTHOR[0m
+       Hugs 98: Mark Jones and others, June 1999.
+
+       Manual page: Jonathan Bowen, modified by Gary Leavens, and  then  (with
+       apologies  to the original authors) by Mark Jones.  Updated for Hugs 98
+       by Antti-Juhani Kaijanaho and Ross Paterson.
+
+                                September 2003                         HUGS(1)

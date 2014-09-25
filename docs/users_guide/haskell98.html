@@ -1,0 +1,753 @@
+<HTML
+><HEAD
+><TITLE
+>Hugs vs Haskell 98 and addenda</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Compiling modules that use the Foreign Function Interface"
+HREF="ffihugs.html"><LINK
+REL="NEXT"
+TITLE="Addenda to Haskell 98"
+HREF="addenda.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ffihugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="addenda.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="HASKELL98"
+>Chapter 4. Hugs <I
+CLASS="FOREIGNPHRASE"
+>vs</I
+> Haskell 98 and addenda</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>4.1. <A
+HREF="haskell98.html#BUGS-HASKELL98"
+>Haskell 98 non-compliance</A
+></DT
+><DT
+>4.2. <A
+HREF="addenda.html"
+>Addenda to Haskell 98</A
+></DT
+></DL
+></DIV
+><P
+>In <TT
+CLASS="OPTION"
+>+98</TT
+> mode, Hugs supports
+<A
+HREF="http://www.haskell.org/definition/"
+TARGET="_top"
+>Haskell 98</A
+>
+and some standardized extensions
+(described by addenda to the Haskell 98 report).</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BUGS-HASKELL98"
+>4.1. Haskell 98 non-compliance</A
+></H1
+><P
+>Hugs deviates from Haskell 98 in a few minor ways,
+listed here corresponding to the relevant sections of the Report.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BUGS-LEXICAL"
+>4.1.1. Lexical structure</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Restricted character set</DT
+><DD
+><P
+>The Haskell report specifies that programs may be written using Unicode.
+Hugs only accepts the ISO8859-1 (Latin-1) subset at the moment.</P
+></DD
+><DT
+>Floating point literals</DT
+><DD
+><P
+>Hugs is confused by such things as
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>0xy</TT
+>"</SPAN
+>,
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>0oy</TT
+>"</SPAN
+>,
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>9e+y</TT
+>"</SPAN
+> and
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>9.0e+y</TT
+>"</SPAN
+>,
+because it doesn't look far enough ahead.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BUGS-SYNTAX"
+>4.1.2. Expressions</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Interaction of fixities with the
+<TT
+CLASS="LITERAL"
+>let</TT
+>/lambda meta-rule</DT
+><DD
+><P
+>Hugs doesn't use the fixity of operators until after parsing, and so
+fails to accept legal (but weird) Haskell 98 expressions like
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  let x = True in x == x == True</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+>Restricted syntax for left sections</DT
+><DD
+><P
+>In Hugs, the expression must be an fexp
+(or <TT
+CLASS="LITERAL"
+>case</TT
+> or <TT
+CLASS="LITERAL"
+>do</TT
+>).
+Legal expressions like <TT
+CLASS="LITERAL"
+>(a+b+)</TT
+>) and
+<TT
+CLASS="LITERAL"
+>(a*b+)</TT
+>) are rejected.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BUGS-TYPES"
+>4.1.3. Declarations and bindings</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Slight relaxation of polymorphic recursion</DT
+><DD
+><P
+>Hugs's treatment of polymorphic recursion is less restrictive than Haskell 98
+when the functions involved are mutually recursive.
+Consider the following example:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  data BalancedTree a = Zero a | Succ (BalancedTree (a,a))
+
+  zig :: BalancedTree a -&#62; a
+  zig (Zero a) = a
+  zig (Succ t) = fst (zag t)
+
+  zag (Zero a) = a
+  zag (Succ t) = snd (zig t)</PRE
+></TD
+></TR
+></TABLE
+>
+As with many operations on non-regular (or nested) types,
+<TT
+CLASS="LITERAL"
+>zig</TT
+> and <TT
+CLASS="LITERAL"
+>zag</TT
+>
+need to be polymorphic in the element type.
+In Haskell 98, the bindings of the two functions are interdependent,
+and thus constitute a single binding group.
+When type inference is performed on this group,
+<TT
+CLASS="LITERAL"
+>zig</TT
+> may be used at different types,
+because it has a user-supplied polymorphic signature.
+However, <TT
+CLASS="LITERAL"
+>zag</TT
+> may not, and the example is rejected,
+unless we add an explicit type signature for <TT
+CLASS="LITERAL"
+>zag</TT
+>.
+(It could be argued that this is a bug in Haskell 98.)</P
+><P
+>In Hugs, the binding of <TT
+CLASS="LITERAL"
+>zig</TT
+> depends on that of
+<TT
+CLASS="LITERAL"
+>zag</TT
+>, but not vice versa.
+(The binding of <TT
+CLASS="LITERAL"
+>zag</TT
+> is considered to depend only on
+the explicit signature of <TT
+CLASS="LITERAL"
+>zig</TT
+>.)
+It is possible to infer a polymorphic type for <TT
+CLASS="LITERAL"
+>zag</TT
+>,
+and from that for <TT
+CLASS="LITERAL"
+>zig</TT
+>.
+This type matches the declared signature, so Hugs accepts this example.</P
+></DD
+><DT
+>Relaxation of type classes</DT
+><DD
+><P
+>Contrary to the the Report (4.3.1), Hugs allows the types of the member
+functions of a class <TT
+CLASS="REPLACEABLE"
+><I
+>C</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+>
+to impose further constraints on <TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+>, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class Foo a where
+    op :: Num a =&#62; a -&#62; a -&#62; a</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+>Different implementation of the monomorphism restriction for top-level bindings</DT
+><DD
+><P
+>For example, Hugs rejects the following example from the
+Haskell 98 Report, 4.5.5:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  module M where
+    import List
+    len1 = genericLength "Hello"
+    len2 = (2*len1) :: Rational</PRE
+></TD
+></TR
+></TABLE
+>
+This module consists of two binding groups, containing <TT
+CLASS="LITERAL"
+>len1</TT
+>
+and <TT
+CLASS="LITERAL"
+>len2</TT
+> respectively.
+Type inference on the first (<TT
+CLASS="LITERAL"
+>len1</TT
+>) triggers the monomorphism
+restriction, so that <TT
+CLASS="LITERAL"
+>len1</TT
+> is assigned the monomorphic type
+<TT
+CLASS="LITERAL"
+>(Num a =&#62; a)</TT
+>.
+The next step differs between Haskell 98 and Hugs:
+<P
+></P
+><UL
+><LI
+><P
+>In Haskell 98,
+type inference is then performed on <TT
+CLASS="LITERAL"
+>len2</TT
+>,
+resolving the type variable <TT
+CLASS="LITERAL"
+>a</TT
+>
+to <TT
+CLASS="LITERAL"
+>Rational</TT
+>, and the module is legal.</P
+></LI
+><LI
+><P
+>In Hugs, the defaulting rule is applied to <TT
+CLASS="LITERAL"
+>len1</TT
+>,
+instantiating the type variable <TT
+CLASS="LITERAL"
+>a</TT
+> to
+<TT
+CLASS="LITERAL"
+>Integer</TT
+>.
+Then type inference on <TT
+CLASS="LITERAL"
+>len2</TT
+> fails.</P
+></LI
+></UL
+></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BUGS-MODULES"
+>4.1.4. Modules</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Implicit module header</DT
+><DD
+><P
+>In Haskell 98, if the module header is omitted, it defaults to
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>module Main(main) where</TT
+>"</SPAN
+>.
+In Hugs it defaults to <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>module Main where</TT
+>"</SPAN
+>,
+because many people test small modules without module headers.</P
+></DD
+><DT
+>Implicit export list</DT
+><DD
+><P
+>In Haskell 98, a missing export list means all names defined in the
+current module.
+In Hugs, it is treated as
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>(module <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+>)</TT
+>"</SPAN
+>,
+where <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+> is the current module.
+This is almost the same, differing only when an imported module is aliased as
+<TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+>.</P
+></DD
+><DT
+>Type synonyms in export and import lists</DT
+><DD
+><P
+>Hugs allows the <TT
+CLASS="REPLACEABLE"
+><I
+>T</I
+></TT
+><TT
+CLASS="LITERAL"
+>(..)</TT
+>
+syntax for type synonyms in export and import lists.
+It also allows the form <TT
+CLASS="REPLACEABLE"
+><I
+>T</I
+></TT
+><TT
+CLASS="LITERAL"
+>()</TT
+>
+for type synonyms in import lists.</P
+></DD
+><DT
+>Mutually recursive modules are not supported</DT
+><DD
+><P
+>Note that although the Haskell 98 specification of the
+<TT
+CLASS="LITERAL"
+>Prelude</TT
+> and library modules is recursive,
+Hugs achieves the same effect by putting most of these definitions
+in a module <TT
+CLASS="LITERAL"
+>Hugs.Prelude</TT
+> that these modules import.</P
+></DD
+><DT
+>Weird treatment of <TT
+CLASS="LITERAL"
+>(:)</TT
+></DT
+><DD
+><P
+>The Hugs prelude exports <TT
+CLASS="LITERAL"
+>(:)</TT
+> as if it were an identifier,
+even though this is not permitted in user-defined modules.
+This means that Hugs incorrectly rejects the following:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  module Foo where
+  import Prelude()
+  cs = 'a':cs</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BUGS-PRIMITIVES"
+>4.1.5. Predefined types and classes</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Unicode is not supported</DT
+><DD
+><P
+>The type <TT
+CLASS="LITERAL"
+>Char</TT
+> is limited to the ISO8859-1 subset of Unicode.</P
+></DD
+><DT
+>Rational literals lose precision</DT
+><DD
+><P
+>In Haskell 98, a floating point literal like <TT
+CLASS="LITERAL"
+>1.234e-5</TT
+>
+stands for <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>fromRational (1234 % 100000000)</TT
+>"</SPAN
+>.
+In particular, if the literal is of <TT
+CLASS="LITERAL"
+>Rational</TT
+> type,
+the fraction is exact.
+In Hugs such literals are stored as double precision floating point numbers.
+If the literal is of <TT
+CLASS="LITERAL"
+>Rational</TT
+> type,
+it usually denotes the same number, but some precision may be lost.</P
+></DD
+><DT
+>Floating point values are printed differently</DT
+><DD
+><P
+>Haskell 98 specifies that <TT
+CLASS="LITERAL"
+>show</TT
+> for floating point numbers
+is the function <TT
+CLASS="LITERAL"
+>Numeric.showFloat</TT
+>,
+but Hugs uses an internal function with slightly different semantics.</P
+></DD
+><DT
+>Derived <TT
+CLASS="LITERAL"
+>Read</TT
+> instances do not work for some infix
+constructors.</DT
+><DD
+><P
+></P
+></DD
+><DT
+>Derived instances for large tuples are not supplied</DT
+><DD
+><P
+>In Haskell 98, all tuple types are instances of
+<TT
+CLASS="LITERAL"
+>Eq</TT
+>, <TT
+CLASS="LITERAL"
+>Ord</TT
+>, <TT
+CLASS="LITERAL"
+>Bounded</TT
+>,
+<TT
+CLASS="LITERAL"
+>Read</TT
+>, and <TT
+CLASS="LITERAL"
+>Show</TT
+>
+if all their component types are.
+Hugs defines these instances only for tuple types of size 5 or less
+(3 or less in the small Hugs configuration).</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ffihugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="addenda.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Compiling modules that use the Foreign Function Interface</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Addenda to Haskell 98</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

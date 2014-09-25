@@ -1,0 +1,550 @@
+<HTML
+><HEAD
+><TITLE
+>Type class extensions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"><LINK
+REL="PREVIOUS"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"><LINK
+REL="NEXT"
+TITLE="Quantified types"
+HREF="quantified-types.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 5. Language extensions supported by Hugs and GHC</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="quantified-types.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CLASS-EXTENSIONS"
+>5.2. Type class extensions</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FLEXIBLE-CONTEXTS"
+>5.2.1. More flexible contexts</A
+></H2
+><P
+>In Haskell 98, contexts consist of class constraints
+on type variables applied to zero or more types, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f :: (Functor f, Num (f Int)) =&#62; f String -&#62; f Int -&#62; f Int</PRE
+></TD
+></TR
+></TABLE
+>
+In class and instance declarations only type variables may be constrained.
+With the <TT
+CLASS="OPTION"
+>-98</TT
+> option,
+any type may be constrained by a class, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  g :: (C [a], D (a -&#62; b)) =&#62; [a] -&#62; b</PRE
+></TD
+></TR
+></TABLE
+>
+Classes are not limited to a single argument either
+(see <A
+HREF="class-extensions.html#MULTI-PARAM"
+>Section 5.2.4</A
+>).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FLEXIBLE-INSTANCES"
+>5.2.2. More flexible instance declarations</A
+></H2
+><P
+>In Haskell 98, instances may only be declared for
+a <TT
+CLASS="LITERAL"
+>data</TT
+> or <TT
+CLASS="LITERAL"
+>newtype</TT
+> type constructor
+applied to type variables.
+With the <TT
+CLASS="OPTION"
+>-98</TT
+> option, any type may be made an instance:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  instance Monoid (a -&#62; a) where ...
+  instance Show (Tree Int) where ...
+  instance MyClass a where ...
+  instance C String where</PRE
+></TD
+></TR
+></TABLE
+>
+This relaxation, together with the relaxation of contexts mentioned above,
+makes the checking of constraints undecidable in general
+(because you can now code arbitrary Prolog programs using instances).
+To ensure that type checking terminates,
+Hugs imposes a limit on the depth of constraints it will check,
+and type checking fails if this limit is reached.
+You can raise the limit with the
+<A
+HREF="options.html#OPTION-CONSTRAINT-CUTOFF"
+><TT
+CLASS="OPTION"
+>-c</TT
+></A
+> option,
+but such a failure usually indicates that the type checker wasn't going to
+terminate for the particular constraint problem you set it.</P
+><P
+>Note that GHC implements a different solution, placing syntactic
+restrictions on instances to ensure termination, though you can also
+turn these off, in which case a depth limit like that in Hugs is used.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OVERLAPPING-INSTANCES"
+>5.2.3. Overlapping instances</A
+></H2
+><P
+>With the relaxation on the form of instances discussed in the previous
+section, it seems we could write
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class C a where c :: a
+  instance C (Bool,a) where ...
+  instance C (a,Char) where ...</PRE
+></TD
+></TR
+></TABLE
+>
+but then in the expression <TT
+CLASS="LITERAL"
+>c :: (Bool,Char)</TT
+>,
+either instance could be chosen.
+For this reason, overlapping instances are forbidden:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  ERROR "Test.hs":4 - Overlapping instances for class "C"
+  *** This instance   : C (a,Char)
+  *** Overlaps with   : C (Bool,a)
+  *** Common instance : C (Bool,Char)</PRE
+></TD
+></TR
+></TABLE
+>
+However if the
+<A
+HREF="options.html#OPTION-OVERLAPPING"
+><TT
+CLASS="OPTION"
+>+o</TT
+></A
+> option is set,
+they are permitted when one of the types is a substitution instance of
+the other (but not equivalent to it), as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class C a where toString :: a -&#62; String
+  instance C [Char] where ...
+  instance C a =&#62; C [a] where ...</PRE
+></TD
+></TR
+></TABLE
+>
+Now for the type <TT
+CLASS="LITERAL"
+>[Char]</TT
+>, the first instance is used;
+for any type <TT
+CLASS="LITERAL"
+>[<TT
+CLASS="REPLACEABLE"
+><I
+>t</I
+></TT
+>]</TT
+>,
+where <TT
+CLASS="REPLACEABLE"
+><I
+>t</I
+></TT
+> is a type distinct from
+<TT
+CLASS="LITERAL"
+>Char</TT
+>, the second instance is used.
+Note that the context plays no part in the acceptability of the instances,
+or in the choice of which to use.</P
+><P
+>The above analysis omitted one case, where the type <TT
+CLASS="LITERAL"
+>t</TT
+> is
+a type variable, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f :: C a =&#62; [a] -&#62; String
+  f xs = toString xs</PRE
+></TD
+></TR
+></TABLE
+>
+We cannot decide which instance to choose, so Hugs rejects this definition.
+However if the
+<A
+HREF="options.html#OPTION-OVERLAPPING"
+><TT
+CLASS="OPTION"
+>+O</TT
+></A
+> option is set,
+this declaration is accepted, and the more general instance is selected,
+even though this will be the wrong choice if <TT
+CLASS="LITERAL"
+>f</TT
+> is later
+applied to a list of <TT
+CLASS="LITERAL"
+>Char</TT
+>.</P
+><P
+>Hugs used to have a <TT
+CLASS="OPTION"
+>+m</TT
+> option
+(for multi-instance resolution,
+if Hugs was compiled with <TT
+CLASS="LITERAL"
+>MULTI_INST</TT
+> set),
+which accepted more overlapping instances by deferring the choice between them,
+but it is currently broken.</P
+><P
+>Sometimes one can avoid overlapping instances.
+The particular example discussed above is similar to the situation described
+by the <TT
+CLASS="LITERAL"
+>Show</TT
+> class in the <TT
+CLASS="LITERAL"
+>Prelude</TT
+>.
+However there overlapping instances are avoided by adding the method
+<TT
+CLASS="LITERAL"
+>showList</TT
+> to the class</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="MULTI-PARAM"
+>5.2.4. Multiple parameter type classes</A
+></H2
+><P
+>In Haskell 98, type classes have a single parameter;
+they may be thought of as sets of types.
+In Hugs, they may have one or more parameters,
+corresponding to relations between types, e.g.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class Isomorphic a b where
+    from :: a -&#62; b
+    to :: b -&#62; a</PRE
+></TD
+></TR
+></TABLE
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONAL-DEPENDENCIES"
+>5.2.5. Functional dependencies</A
+></H2
+><P
+>Multiple parameter type classes often lead to ambiguity.
+Functional dependencies (inspired by relational databases)
+provide a partial solution,
+and were introduced in
+<I
+CLASS="CITETITLE"
+>Type Classes with Functional Dependencies</I
+>,
+Mark P. Jones, In
+<I
+CLASS="CITETITLE"
+>Proceedings of the 9th European Symposium on Programming</I
+>, LNCS vol. 1782, Springer 2000.</P
+><P
+>Functional dependencies are introduced by a vertical bar:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class MyClass a b c | a -&#62; b where</PRE
+></TD
+></TR
+></TABLE
+>
+This says that the <TT
+CLASS="LITERAL"
+>b</TT
+> parameter is determined by the
+<TT
+CLASS="LITERAL"
+>a</TT
+> parameter;
+there cannot be two instances of <TT
+CLASS="LITERAL"
+>MyClass</TT
+> with the same
+first parameter and different second parameters.
+The type inference system then uses this information to resolve many
+ambiguities.
+You can have several dependencies:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class MyClass a b c | a -&#62; b, a -&#62; c where</PRE
+></TD
+></TR
+></TABLE
+>
+This example could also be written
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class MyClass a b c | a -&#62; b c where</PRE
+></TD
+></TR
+></TABLE
+>
+Similarly more than one type parameter may appear to the left of the arrow:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class MyClass a b c | a b -&#62; c where</PRE
+></TD
+></TR
+></TABLE
+>
+This says that the <TT
+CLASS="LITERAL"
+>c</TT
+> parameter is determined by the
+<TT
+CLASS="LITERAL"
+>a</TT
+> and <TT
+CLASS="LITERAL"
+>b</TT
+> parameters together;
+there cannot be two instances of <TT
+CLASS="LITERAL"
+>MyClass</TT
+> with the same
+first parameter and second parameters, but different third parameters.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="quantified-types.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Language extensions supported by Hugs and GHC</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Quantified types</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

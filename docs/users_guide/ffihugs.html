@@ -1,0 +1,244 @@
+<HTML
+><HEAD
+><TITLE
+>Compiling modules that use the Foreign Function Interface</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Changing the behaviour of Hugs"
+HREF="options.html"><LINK
+REL="PREVIOUS"
+TITLE="Standalone programs"
+HREF="runhugs.html"><LINK
+REL="NEXT"
+TITLE="Hugs vs Haskell 98 and addenda"
+HREF="haskell98.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="runhugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. Changing the behaviour of Hugs</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="haskell98.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FFIHUGS"
+>3.4. Compiling modules that use the Foreign Function Interface</A
+></H1
+><P
+><B
+CLASS="COMMAND"
+>ffihugs</B
+>  [<TT
+CLASS="OPTION"
+>+G</TT
+>] [<TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+>...] [<TT
+CLASS="OPTION"
+>+L</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>cc-option</I
+></TT
+>...]  <TT
+CLASS="REPLACEABLE"
+><I
+>file</I
+></TT
+> </P
+><P
+>Suppose you have some C functions in <TT
+CLASS="LITERAL"
+>test.c</TT
+>
+and some ffi declarations for those functions in <TT
+CLASS="LITERAL"
+>Test.hs</TT
+>
+and the code in <TT
+CLASS="LITERAL"
+>test.c</TT
+> needs to be
+compiled with <TT
+CLASS="OPTION"
+>-lm</TT
+>.
+To use these with Hugs, you must first use <B
+CLASS="COMMAND"
+>ffihugs</B
+>
+to generate <TT
+CLASS="LITERAL"
+>Test.c</TT
+>, compile it and link it against
+<TT
+CLASS="LITERAL"
+>test.c</TT
+> with <TT
+CLASS="OPTION"
+>-lm</TT
+> to produce
+<TT
+CLASS="LITERAL"
+>Test.so</TT
+>:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  ffihugs +G +L"test.c" +L"-lm" Test.hs </PRE
+></TD
+></TR
+></TABLE
+>
+(If <TT
+CLASS="LITERAL"
+>Test.hs</TT
+> depends on other ffi modules,
+you'll have to compile them first.)
+Now you can run Hugs as normal;
+when <TT
+CLASS="LITERAL"
+>Test.hs</TT
+> is loaded,
+Hugs will load <TT
+CLASS="LITERAL"
+>Test.so</TT
+>.)
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  hugs Test.hs</PRE
+></TD
+></TR
+></TABLE
+>
+and then use the imported or exported functions.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runhugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="haskell98.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Standalone programs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="options.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Hugs <I
+CLASS="FOREIGNPHRASE"
+>vs</I
+> Haskell 98 and addenda</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

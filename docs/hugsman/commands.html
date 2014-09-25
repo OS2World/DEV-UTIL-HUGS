@@ -1,0 +1,742 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="started.html">back</a> | <a href="libs.html">next</a>  <br><hr>
+<a name="commands"></a><a name="sect5"></a>
+<h2>5<tt>&nbsp;&nbsp;</tt>Hugs commands</h2>
+Hugs provides a number of commands that can be used to evaluate
+expressions, to load files, and to inspect or modify the
+behaviour of the system while the interpreter is running.  Almost
+all of the commands in Hugs begin with the <tt>:</tt> character,
+followed by a short command word.  For convenience, all but the first
+letter of a command may be omitted.  For
+example, <tt>:l</tt>, <tt>:s</tt> and <tt>:q</tt> can be used as abbreviations
+for the <tt>:load</tt>, <tt>:set</tt> and <tt>:quit</tt> commands, respectively.<p>
+Most Hugs commands take arguments, separated from the command itself,
+and from one another, by spaces.  The Haskell syntax for string constants
+can be used to enter parts of arguments that contain spaces, newlines, or
+other special characters.  For example, the command:
+
+<tt><br>
+&nbsp;:load&nbsp;My&nbsp;File<br>
+
+
+</tt>will be treated as a command to load two files, <tt>My</tt> and <tt>File</tt>.
+Any of the following commands can be used to load a
+single file, <tt>My&nbsp;File</tt>, whose name includes an embedded space:
+
+<tt><br>
+&nbsp;:load&nbsp;"My&nbsp;File"<br>
+&nbsp;:load&nbsp;"My\SPFile"<br>
+&nbsp;:load&nbsp;"My\&nbsp;&nbsp;\&nbsp;File"<br>
+&nbsp;:load&nbsp;My"&nbsp;"File<br>
+
+
+</tt>You may wish to study the lexical syntax of Haskell strings to
+understand some of these examples. 
+In practice, filenames do not usually include spaces or special
+characters and can be entered without surrounding quotes, as in:
+
+<tt><br>
+&nbsp;:load&nbsp;fact.hs<br>
+
+
+</tt>The full set of Hugs commands is described in the following sections.<p>
+<a name="sect5.1"></a>
+<h3>5.1<tt>&nbsp;&nbsp;</tt>Basic commands</h3><p>
+<table border=2 cellpadding=3>
+<tr><td><I>Evaluate expression</I> expr</td></tr></table>
+
+
+To evaluate an expression, the user simply enters it at the Hugs
+prompt.
+This is treated as a special case, without the leading colon that
+is required for other commands.  The expression
+must fit on a single line; there is no way to continue an expression
+onto the next line of input to the interpreter.  The actual
+behaviour of the evaluator depends on the type of expr:
+
+<UL><LI>If expr has type <tt>IO&nbsp;t</tt>, for some type <tt>t</tt>,
+then it will be
+treated as a program using the I/O facilities provided by the
+Haskell <tt>IO</tt> monad.  Any final result
+produced by the computation will be discarded.
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;putStr&nbsp;"Hello,&nbsp;world"<br>
+&nbsp;Hello,&nbsp;world<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt><LI>In any other case, the value produced by the expression is
+converted to a string by applying the <tt>show</tt> function from the
+standard prelude, and the interpreter uses this to
+print the result. 
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;"Hello"&nbsp;++&nbsp;",&nbsp;"&nbsp;++&nbsp;"world"<br>
+&nbsp;"Hello,&nbsp;world"<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>Unlike some previous versions of Hugs, there is no
+special treatment for values of type <tt>String</tt>; to display a string
+without the enclosing quotes and special escapes, you should turn it
+into a program using the <tt>putStr</tt> function,
+as shown above.
+</UL>
+The interpreter will not evaluate an expression that contains a syntax
+error, a type error, or a reference to an undefined variable:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;[1..)<br>
+&nbsp;ERROR:&nbsp;Syntax&nbsp;error&nbsp;in&nbsp;expression&nbsp;(unexpected&nbsp;`)')<br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;'a'<br>
+&nbsp;ERROR:&nbsp;Type&nbsp;error&nbsp;in&nbsp;application<br>
+&nbsp;***&nbsp;expression&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;sum&nbsp;'a'<br>
+&nbsp;***&nbsp;term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;'a'<br>
+&nbsp;***&nbsp;type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Char<br>
+&nbsp;***&nbsp;does&nbsp;not&nbsp;match&nbsp;:&nbsp;[a]<br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;[1..n]<br>
+&nbsp;ERROR:&nbsp;Undefined&nbsp;variable&nbsp;"n"<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>Another common problem occurs if there is no <tt>show</tt> function for the
+expression entered---that is, if its type is not an instance of the
+<tt>Show</tt> class.  For example, suppose that a module defines a
+type <tt>T</tt> without a <tt>Show</tt> instance:
+
+<tt><br>
+&nbsp;module&nbsp;Test&nbsp;where<br>
+&nbsp;data&nbsp;T&nbsp;=&nbsp;A&nbsp;|&nbsp;B<br>
+
+
+</tt>With just these definitions, any attempt to evaluate an expression of
+type <tt>T</tt> will cause an error:
+
+<tt><br>
+&nbsp;Test&gt;&nbsp;A<br>
+&nbsp;ERROR:&nbsp;Cannot&nbsp;find&nbsp;"show"&nbsp;function&nbsp;for:<br>
+&nbsp;***&nbsp;expression&nbsp;:&nbsp;A<br>
+&nbsp;***&nbsp;of&nbsp;type&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;T<br>
+&nbsp;Test&gt;&nbsp;<br>
+
+
+</tt>To avoid problems like this, you
+will need to add an instance of the <tt>Show</tt> class
+to your program.  One of the simplest ways to do that is to request
+a derived instance of <tt>Show</tt> as part of the datatype definition,
+as in:
+
+<tt><br>
+&nbsp;module&nbsp;Test&nbsp;where<br>
+&nbsp;data&nbsp;T&nbsp;=&nbsp;A&nbsp;|&nbsp;B&nbsp;&nbsp;deriving&nbsp;Show<br>
+
+
+</tt>Once this has been loaded, Hugs will
+evaluate and display values of type <tt>T</tt>:
+
+<tt><br>
+&nbsp;Test&gt;&nbsp;A<br>
+&nbsp;A<br>
+&nbsp;Test&gt;&nbsp;take&nbsp;5&nbsp;(cycle&nbsp;[A,B])<br>
+&nbsp;[A,&nbsp;B,&nbsp;A,&nbsp;B,&nbsp;A]<br>
+&nbsp;Test&gt;<br>
+<p>
+</tt>You should also note that the behaviour of the evaluator can be changed
+while the interpreter is running by using
+the <tt>:set</tt> command to
+modify option settings.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>View or change settings</I> :set [options]</td></tr></table>
+
+Without any arguments, the <tt>:set</tt> command displays a list of
+the options and their current settings.
+The following output shows the settings on a typical machine:
+
+<tt><br>
+Prelude&gt;&nbsp;:set<br>
+&nbsp;TOGGLES:&nbsp;groups&nbsp;begin&nbsp;with&nbsp;+/-&nbsp;to&nbsp;turn&nbsp;options&nbsp;on/off&nbsp;resp.<br>
+&nbsp;s&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;no.&nbsp;reductions/cells&nbsp;after&nbsp;eval<br>
+&nbsp;t&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;type&nbsp;after&nbsp;evaluation<br>
+&nbsp;f&nbsp;&nbsp;&nbsp;&nbsp;Terminate&nbsp;evaluation&nbsp;on&nbsp;first&nbsp;error<br>
+&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;no.&nbsp;cells&nbsp;recovered&nbsp;after&nbsp;gc<br>
+&nbsp;l&nbsp;&nbsp;&nbsp;&nbsp;Literate&nbsp;modules&nbsp;as&nbsp;default<br>
+&nbsp;e&nbsp;&nbsp;&nbsp;&nbsp;Warn&nbsp;about&nbsp;errors&nbsp;in&nbsp;literate&nbsp;modules<br>
+&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;dots&nbsp;to&nbsp;show&nbsp;progress<br>
+&nbsp;q&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;nothing&nbsp;to&nbsp;show&nbsp;progress<br>
+&nbsp;w&nbsp;&nbsp;&nbsp;&nbsp;Always&nbsp;show&nbsp;which&nbsp;modules&nbsp;are&nbsp;loaded<br>
+&nbsp;k&nbsp;&nbsp;&nbsp;&nbsp;Show&nbsp;kind&nbsp;errors&nbsp;in&nbsp;full<br>
+&nbsp;u&nbsp;&nbsp;&nbsp;&nbsp;Use&nbsp;"show"&nbsp;to&nbsp;display&nbsp;results<br>
+&nbsp;i&nbsp;&nbsp;&nbsp;&nbsp;Chase&nbsp;imports&nbsp;while&nbsp;loading&nbsp;modules<br>
+&nbsp;<br>
+<br>
+&nbsp;OTHER&nbsp;OPTIONS:&nbsp;(leading&nbsp;+&nbsp;or&nbsp;-&nbsp;makes&nbsp;no&nbsp;difference)<br>
+&nbsp;hnum&nbsp;Set&nbsp;heap&nbsp;size&nbsp;(cannot&nbsp;be&nbsp;changed&nbsp;within&nbsp;Hugs)<br>
+&nbsp;pstr&nbsp;Set&nbsp;prompt&nbsp;string&nbsp;to&nbsp;str<br>
+&nbsp;rstr&nbsp;Set&nbsp;repeat&nbsp;last&nbsp;expression&nbsp;string&nbsp;to&nbsp;str<br>
+&nbsp;Pstr&nbsp;Set&nbsp;search&nbsp;path&nbsp;for&nbsp;modules&nbsp;to&nbsp;str<br>
+&nbsp;Estr&nbsp;Use&nbsp;editor&nbsp;setting&nbsp;given&nbsp;by&nbsp;str<br>
+&nbsp;cnum&nbsp;Set&nbsp;constraint&nbsp;cutoff&nbsp;limit<br>
+&nbsp;Fstr&nbsp;Set&nbsp;preprocessor&nbsp;filter&nbsp;to&nbsp;str<br>
+&nbsp;<br>
+&nbsp;Current&nbsp;settings:&nbsp;+fewkui&nbsp;-stgl.q&nbsp;-h250000&nbsp;-p"%s&gt;&nbsp;"&nbsp;-r$$&nbsp;-c40<br>
+&nbsp;Search&nbsp;path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;-P{Hugs}\lib;{Hugs}\lib\hugs;{Hugs}\lib\exts<br>
+&nbsp;Editor&nbsp;setting&nbsp;&nbsp;:&nbsp;-E"vi&nbsp;+%d&nbsp;%s"<br>
+&nbsp;Preprocessor&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;-F<br>
+&nbsp;Compatibility&nbsp;&nbsp;&nbsp;:&nbsp;Haskell&nbsp;98&nbsp;(+98)<br>
+&nbsp;Prelude&gt;<br>
+
+
+
+</tt>The <tt>:set</tt> command can also be used to change options
+by supplying the required settings as arguments.  For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;+st<br>
+&nbsp;Prelude&gt;&nbsp;1&nbsp;+&nbsp;3<br>
+&nbsp;4&nbsp;::&nbsp;Int<br>
+&nbsp;(4&nbsp;reductions,&nbsp;4&nbsp;cells)<br>
+&nbsp;Prelude&gt;<br>
+<p>
+</tt>On Windows 95/NT, all option settings
+are written out to the registry when a <tt>:set</tt> command is
+executed, and will be used by subsequent executions of Hugs.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Shell escape</I> :![command]</td></tr></table>
+
+A <tt>:!</tt>cmd command can be used to execute the system
+command cmd without leaving the Hugs interpreter.  For example,
+<tt>:!ls</tt> (or <tt>:!dir</tt> on DOS machines) can be used to list the
+contents of the current directory.  For convenience, the <tt>:!</tt> command
+can be abbreviated to a single <tt>!</tt> character.<p>
+The <tt>:!</tt> command, without any arguments, starts a new shell:
+
+<UL><LI>On a Unix machine, the <tt>SHELL</tt> environment variable is used to
+determine which shell to use; the default is <tt>/bin/sh</tt>.
+<LI>On an DOS machine, the <tt>COMSPEC</tt> environment variable is used
+to determine which shell to use; this is usually <tt>COMMAND.COM</tt>.
+</UL>
+Most shells provide an <tt>exit</tt> command to terminate the
+shell and return to Hugs.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>List commands</I> :?</td></tr></table>
+
+The <tt>:?</tt> command displays the following summary of all Hugs commands:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:?<br>
+&nbsp;LIST&nbsp;OF&nbsp;COMMANDS:&nbsp;&nbsp;Any&nbsp;command&nbsp;may&nbsp;be&nbsp;abbreviated&nbsp;to&nbsp;:c&nbsp;where<br>
+&nbsp;c&nbsp;is&nbsp;the&nbsp;first&nbsp;character&nbsp;in&nbsp;the&nbsp;full&nbsp;name.<br>
+<br>
+&nbsp;:load&nbsp;&lt;filenames&gt;&nbsp;&nbsp;&nbsp;load&nbsp;modules&nbsp;from&nbsp;specified&nbsp;files<br>
+&nbsp;:load&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clear&nbsp;all&nbsp;files&nbsp;except&nbsp;prelude<br>
+&nbsp;:also&nbsp;&lt;filenames&gt;&nbsp;&nbsp;&nbsp;read&nbsp;additional&nbsp;modules<br>
+&nbsp;:reload&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat&nbsp;last&nbsp;load&nbsp;command<br>
+&nbsp;:project&nbsp;&lt;filename&gt;&nbsp;use&nbsp;project&nbsp;file<br>
+&nbsp;:edit&nbsp;&lt;filename&gt;&nbsp;&nbsp;&nbsp;&nbsp;edit&nbsp;file<br>
+&nbsp;:edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;edit&nbsp;last&nbsp;module<br>
+&nbsp;:module&nbsp;&lt;module&gt;&nbsp;&nbsp;&nbsp;&nbsp;set&nbsp;module&nbsp;for&nbsp;evaluating&nbsp;expressions<br>
+&nbsp;&lt;expr&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;evaluate&nbsp;expression<br>
+&nbsp;:type&nbsp;&lt;expr&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;type&nbsp;of&nbsp;expression<br>
+&nbsp;:?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;display&nbsp;this&nbsp;list&nbsp;of&nbsp;commands<br>
+&nbsp;:set&nbsp;&lt;options&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set&nbsp;command&nbsp;line&nbsp;options<br>
+&nbsp;:set&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;help&nbsp;on&nbsp;command&nbsp;line&nbsp;options<br>
+&nbsp;:names&nbsp;[pat]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list&nbsp;names&nbsp;currently&nbsp;in&nbsp;scope<br>
+&nbsp;:info&nbsp;&lt;names&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;describe&nbsp;named&nbsp;objects<br>
+&nbsp;:browse&nbsp;&lt;modules&gt;&nbsp;&nbsp;&nbsp;browse&nbsp;names&nbsp;defined&nbsp;in&nbsp;&lt;modules&gt;<br>
+&nbsp;:find&nbsp;&lt;name&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;edit&nbsp;module&nbsp;containing&nbsp;definition&nbsp;of&nbsp;name<br>
+&nbsp;:!command&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shell&nbsp;escape<br>
+&nbsp;:cd&nbsp;dir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change&nbsp;directory<br>
+&nbsp;:gc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;force&nbsp;garbage&nbsp;collection<br>
+&nbsp;:version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;Hugs&nbsp;version<br>
+&nbsp;:quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit&nbsp;Hugs&nbsp;interpreter<br>
+&nbsp;Prelude&gt;<br>
+<p>
+</tt><table border=2 cellpadding=3>
+<tr><td><I>Change module</I> :module module</td></tr></table>
+
+A <tt>:module&nbsp;</tt>module command changes the current module to one
+given by module.  This is the module in which evaluation takes
+place and in which objects named in commands are resolved.  The specified
+module must be part of the current program.  If no module is specified, then
+the last module to be loaded is assumed.  (Note that the name of the current
+module is usually displayed as part of the Hugs prompt.)<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Change directory</I> :cd directory</td></tr></table>
+
+A <tt>:cd&nbsp;</tt>dir command changes the current working directory
+to the path given by dir.  If no path is specified, then the
+command is ignored.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Force a garbage collection</I> :gc</td></tr></table>
+
+A <tt>:gc</tt> command can be used to force a garbage collection of the
+interpreter heap, and to print the number of unused cells obtained as a
+result:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:gc<br>
+&nbsp;Garbage&nbsp;collection&nbsp;recovered&nbsp;95766&nbsp;cells<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+<p>
+</tt><table border=2 cellpadding=3>
+<tr><td><I>Exit the interpreter</I> :quit</td></tr></table>
+
+The <tt>:quit</tt> command terminates the current Hugs session.<p>
+<a name="sect5.2"></a>
+<h3>5.2<tt>&nbsp;&nbsp;</tt>Loading and editing modules and projects</h3><p>
+<table border=2 cellpadding=3>
+<tr><td><I>Load definitions from module</I> :load [filename ...]</td></tr></table>
+
+The <tt>:load</tt> command removes any previously loaded modules,
+and then attempts to load the definitions from each of the listed files,
+one after the other.  If one of these files contains an error, then the
+load process is suspended and a suitable error message will be displayed.
+Once the problem has been corrected, the load process can be restarted
+using a <tt>:reload</tt> command.  On some systems,
+the load process will be restarted automatically after
+a <tt>:edit</tt> command.
+(The exception occurs on Windows 95/NT because of the way that the
+interpreter and editor are executed as independent processes.)<p>
+If no file names are specified, the <tt>:load</tt> command just removes
+any previously loaded definitions, leaving just the definitions provided
+by the prelude.<p>
+The <tt>:load</tt> command uses the list of directories specified by
+the current path to search
+for module files.  We can specify the list of directory and filename pairs,
+in the order that they are searched, using a Haskell list comprehension:
+
+<tt><br>
+&nbsp;[&nbsp;(dir,file++suf)&nbsp;|&nbsp;dir&nbsp;&lt;-&nbsp;[""]&nbsp;++&nbsp;path,&nbsp;suf&nbsp;&lt;-&nbsp;["",&nbsp;".hs",&nbsp;".lhs"]]<br>
+
+
+</tt>The <tt>file</tt> mentioned here is the name of the module file that was
+entered by the user, while <tt>path</tt> is the current Hugs search path.
+The search starts with the directory <tt>""</tt>,
+which usually represents a search relative to the current working
+directory.  So, the very first filename that the system tries to load
+is <I>exactly</I> the same filename entered by the user.  However, if
+the named file cannot be accessed, then the system will try adding
+a <tt>.hs</tt> suffix, and then a <tt>.lhs</tt> suffix, and then it will repeat
+the process for each directory in the path, until either a suitable
+file has been located, or, otherwise, until all of the possible choices
+have been tried.
+For example, this means that you do not have to type the <tt>.hs
+</tt>suffix to load a file <tt>Demo.hs</tt> from the current directory,
+provided that you do not already have a <tt>Demo</tt> file in the same
+directory.  In the same way, it is not usually necesary to include
+the full pathname for one of the standard Hugs libraries.  For example,
+provided that you do not have an <tt>Array</tt>, <tt>Array.hs</tt>,
+or <tt>Array.lhs</tt> file in the current working directory, you
+can load the standard <tt>Array</tt> library
+by typing just <tt>:load&nbsp;Array</tt>.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Load additional files</I> :also [filename ...]</td></tr></table>
+
+The <tt>:also</tt> command can be used to load module files, without
+removing any that have previously been loaded.  (However, if any of
+the previously
+modules have been modified since they were last read, then they
+will be reloaded automatically before the additional files are read.)<p>
+If successful, a command of the form <tt>:load&nbsp;f1&nbsp;..&nbsp;fn</tt> is
+equivalent to the sequence of commands:
+
+<tt><br>
+&nbsp;:load<br>
+&nbsp;:also&nbsp;f1<br>
+&nbsp;&nbsp;&nbsp;.<br>
+&nbsp;&nbsp;&nbsp;.<br>
+&nbsp;:also&nbsp;fn<br>
+
+
+</tt>In particular, <tt>:also</tt> uses the same mechanisms
+as <tt>:load</tt> to
+search for modules.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Repeat last load command</I> :reload</td></tr></table>
+
+The <tt>:reload</tt> command can be used to repeat the last load command.
+If none of the previously loaded files has been modified since the last
+time that it was loaded,  then <tt>:reload</tt> will not have any effect.
+However, if one of the modules has been modified, then it will be
+reloaded.  Note that modules are loaded in a specific order,
+with the possibility that later modules may import
+earlier ones.  To allow for this, if one module has been reloaded, then all
+subsequent modules will also be reloaded.<p>
+This feature is particularly useful in a windowing environment.  If the
+interpreter is running in one window, then <tt>:reload</tt> can be used to
+force the interpreter to take account of changes made by editing modules
+in other windows.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Load project</I> :project [project file]</td></tr></table>
+
+Project files were originally introduced to ease the task of working with
+programs whose source code was spread over several files, all of
+which had to be loaded at the same time. The facilities
+for import chasing usually provide
+a much better way to deal with multiple file projects, but the current
+release of Hugs does still support the use of project files.<p>
+The <tt>:project</tt> command takes a single argument; the name of a text
+file containing a list of file names, separated from one another
+by whitespace (which may include spaces, newlines, or Haskell-style
+comments).  For example, the following is a valid project file:
+
+<tt><br>
+&nbsp;{-&nbsp;A&nbsp;simple&nbsp;project&nbsp;file,&nbsp;Demo.prj&nbsp;-}<br>
+&nbsp;Types&nbsp;&nbsp;&nbsp;--&nbsp;datatype&nbsp;definitions<br>
+&nbsp;Basics&nbsp;&nbsp;--&nbsp;basic&nbsp;operations<br>
+&nbsp;Main&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;the&nbsp;main&nbsp;program<br>
+
+
+</tt>If we load this into Hugs with a command <tt>:project&nbsp;Demo.prj</tt>,
+then the interpreter will read the project file and then
+try to load each of the named files.  In this particular case, the overall
+effect is, essentially, the same as that of:
+
+<tt><br>
+&nbsp;:load&nbsp;Types&nbsp;Basics&nbsp;Main<br>
+
+
+</tt>Once a project file has been selected, the <tt>:project</tt> command
+(without any arguments) can be used to force Hugs to reread both the
+project file and the module files that it lists.  This might be useful
+if, for example, the project file itself has been modified since it
+was first read.<p>
+Project file names may also be specified on the command line when the
+interpreter is invoked by preceding the project file name with a single
+<tt>+</tt> character.  Note that there must be at least one space on each side
+of the <tt>+</tt>.  Standard command line
+options can also be used at the
+same time, but additional filename arguments will be ignored.  Starting Hugs
+with a command of the form <tt>hugs&nbsp;+&nbsp;Demo.prj</tt> is equivalent to starting
+Hugs without any arguments and then giving the
+command <tt>:p&nbsp;Demo.prj</tt>.<p>
+The <tt>:project</tt> command uses the same mechanisms
+as <tt>:load</tt> to
+locate the files mentioned in a project file, but it will not use
+the current path to locate
+the project file itself; you must specify a full pathname.<p>
+As has already been said, import chasing usually provides a much better
+way to deal with multiple file programs than the old project file system.
+The big advantage of import chasing is that dependencies between modules
+are documented within individual modules,
+leaving the system free to determine the order in which the files should
+be loaded.  For example, if the <tt>Main</tt> module in the example above
+actually needs the definitions in <tt>Types</tt> and <tt>Basics</tt>, then
+this will be documented by import statements, and the whole program could
+be loaded with a single <tt>:load&nbsp;Main</tt> command.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Edit file</I> :edit [file]</td></tr></table>
+
+The <tt>:edit</tt> command starts an editor program to modify or view a
+module file.  On Windows 95/NT, the editor and interpreter are executed
+as independent processes.  On other systems, the current Hugs session
+will be suspended while the editor is running.  Then, when the editor
+terminates, the Hugs session will be resumed and any files that have
+been changed will be reloaded automatically.
+The <tt>-E</tt> option should be used to configure Hugs to
+your preferred choice of editor.<p>
+If no filename is specified, then Hugs uses the name of the last
+file that it tried to load.  This allows the <tt>:edit</tt> command
+to integrate smoothly with the facilities for loading files.<p>
+For example, suppose that you want to load four
+files, <tt>f1.hs</tt>, <tt>f2.hs</tt>, <tt>f3.hs</tt> and <tt>f4.hs</tt> into the
+interpreter, but the file <tt>f3.hs</tt> contains an error of some kind.
+If you give the command:
+
+<tt><br>
+&nbsp;:load&nbsp;f1&nbsp;f2&nbsp;f3&nbsp;f4<br>
+
+
+</tt>then Hugs will successfully load <tt>f1.hs</tt> and <tt>f2.hs</tt>, but will
+abort the load command when it encounters the error in <tt>f3.hs</tt>,
+printing an error message to describe the problem that occured.
+Now, if you use the command:
+
+<tt><br>
+&nbsp;:edit<br>
+
+
+</tt>then Hugs will start up the editor with the cursor positioned at the
+relevant line of <tt>f3.hs</tt> (whenever this is possible) so that the
+error can be corrected and the changes saved in <tt>f3.hs</tt>.
+When you close down the editor and return to Hugs, the
+interpreter will automatically attempt to reload <tt>f3.hs</tt> and then,
+if successful, go on to load the next file, <tt>f4.hs</tt>.
+So, after just two commands in Hugs, the error in <tt>f3.hs</tt> has been
+corrected and all four of the files listed on the original command
+line have been loaded into the interpreter, ready for use.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Find definition</I> :find name</td></tr></table>
+
+The <tt>:find&nbsp;</tt>name command starts up the editor at the definition
+of a type constructor or function, specified by the argument name,
+in one of the files currently loaded into Hugs.  Note that Hugs must be
+configured with an appropriate editor for
+this to work properly.
+There are four possibilities:
+
+<UL><LI>If there is a type constructor with the specified name, then
+the cursor will be positioned at the first line in the definition of
+that type constructor.
+<LI>If the name is defined by a function or variable binding, then
+the cursor will be positioned at the first line in the definition of
+the function or variable (ignoring any type declaration, if present).
+<LI>If the name is a constructor function or a selector function
+associated with a particular datatype, then the cursor will be
+positioned at the first line in the definition of the
+corresponding datatype definition.
+<LI>If the name represents an internal Hugs function, then the
+cursor will be positioned at the beginning of the standard
+prelude file.
+</UL>
+Note that names of infix operators should be given without any
+enclosing them in parentheses.  Thus <tt>:f&nbsp;!!</tt> starts an editor on the
+standard prelude at the first line in the definition of <tt>(!!)</tt>.
+If a given name could be interpreted both as a type constructor and as
+a value constructor, then the former is assumed.<p>
+<a name="sect5.3"></a>
+<h3>5.3<tt>&nbsp;&nbsp;</tt>Finding information about the system</h3><p>
+<table border=2 cellpadding=3>
+<tr><td><I>List names</I> :names [pattern ...]</td></tr></table>
+
+The <tt>:names</tt> command can be used to list the names of variables and
+functions whose definitions are currently loaded into the interpreter.
+Without any arguments, <tt>:names</tt> produces a list of all names known
+to the system; the names are listed in alphabetical order.<p>
+The <tt>:names</tt> command can also accept one or more pattern strings,
+limiting the list of names that will be printed to those matching one or more
+of the given pattern strings:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:n&nbsp;fold*<br>
+&nbsp;foldl&nbsp;foldl'&nbsp;foldl1&nbsp;foldr&nbsp;foldr1<br>
+&nbsp;(5&nbsp;names&nbsp;listed)<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Each pattern string consists of a string of characters and may use
+standard wildcard syntax: <tt>*</tt> (matches anything), <tt>?</tt> (matches
+any single character), <tt>\c</tt> (matches exactly the character <tt>c</tt>)
+and ranges of characters of the form <tt>[a-zA-Z]</tt>, etc.  For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:n&nbsp;*map*&nbsp;*[Ff]ile&nbsp;?<br>
+&nbsp;$&nbsp;%&nbsp;*&nbsp;+&nbsp;-&nbsp;.&nbsp;/&nbsp;:&nbsp;&lt;&nbsp;&gt;&nbsp;appendFile&nbsp;map&nbsp;mapM&nbsp;mapM_&nbsp;readFile&nbsp;writeFile&nbsp;^<br>
+&nbsp;(17&nbsp;names&nbsp;listed)<br>
+&nbsp;Prelude&gt;<br>
+<p>
+</tt><table border=2 cellpadding=3>
+<tr><td><I>Print type of expression</I> :type expr</td></tr></table>
+
+The <tt>:type</tt> command can be used to print the type of an expression
+without evaluating it.  For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:t&nbsp;"hello,&nbsp;world"<br>
+&nbsp;"hello,&nbsp;world"&nbsp;::&nbsp;String<br>
+&nbsp;Prelude&gt;&nbsp;:t&nbsp;putStr&nbsp;"hello,&nbsp;world"<br>
+&nbsp;putStr&nbsp;"hello,&nbsp;world"&nbsp;::&nbsp;IO&nbsp;()<br>
+&nbsp;Prelude&gt;&nbsp;:t&nbsp;sum&nbsp;[1..10]<br>
+&nbsp;sum&nbsp;(enumFromTo&nbsp;1&nbsp;10)&nbsp;::&nbsp;(Num&nbsp;a,&nbsp;Enum&nbsp;a)&nbsp;=&gt;&nbsp;a<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Note that Hugs displays the most general type that can be inferred
+for each expression.  For example, compare the type inferred
+for <tt>sum&nbsp;[1..10]</tt> above with the type printed by the evaluator
+(using <tt>:set&nbsp;+t</tt>):
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;+t<br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;[1..10]<br>
+&nbsp;55&nbsp;::&nbsp;Int<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>The difference is explained by the fact that the evaluator uses the Haskell
+default mechanism to instantiate the type variable <tt>a</tt> in the most
+general type to the type <tt>Int</tt>, avoiding an error with unresolved
+overloading.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Display information about names</I> :info [name ...]</td></tr></table>
+
+The <tt>:info</tt> command is useful for obtaining information about the
+files, classes, types and values that are currently loaded.<p>
+If there are no arguments, then <tt>:info</tt> prints a list of all the
+files that are currently loaded into the interpreter.
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;Demo.hs<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>If there are arguments, then Hugs treats each one as a name, and displays
+information about any corresponding type constructor, class, or function.
+The following examples show the the kind of output that you can expect:
+
+<UL><LI>Datatypes:  The system displays the name of the datatype, the names
+and types of any constructors or selectors, and a summary of related
+instance declarations:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info&nbsp;Either<br>
+&nbsp;--&nbsp;type&nbsp;constructor<br>
+&nbsp;data&nbsp;Either&nbsp;a&nbsp;b<br>
+<br>
+&nbsp;--&nbsp;constructors:<br>
+&nbsp;Left&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Either&nbsp;a&nbsp;b<br>
+&nbsp;Right&nbsp;::&nbsp;b&nbsp;-&gt;&nbsp;Either&nbsp;a&nbsp;b<br>
+<br>
+&nbsp;--&nbsp;instances:<br>
+&nbsp;instance&nbsp;(Eq&nbsp;b,&nbsp;Eq&nbsp;a)&nbsp;=&gt;&nbsp;Eq&nbsp;(Either&nbsp;a&nbsp;b)<br>
+&nbsp;instance&nbsp;(Ord&nbsp;b,&nbsp;Ord&nbsp;a)&nbsp;=&gt;&nbsp;Ord&nbsp;(Either&nbsp;a&nbsp;b)<br>
+&nbsp;instance&nbsp;(Read&nbsp;b,&nbsp;Read&nbsp;a)&nbsp;=&gt;&nbsp;Read&nbsp;(Either&nbsp;a&nbsp;b)<br>
+&nbsp;instance&nbsp;(Show&nbsp;b,&nbsp;Show&nbsp;a)&nbsp;=&gt;&nbsp;Show&nbsp;(Either&nbsp;a&nbsp;b)<br>
+&nbsp;instance&nbsp;Eval&nbsp;(Either&nbsp;a&nbsp;b)<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Newtypes are dealt with in exactly the same way.
+For a simple example of a datatype with selectors, the output produced
+for a <tt>Time</tt> datatype:
+
+<tt><br>
+&nbsp;data&nbsp;Time&nbsp;=&nbsp;MkTime&nbsp;{&nbsp;hours,&nbsp;mins,&nbsp;secs&nbsp;::&nbsp;Int&nbsp;}<br>
+
+
+</tt>is as follows:
+
+<tt><br>
+&nbsp;Time&gt;&nbsp;:info&nbsp;Time<br>
+&nbsp;--&nbsp;type&nbsp;constructor<br>
+&nbsp;data&nbsp;Time<br>
+&nbsp;<br>
+&nbsp;--&nbsp;constructors:<br>
+&nbsp;MkTime&nbsp;::&nbsp;Int&nbsp;-&gt;&nbsp;Int&nbsp;-&gt;&nbsp;Int&nbsp;-&gt;&nbsp;Time<br>
+&nbsp;<br>
+&nbsp;--&nbsp;selectors:<br>
+&nbsp;hours&nbsp;::&nbsp;Time&nbsp;-&gt;&nbsp;Int<br>
+&nbsp;mins&nbsp;::&nbsp;Time&nbsp;-&gt;&nbsp;Int<br>
+&nbsp;secs&nbsp;::&nbsp;Time&nbsp;-&gt;&nbsp;Int<br>
+&nbsp;<br>
+&nbsp;--&nbsp;instances:<br>
+<br>
+&nbsp;instance&nbsp;Eval&nbsp;Time<br>
+&nbsp;<br>
+&nbsp;Time&gt;<br>
+
+
+</tt><LI>Type synonyms:  The system displays the name and expansion:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info&nbsp;String<br>
+&nbsp;--&nbsp;type&nbsp;constructor<br>
+&nbsp;type&nbsp;String&nbsp;=&nbsp;[Char]<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>The expansion is not included in the output if the synonym is
+restricted. <LI>Type classes: The system lists the name, superclasses, members, and
+instance declarations for the specified class:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info&nbsp;Num<br>
+&nbsp;--&nbsp;type&nbsp;class<br>
+&nbsp;class&nbsp;(Eq&nbsp;a,&nbsp;Show&nbsp;a,&nbsp;Eval&nbsp;a)&nbsp;=&gt;&nbsp;Num&nbsp;a&nbsp;where<br>
+&nbsp;&nbsp;&nbsp;(+)&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;(-)&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;(*)&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;negate&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;abs&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;signum&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;fromInteger&nbsp;::&nbsp;Integer&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;fromInt&nbsp;::&nbsp;Int&nbsp;-&gt;&nbsp;a<br>
+<br>
+&nbsp;--&nbsp;instances:<br>
+&nbsp;instance&nbsp;Num&nbsp;Int<br>
+&nbsp;instance&nbsp;Num&nbsp;Integer<br>
+&nbsp;instance&nbsp;Num&nbsp;Float<br>
+&nbsp;instance&nbsp;Num&nbsp;Double<br>
+&nbsp;instance&nbsp;Integral&nbsp;a&nbsp;=&gt;&nbsp;Num&nbsp;(Ratio&nbsp;a)<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt><LI>Other values: For example, named functions and individual
+constructor, selector, and member functions are displayed with their name
+and type:
+
+<tt><br>
+&nbsp;Time&gt;&nbsp;:info&nbsp;.&nbsp;:&nbsp;hours&nbsp;min<br>
+&nbsp;(.)&nbsp;::&nbsp;(a&nbsp;-&gt;&nbsp;b)&nbsp;-&gt;&nbsp;(c&nbsp;-&gt;&nbsp;a)&nbsp;-&gt;&nbsp;c&nbsp;-&gt;&nbsp;b<br>
+<br>
+&nbsp;(:)&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]	&nbsp;--&nbsp;data&nbsp;constructor<br>
+<br>
+&nbsp;hours&nbsp;::&nbsp;Time&nbsp;-&gt;&nbsp;Int&nbsp;&nbsp;--&nbsp;selector&nbsp;function<br>
+<br>
+&nbsp;min&nbsp;::&nbsp;Ord&nbsp;a&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;&nbsp;--&nbsp;class&nbsp;member<br>
+<br>
+&nbsp;Time&gt;<br>
+
+
+</tt></UL>
+As the last example shows, the <tt>:info</tt> command can take several arguments
+and prints out information about each in turn.	A warning message is
+displayed if there are no known references to an argument:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info&nbsp;(:)<br>
+&nbsp;Unknown&nbsp;reference&nbsp;`(:)'<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>This illustrates that the arguments are treated as textual names for
+operators, not syntactic expressions (for example, identifiers). The
+type of the <tt>(:)</tt> operator can be obtained using the command
+<tt>:info&nbsp;:</tt> as above.  There is no provision for including wildcard
+characters of any form in the arguments of <tt>:info</tt> commands.<p>
+If a particular argument can be interpreted as, for example, both a
+constructor function, and a type constructor, depending on context, then
+the output for both possibilities will be displayed.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Display names defined in modules</I> :browse [module ...]</td></tr></table>
+
+The <tt>:browse</tt> command can be used to display the list of
+functions that are exported from the named modules:
+
+<tt><br>
+&nbsp;List&gt;&nbsp;:browse&nbsp;Maybe<br>
+&nbsp;module&nbsp;Maybe&nbsp;where<br>
+&nbsp;mapMaybe&nbsp;::&nbsp;(a&nbsp;-&gt;&nbsp;Maybe&nbsp;b)&nbsp;-&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[b]<br>
+&nbsp;catMaybes&nbsp;::&nbsp;[Maybe&nbsp;a]&nbsp;-&gt;&nbsp;[a]<br>
+&nbsp;listToMaybe&nbsp;::&nbsp;[a]&nbsp;-&gt;&nbsp;Maybe&nbsp;a<br>
+&nbsp;maybeToList&nbsp;::&nbsp;Maybe&nbsp;a&nbsp;-&gt;&nbsp;[a]<br>
+&nbsp;fromMaybe&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Maybe&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;fromJust&nbsp;::&nbsp;Maybe&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;isNothing&nbsp;::&nbsp;Maybe&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;isJust&nbsp;::&nbsp;Maybe&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;List&gt;<br>
+
+
+</tt>Only the names of currently loaded modules will be recognized.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Display Hugs version</I> :version</td></tr></table>
+
+The <tt>:version</tt> command is used to display the version of
+the Hugs interpreter:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:version<br>
+&nbsp;--&nbsp;Hugs&nbsp;Version&nbsp;September&nbsp;1999<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>This is the same information that is displayed in the Hugs
+startup banner.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="started.html">back</a> | <a href="libs.html">next</a>  <br><font size=2>May 22, 1999</font>

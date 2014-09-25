@@ -1,0 +1,81 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | back | <a href="basics.html">next</a>  <br><hr>
+<a name="summary"></a><a name="sect2"></a>
+<h2>2<tt>&nbsp;&nbsp;</tt>A technical summary of Hugs 98</h2>
+Hugs 98 provides an almost complete implementation of
+Haskell 98 [<a href="hugs.html#$Haskell98">Haskell98</a>], including:
+
+<UL><LI>Lazy evaluation, higher order functions, and pattern
+matching.
+<LI>A wide range of built-in types, from characters
+to bignums, and lists to functions, with comprehensive
+facilities for defining new datatypes and type synonyms.
+<LI>An advanced polymorphic type system with type and
+constructor class overloading.
+<LI>All of the features of the Haskell 98 expression
+and pattern syntax including lambda, case, conditional and
+let expressions, list comprehensions, do-notation, operator
+sections, and wildcard, irrefutable and `as' patterns.
+<LI>An implementation of the main Haskell 98 primitives
+for monadic I/O, with support for simple
+interactive programs, access to text files, handle-based I/O,
+and exception handling.
+<LI>An almost complete implementation of the Haskell module
+system.  The primary omission is that mutually recursive modules are
+not yet supported.
+</UL><p>
+Hugs 98 also supports a number of advanced and experimental
+extensions including multi-parameter classes, extensible records,
+rank-2 polymorphism, existentials, scoped type variables, and
+restricted type synonyms.
+By default, these features can only be used if Hugs
+is started with the <tt>-98</tt> command line flag.
+(See Section <a href="exts.html#exts">7</a> for details.)<p>
+Hugs is implemented as an interpreter that provides:
+
+<UL><LI>A relatively small, portable system that can be used
+on a range of different machines, from home computers, to
+Unix workstations.
+<LI>A read-eval-print loop for displaying the value of
+each expression that is entered into the interpreter.
+<LI>Fast loading, type checking, and compilation of
+Haskell programs, with facilities for automatic loading of
+imported modules.
+<LI>Integration with an external editor, chosen by
+the user, to allow for rapid development, and for location
+of errors.
+<LI>Modest browsing facilities that can be used to
+find information about the operations and types that are
+available.
+</UL><p>
+Hugs is a successor to Gofer --- an experimental
+functional programming system that was first released in
+September 1991 --- and users of Gofer will see much that is
+familiar in Hugs.  However, Hugs offers much greater
+compatibility with the Haskell standard; indeed, the
+name <I>Hugs</I> was originally chosen as a mnemonic for
+the "<I>Haskell users' Gofer system</I>."<p>
+There have been many modifications and enhancements to Hugs
+since its first release on Valentines day, February 14, in 1995.
+Some of the most obvious improvements include:
+
+<UL><LI>Full support for new Haskell 98 features, including
+the labelled field syntax, do-notation, newtype, strictness
+annotations in datatypes, the <tt>Eval</tt> class, ISO character
+set, etc.
+<LI>Support for Haskell modules, and a growing collection of
+library modules, that includes facilities for Win32
+programming.
+<LI>User interface enhancements, particularly
+the import chasing and search path features,
+which were motivated by a greater emphasis on the role of
+libraries in Haskell 1.3 and later versions of the language.
+<LI>Small improvements in runtime performance, and more
+reliable space usage, thanks to the use of non-conservative
+garbage collection during program execution.
+<LI>A graphical user interface for the Hugs systems that runs on
+the Windows operating system. 
+</UL>
+There have also been a number of other enhancements, and fixes for bugs
+in previous releases.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | back | <a href="basics.html">next</a>  <br><font size=2>May 22, 1999</font>

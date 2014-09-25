@@ -1,0 +1,328 @@
+<HTML
+><HEAD
+><TITLE
+>Getting information</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Using Hugs"
+HREF="using-hugs.html"><LINK
+REL="PREVIOUS"
+TITLE="Loading and editing Haskell module files"
+HREF="module-commands.html"><LINK
+REL="NEXT"
+TITLE="Miscellaneous commands"
+HREF="misc-commands.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="module-commands.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. Using Hugs</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="misc-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFO-COMMANDS"
+>2.3. Getting information</A
+></H1
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="HELP-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:?</B
+> </P
+></A
+></DT
+><DD
+><P
+>Display a brief summary of the commands listed here.</P
+></DD
+><DT
+><A
+NAME="NAMES-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:names</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>...]</P
+></A
+></DT
+><DD
+><P
+>List names that match any of the listed patterns
+and are defined in any of the currently loaded modules.
+Patterns resemble filename patterns:
+<TT
+CLASS="LITERAL"
+>*</TT
+> matches any substring,
+<TT
+CLASS="LITERAL"
+>?</TT
+> matches any character,
+<TT
+CLASS="LITERAL"
+>[</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>chars</I
+></TT
+><TT
+CLASS="LITERAL"
+>]</TT
+>
+matches any of <TT
+CLASS="REPLACEABLE"
+><I
+>chars</I
+></TT
+>,
+with <TT
+CLASS="REPLACEABLE"
+><I
+>char</I
+></TT
+><TT
+CLASS="LITERAL"
+>-</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>char</I
+></TT
+>
+standing for a range of characters, and
+<TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>char</I
+></TT
+> matches <TT
+CLASS="REPLACEABLE"
+><I
+>char</I
+></TT
+>.</P
+><P
+>If no patterns are given,
+all names defined in any of the currently loaded modules are listed.</P
+></DD
+><DT
+><A
+NAME="INFO-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:info</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>]</P
+></A
+></DT
+><DD
+><P
+>Describe the named objects.
+Qualified names may be used for
+objects defined or imported in any loaded module other than the current one.</P
+><P
+>If no arguments are given, the names of all currently loaded files are printed.</P
+></DD
+><DT
+><A
+NAME="BROWSE-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:browse</B
+>  [<TT
+CLASS="OPTION"
+>all</TT
+>] [<TT
+CLASS="REPLACEABLE"
+><I
+>module</I
+></TT
+>...]</P
+></A
+></DT
+><DD
+><P
+>List names exported by the specified modules (which must already be loaded).
+If <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="OPTION"
+>all</TT
+>"</SPAN
+> is given,
+list all names in scope inside the modules.
+If no modules are given, it describes the current module.</P
+></DD
+><DT
+><A
+NAME="VERSION-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:version</B
+> </P
+></A
+></DT
+><DD
+><P
+>Print the version of the Hugs interpreter.
+Major releases of Hugs are identified by a month and year:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :version
+  -- Hugs Version November 2003</PRE
+></TD
+></TR
+></TABLE
+>
+Development snapshots are identified by a date in
+<TT
+CLASS="REPLACEABLE"
+><I
+>YYYYMMDD</I
+></TT
+> form.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="module-commands.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="misc-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Loading and editing Haskell module files</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Miscellaneous commands</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

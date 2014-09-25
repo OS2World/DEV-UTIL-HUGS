@@ -1,0 +1,197 @@
+<HTML
+><HEAD
+><TITLE
+>Restricted type synonyms</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Hugs-specific language extensions"
+HREF="hugs-only.html"><LINK
+REL="PREVIOUS"
+TITLE="Hugs-specific language extensions"
+HREF="hugs-only.html"><LINK
+REL="NEXT"
+TITLE="Here documents"
+HREF="here-documents.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 6. Hugs-specific language extensions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="here-documents.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RESTRICTED-SYNONYMS"
+>6.2. Restricted type synonyms</A
+></H1
+><P
+>Restricted type synonyms are a mechanism for defining abstract datatypes.
+You can achieve similar effects, and more portably,
+using the Haskell 98 module system.</P
+><P
+>The idea is that you can say that a type synonym is transparent
+in the definitions of certain functions (the operations on the type),
+but opaque elsewhere, by writing
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  type Table a b = [(a,b)] in
+        empty :: Table a b,
+        isEmpty :: Table a b -&#62; Bool,
+        add :: a -&#62; b -&#62; Table a b -&#62; Table a b,
+        search :: a -&#62; Table a b -&#62; Maybe b
+
+  empty = []
+  isEmpty = null
+  add a b t = (a,b):t
+  search = lookup</PRE
+></TD
+></TR
+></TABLE
+>
+or equivalently
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  type Table a b = [(a,b)] in empty, isEmpty, add, search
+
+  empty :: Table a b
+  empty = []
+
+  ...</PRE
+></TD
+></TR
+></TABLE
+>
+See
+<A
+HREF="http://cvs.haskell.org/Hugs/pages/hugsman/exts.html#sect7.3.5"
+TARGET="_top"
+>Section 7.3.5 of the <I
+CLASS="CITETITLE"
+>Hugs 98 User Manual</I
+></A
+>
+for details.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="here-documents.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Hugs-specific language extensions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Here documents</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

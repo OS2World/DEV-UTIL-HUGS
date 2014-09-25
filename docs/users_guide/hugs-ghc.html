@@ -1,0 +1,464 @@
+<HTML
+><HEAD
+><TITLE
+>Language extensions supported by Hugs and GHC</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Addenda to Haskell 98"
+HREF="addenda.html"><LINK
+REL="NEXT"
+TITLE="Type class extensions"
+HREF="class-extensions.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="addenda.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="class-extensions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="HUGS-GHC"
+>Chapter 5. Language extensions supported by Hugs and GHC</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>5.1. <A
+HREF="hugs-ghc.html#SYNTAX-EXTENSIONS"
+>Syntactic extensions</A
+></DT
+><DT
+>5.2. <A
+HREF="class-extensions.html"
+>Type class extensions</A
+></DT
+><DT
+>5.3. <A
+HREF="quantified-types.html"
+>Quantified types</A
+></DT
+><DT
+>5.4. <A
+HREF="type-annotations.html"
+>Type annotations in patterns</A
+></DT
+><DT
+>5.5. <A
+HREF="implicit-parameters.html"
+>Implicit parameters</A
+></DT
+></DL
+></DIV
+><P
+>These experimental features are enabled with the <TT
+CLASS="OPTION"
+>-98</TT
+>
+option.
+Most are described in
+<A
+HREF="http://cvs.haskell.org/Hugs/pages/hugsman/exts.html"
+TARGET="_top"
+>Section 7 of the <I
+CLASS="CITETITLE"
+>Hugs 98 User Manual</I
+></A
+>.
+Those described in this chapter are also supported by
+<A
+HREF="http://www.haskell.org/ghc/"
+TARGET="_top"
+>GHC</A
+>
+with appropriate options,
+though in some cases the GHC versions are more general</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SYNTAX-EXTENSIONS"
+>5.1. Syntactic extensions</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RECURSIVE-DO"
+>5.1.1. Recursive do-notation</A
+></H2
+><P
+>The recursive do-notation (also known as mdo-notation) is implemented
+as described in:
+
+    <I
+CLASS="CITETITLE"
+>A recursive do for Haskell</I
+>,
+    Levent Erkök and John Launchbury,
+    <I
+CLASS="CITETITLE"
+>Haskell Workshop 2002</I
+>,
+    pages: 29–37. Pittsburgh, Pennsylvania.</P
+><P
+>The do-notation of Haskell does not allow recursive bindings, that is,
+the variables bound in a do-expression are visible only in the textually
+following code block. Compare this to a let-expression, where bound
+variables are visible in the entire binding group. It turns out that
+several applications can benefit from recursive bindings in the do-notation,
+and this extension provides the necessary syntactic support.</P
+><P
+>Here is a simple (yet contrived) example:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  import Control.Monad.Fix
+
+  justOnes = mdo xs &#60;- Just (1:xs)
+                 return xs</PRE
+></TD
+></TR
+></TABLE
+>
+As you can guess <TT
+CLASS="LITERAL"
+>justOnes</TT
+> will evaluate to
+<TT
+CLASS="LITERAL"
+>Just [1,1,1,...</TT
+></P
+><P
+>The <TT
+CLASS="LITERAL"
+>Control.Monad.Fix</TT
+> module introduces
+the <TT
+CLASS="LITERAL"
+>MonadFix</TT
+> class, defined as
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class Monad m =&#62; MonadFix m where
+      mfix :: (a -&#62; m a) -&#62; m a</PRE
+></TD
+></TR
+></TABLE
+>
+The function <TT
+CLASS="LITERAL"
+>mfix</TT
+> dictates how the required recursion
+operation should be performed.
+If recursive bindings are required for a monad, then that
+monad must be declared an instance of the <TT
+CLASS="LITERAL"
+>MonadFix</TT
+> class.
+For details, see the above mentioned reference.</P
+><P
+>The <TT
+CLASS="LITERAL"
+>Control.Monad.Fix</TT
+> module also defines instances of
+<TT
+CLASS="LITERAL"
+>MonadFix</TT
+> for <TT
+CLASS="LITERAL"
+>List</TT
+>,
+<TT
+CLASS="LITERAL"
+>Maybe</TT
+> and <TT
+CLASS="LITERAL"
+>IO</TT
+>.
+Furthermore, several other monad modules provide instances of the
+<TT
+CLASS="LITERAL"
+>MonadFix</TT
+> class, including
+the <TT
+CLASS="LITERAL"
+>Control.Monad.ST</TT
+> and
+<TT
+CLASS="LITERAL"
+>Control.Monad.ST.Lazy</TT
+>
+modules for Haskell's internal state monad (strict and lazy, respectively).</P
+><P
+>There are three important points in using the recursive-do notation:
+<P
+></P
+><UL
+><LI
+><P
+>The recursive version of the do-notation uses
+the keyword <TT
+CLASS="LITERAL"
+>mdo</TT
+> (rather than <TT
+CLASS="LITERAL"
+>do</TT
+>).</P
+></LI
+><LI
+><P
+>You should <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>import Control.Monad.Fix</TT
+>"</SPAN
+>.</P
+></LI
+><LI
+><P
+>Hugs should be started with the flag <TT
+CLASS="OPTION"
+>-98</TT
+>.</P
+></LI
+></UL
+>
+The web page: <SPAN
+CLASS="QUOTE"
+>"<A
+HREF="http://www.cse.ogi.edu/PacSoft/projects/rmb"
+TARGET="_top"
+>http://www.cse.ogi.edu/PacSoft/projects/rmb</A
+>"</SPAN
+>
+contains up to date information on recursive monadic bindings.</P
+><P
+>Historical note: The old implementation of the mdo-notation (and most
+of the existing documents) used the name <TT
+CLASS="LITERAL"
+>MonadRec</TT
+>
+for the class and the corresponding library.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ZIP-COMPREHENSION"
+>5.1.2. Parallel list comprehensions (a.k.a. zip-comprehensions)</A
+></H2
+><P
+>Parallel list comprehensions are a natural extension to list comprehensions.
+List comprehensions can be thought of as a nice syntax for writing maps and
+filters.
+Parallel comprehensions extend this to include the <TT
+CLASS="LITERAL"
+>zipWith</TT
+>
+family.</P
+><P
+>A parallel list comprehension has multiple independent branches of qualifier
+lists, each separated by a <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>|</TT
+>"</SPAN
+> symbol.
+For example, the following zips together two lists:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   [ (x, y) | x &#60;- xs | y &#60;- ys ]</PRE
+></TD
+></TR
+></TABLE
+>
+The behavior of parallel list comprehensions follows that
+of <TT
+CLASS="LITERAL"
+>zip</TT
+>, in that
+the resulting list will have the same length as the shortest branch.</P
+><P
+>We can define parallel list comprehensions by translation to regular
+comprehensions.
+Given a parallel comprehension of the form:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   [ e | p1 &#60;- e11, p2 &#60;- e12, ...
+       | q1 &#60;- e21, q2 &#60;- e22, ...
+       ...
+   ]</PRE
+></TD
+></TR
+></TABLE
+>
+This will be translated to:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   [ e | ((p1,p2), (q1,q2), ...) &#60;- zipN [(p1,p2) | p1 &#60;- e11, p2 &#60;- e12, ...]
+                                         [(q1,q2) | q1 &#60;- e21, q2 &#60;- e22, ...]
+                                         ...
+   ]</PRE
+></TD
+></TR
+></TABLE
+>
+where <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="REPLACEABLE"
+><I
+>zipN</I
+></TT
+>"</SPAN
+>
+is the appropriate zip for the given number of branches.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="addenda.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="class-extensions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Addenda to Haskell 98</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Type class extensions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

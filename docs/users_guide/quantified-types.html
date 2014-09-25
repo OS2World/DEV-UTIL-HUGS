@@ -1,0 +1,594 @@
+<HTML
+><HEAD
+><TITLE
+>Quantified types</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"><LINK
+REL="PREVIOUS"
+TITLE="Type class extensions"
+HREF="class-extensions.html"><LINK
+REL="NEXT"
+TITLE="Type annotations in patterns"
+HREF="type-annotations.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="class-extensions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 5. Language extensions supported by Hugs and GHC</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="type-annotations.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUANTIFIED-TYPES"
+>5.3. Quantified types</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RANK-2-TYPES"
+>5.3.1. Rank 2 types</A
+></H2
+><P
+>In Haskell 98, all type signatures are implicitly universally
+quantified at the outer level, for example
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  id :: a -&#62; a</PRE
+></TD
+></TR
+></TABLE
+>
+Variables bound with a <TT
+CLASS="LITERAL"
+>let</TT
+> or <TT
+CLASS="LITERAL"
+>where</TT
+>
+may be polymorphic, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  let f x = x in (f True, f 'a')</PRE
+></TD
+></TR
+></TABLE
+>
+but function arguments may not be: Haskell 98 rejects
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  g f = (f True, f 'a')</PRE
+></TD
+></TR
+></TABLE
+>
+However, with the <TT
+CLASS="OPTION"
+>-98</TT
+>, the function <TT
+CLASS="LITERAL"
+>g</TT
+>
+may be given the signature
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  g :: (forall a. a -&#62; a) -&#62; (Bool, Char)</PRE
+></TD
+></TR
+></TABLE
+>
+This is called a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>rank 2</I
+></SPAN
+> type, because a function
+argument is polymorphic, as indicated by the <TT
+CLASS="LITERAL"
+>forall</TT
+>
+quantifier.</P
+><P
+>Now the function <TT
+CLASS="LITERAL"
+>g</TT
+> may be applied to expression whose
+generalized type is at least as general as that declared.
+In this case the choice is limited: we can write
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  g id
+  g undefined
+  g (const undefined)</PRE
+></TD
+></TR
+></TABLE
+>
+or various equivalent forms
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  g (\x -&#62; x)
+  g (id . id . id)
+  g (id id id)</PRE
+></TD
+></TR
+></TABLE
+>
+There are a number of restrictions on such functions:
+<P
+></P
+><UL
+><LI
+><P
+>Functions that take polymorphic arguments must be given an explicit
+type signature.</P
+></LI
+><LI
+><P
+>In the definition of the function, polymorphic arguments must be matched,
+and can only be matched by a variable or wildcard (<TT
+CLASS="LITERAL"
+>_</TT
+>)
+pattern.</P
+></LI
+><LI
+><P
+>When such functions are used, the polymorphic arguments must be supplied:
+you can't just use <TT
+CLASS="LITERAL"
+>g</TT
+> on its own.</P
+></LI
+></UL
+>
+GHC, which supports arbitrary rank polymorphism,
+is able to relax some of these restrictions.</P
+><P
+>Hugs reports an error if a type variable in a <TT
+CLASS="LITERAL"
+>forall</TT
+>
+is unused in the enclosed type.</P
+><P
+>An important application of rank 2 types is the primitive
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  runST :: (forall s. ST s a) -&#62; a</PRE
+></TD
+></TR
+></TABLE
+>
+in the module <TT
+CLASS="LITERAL"
+>Control.Monad.ST</TT
+>.
+Here the type signature ensures that objects created by the state monad,
+whose types all refer to the parameter <TT
+CLASS="LITERAL"
+>s</TT
+>,
+are unused outside the application of <TT
+CLASS="LITERAL"
+>runST</TT
+>.
+Thus to use this module you need the <TT
+CLASS="OPTION"
+>-98</TT
+> option.
+Also, from the restrictions above,
+it follows that <TT
+CLASS="LITERAL"
+>runST</TT
+> must always
+be applied to its polymorphic argument.
+Hugs does not permit either of
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  myRunST :: (forall s. ST s a) -&#62; a
+  myRunST = runST
+
+  f x = runST $ do
+        ...
+        return y</PRE
+></TD
+></TR
+></TABLE
+>
+(though GHC does).
+Instead, you can write
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  myRunST :: (forall s. ST s a) -&#62; a
+  myRunST x = runST x
+
+  f x = runST (do
+        ...
+        return y)</PRE
+></TD
+></TR
+></TABLE
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POLYMORPHIC-COMPONENTS"
+>5.3.2. Polymorphic components</A
+></H2
+><P
+>Similarly, components of a constructor may be polymorphic:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  newtype List a = MkList (forall r. r -&#62; (a -&#62; r -&#62; r) -&#62; r)
+  newtype NatTrans f g = MkNT (forall a. f a -&#62; g a)
+  data MonadT m = MkMonad {
+                  my_return :: forall a. a -&#62; m a,
+                  my_bind :: forall a b. m a -&#62; (a -&#62; m b) -&#62; m b
+                }</PRE
+></TD
+></TR
+></TABLE
+>
+So that the constructors have rank 2 types:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  MkList :: (forall r. r -&#62; (a -&#62; r -&#62; r) -&#62; r) -&#62; List a
+  MkNT :: (forall a. f a -&#62; g a) -&#62; NatTrans f g
+  MkMonad :: (forall a. a -&#62; m a) -&#62;
+             (forall a b. m a -&#62; (a -&#62; m b) -&#62; m b) -&#62; MonadT m</PRE
+></TD
+></TR
+></TABLE
+>
+As with functions having rank 2 types, such a constructor must be supplied
+with any polymorphic arguments when it is used in an expression.</P
+><P
+>The record update syntax cannot be used with records containing
+polymorphic components.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="EXISTENTIAL-QUANTIFICATION"
+>5.3.3. Existential quantification</A
+></H2
+><P
+>It is also possible to have existentially quantified constructors,
+somewhat confusingly also specified with <TT
+CLASS="LITERAL"
+>forall</TT
+>,
+but before the constructor, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  data Accum a = forall s. MkAccum s (a -&#62; s -&#62; s) (s -&#62; a)</PRE
+></TD
+></TR
+></TABLE
+>
+This type describes objects with a state of an abstract type
+<TT
+CLASS="LITERAL"
+>s</TT
+>,
+together with functions to update and query the state.
+The <TT
+CLASS="LITERAL"
+>forall</TT
+> is somewhat motivated by the polymorphic
+type of the constructor <TT
+CLASS="LITERAL"
+>MkAccum</TT
+>, which is
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  s -&#62; (a -&#62; s -&#62; s) -&#62; (s -&#62; a) -&#62; Accum a</PRE
+></TD
+></TR
+></TABLE
+>
+because it must be able to operate on any state.</P
+><P
+>Some sample values of the <TT
+CLASS="LITERAL"
+>Accum</TT
+> type are:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  adder = MkAccum 0 (+) id
+  averager = MkAccum (0,0)
+                     (\x (t,n) -&#62; (t+x,n+1))
+                     (uncurry (/))</PRE
+></TD
+></TR
+></TABLE
+>
+Unfortunately, existentially quantified constructors may not contain
+named fields.
+You also can't use <TT
+CLASS="LITERAL"
+>deriving</TT
+> with existentially quantified
+types.</P
+><P
+>When we match against an existentially quantified constructor, as in
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  runAccum (MkAccum s add get) [] = ??</PRE
+></TD
+></TR
+></TABLE
+>
+we do not know the type of <TT
+CLASS="LITERAL"
+>s</TT
+>,
+only that <TT
+CLASS="LITERAL"
+>add</TT
+> and <TT
+CLASS="LITERAL"
+>get</TT
+>
+take arguments of the same type as <TT
+CLASS="LITERAL"
+>s</TT
+>.
+So our options are limited.  One possibility is
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  runAccum (MkAccum s add get) [] = get s</PRE
+></TD
+></TR
+></TABLE
+>
+Similarly we can also write
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  runAccum (MkAccum s add get) (x:xs) =
+      runAccum (MkAccum (add x v) add get) xs</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>This particular application of existentials – modelling objects –
+may also be done with a Haskell 98 recursive type:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  data Accum a = MkAccum { add_value :: a -&#62; Accum a, get_value :: a}</PRE
+></TD
+></TR
+></TABLE
+>
+but other applications do require existentials.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="class-extensions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="type-annotations.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Type class extensions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Type annotations in patterns</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

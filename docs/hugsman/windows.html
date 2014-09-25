@@ -1,0 +1,70 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="exts.html">back</a> | <a href="diffs.html">next</a>  <br><hr>
+<a name="otherps"></a><a name="sect8"></a>
+<h2>8<tt>&nbsp;&nbsp;</tt>Other Hugs programs</h2>
+The Hugs interpreter is available in two other guises: a
+stand-alone system that executes programs in a `load and go' style,
+without the surrounding command system; and a Windows user interface,
+layered on top of the basic Hugs system.<p>
+<a name="sect8.1"></a>
+<h3>8.1<tt>&nbsp;&nbsp;</tt>Stand-alone program execution</h3>
+Once a program has been developed and debugged, the Hugs command loop
+can be eliminated and the program can be executed immediately without
+any command to run it.  A slightly modified version of the interpreter
+called <tt>runhugs</tt> loads the literate program specified as its
+first argument and runs <tt>main</tt> in module <tt>Main</tt>.  Unlike the
+standard Hugs system, <tt>runhugs</tt> makes command arguments available
+to the running Hugs system.  The first argument, specifying the
+program, is removed from the argument list.<p>
+On Unix systems, executable programs may be created by
+placing <tt>runhugs</tt> in the first line of an executable file, like so:
+
+<tt><br>
+#!/hugs/runhugs<br>
+<br>
+&gt;&nbsp;module&nbsp;Main&nbsp;where<br>
+&gt;&nbsp;main&nbsp;=&nbsp;putStr&nbsp;"Hello,&nbsp;World\n"<br>
+
+
+</tt>Because <tt>runHugs</tt> uses literate Haskell only,  the line starting
+with <tt>#!</tt> is viewed as a comment.  Stand-alone programs can
+import other modules using import chasing---these modules need not be
+literate.  The <tt>runhugs</tt> program uses the same environment
+variables to set Hugs options as the standard Hugs systems.
+However, <tt>runhugs</tt> does not set options from the command line; all
+command line options are passed into the executing Hugs program.  The
+stand-alone Hugs program may return an exit code.<p>
+On Windows 95/NT, <tt>runhugs</tt> is invoked using a separate
+file extension that is set up to call <tt>runhugs</tt> rather
+than <tt>hugs</tt>.  Installation sets up the <tt>.hsx</tt> extension for this
+purpose.  A <tt>.hsx</tt> program will run when it is clicked on;
+a console window will appear if the program writes to standard output
+or reads from standard input.  This window is closed immedately upon
+exiting the program.  There is no way to pass parameters to
+the <tt>.hsx</tt> program when it is double-clicked.
+Windows 95/NT can also use <tt>runhugs</tt> to open files of a given
+type; this involves setting the "open" command for the file type to
+call <tt>runhugs</tt>, passing it the Haskell program to run and the
+file being opened.  The online documentation has some examples of
+this.<p>
+<a name="sect8.2"></a>
+<h3>8.2<tt>&nbsp;&nbsp;</tt>Hugs for Windows</h3>
+Hugs for Windows (<tt>winhugs</tt>) offers a GUI front-end to the
+Hugs interpreter on Microsoft Windows platforms.  The user interface
+features a scrolling console window that mimics the normal Hugs
+interface, together with a menu and toolbar that provide additional
+facilities for browsing Haskell programs.  Most of the additional
+features are self-explanatory, although short descriptions of menu
+and toolbar choices are displayed in a status line.
+Hugs for Windows uses the same command line options and
+environment/registry variables as Hugs.   It also stores options in
+a <tt>.ini</tt> file.<p>
+The Hugs for Windows front-end is useful for beginners, but is not
+compatible with the Win32 libraries or with programs that use them,
+such as Conal Elliot's Fran system or Paul Hudak's Graphics library.
+In addition, the current
+implementation uses a compute-intensive polling process to detect
+certain events, and this can incur a fairly substantial performance
+penalty.  For these reasons, the Hugs for Windows front-end is not
+recommended for work on large projects.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="exts.html">back</a> | <a href="diffs.html">next</a>  <br><font size=2>May 22, 1999</font>

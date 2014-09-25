@@ -1,0 +1,540 @@
+<HTML
+><HEAD
+><TITLE
+>Using Hugs</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Introduction"
+HREF="introduction.html"><LINK
+REL="NEXT"
+TITLE="Loading and editing Haskell module files"
+HREF="module-commands.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="introduction.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="module-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="USING-HUGS"
+>Chapter 2. Using Hugs</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>2.1. <A
+HREF="using-hugs.html#BASIC-COMMANDS"
+>Basic operation</A
+></DT
+><DT
+>2.2. <A
+HREF="module-commands.html"
+>Loading and editing Haskell module files</A
+></DT
+><DT
+>2.3. <A
+HREF="info-commands.html"
+>Getting information</A
+></DT
+><DT
+>2.4. <A
+HREF="misc-commands.html"
+>Miscellaneous commands</A
+></DT
+></DL
+></DIV
+><P
+>The interpreter may be started with a command line of the form
+<P
+><B
+CLASS="COMMAND"
+>hugs</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+>...] [<TT
+CLASS="REPLACEABLE"
+><I
+>file</I
+></TT
+>...]</P
+>
+On many systems it can also be found in the system menus,
+and may be started by (double) clicking on a file with a
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.hs</TT
+>"</SPAN
+> or
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.lhs</TT
+>"</SPAN
+> extension.</P
+><P
+>Hugs takes options from the command line and elsewhere
+(see <A
+HREF="options.html#OPTIONS-LIST"
+>Section 3.1</A
+>),
+and then loads the Haskell <TT
+CLASS="LITERAL"
+>Prelude</TT
+> module,
+as well as as any modules specified on the command line.</P
+><P
+>Hugs starts with a banner like
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  __   __ __  __  ____   ___      _________________________________________
+  ||   || ||  || ||  || ||__      Hugs 98: Based on the Haskell 98 standard
+  ||___|| ||__|| ||__||  __||     Copyright (c) 1994-2003
+  ||---||         ___||           World Wide Web: http://haskell.org/hugs
+  ||   ||                         Report bugs to: hugs-bugs@haskell.org
+  ||   || Version: November 2003  _________________________________________
+
+  Haskell 98 mode: Restart with command line option -98 to enable extensions
+
+  Type :? for help
+  Prelude&#62;</PRE
+></TD
+></TR
+></TABLE
+>
+The prompt string <TT
+CLASS="LITERAL"
+>Prelude&#62;</TT
+> indicates that the current
+module is the Haskell <TT
+CLASS="LITERAL"
+>Prelude</TT
+>
+(assuming no modules were specified on the command line).
+At this prompt, you can type Haskell expressions to be evaluated,
+and also enter commands of the form
+<SPAN
+CLASS="QUOTE"
+>"<B
+CLASS="COMMAND"
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>cmd</I
+></TT
+></B
+>"</SPAN
+>,
+where <TT
+CLASS="REPLACEABLE"
+><I
+>cmd</I
+></TT
+> may be abbreviated to a single letter.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BASIC-COMMANDS"
+>2.1. Basic operation</A
+></H1
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="EVAL-COMMAND"
+><P
+> <TT
+CLASS="REPLACEABLE"
+><I
+>expr</I
+></TT
+> </P
+></A
+></DT
+><DD
+><P
+>Evaluate a Haskell expression.
+The expression cannot be broken over multiple lines.
+Usually, the value is simply converted to a string
+(using <TT
+CLASS="LITERAL"
+>show</TT
+>) and printed:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; 1+2
+  3</PRE
+></TD
+></TR
+></TABLE
+>
+The printing style can be changed with the
+<A
+HREF="options.html#OPTION-USE-SHOW"
+><TT
+CLASS="OPTION"
+>-u</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-EVALUATION"
+>Section 3.1.4</A
+>).</P
+><P
+>However, if <TT
+CLASS="REPLACEABLE"
+><I
+>expr</I
+></TT
+> has type
+<TT
+CLASS="LITERAL"
+>IO</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>t</I
+></TT
+>
+for some type <TT
+CLASS="REPLACEABLE"
+><I
+>t</I
+></TT
+>,
+the resulting IO action is performed:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; print (1+2) &#62;&#62; putStrLn "bye"
+  3
+  bye</PRE
+></TD
+></TR
+></TABLE
+>
+Usually the value produced by this action is ignored,
+but this can be changed with the
+<A
+HREF="options.html#OPTION-DISPLAY-IO"
+><TT
+CLASS="OPTION"
+>+I</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-EVALUATION"
+>Section 3.1.4</A
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>On ambiguous types: </B
+>If the type of <TT
+CLASS="REPLACEABLE"
+><I
+>expr</I
+></TT
+> is ambiguous,
+defaulting is applied to each ambiguous
+type variable <TT
+CLASS="REPLACEABLE"
+><I
+>v</I
+></TT
+>
+whose constraints all have the form
+<TT
+CLASS="REPLACEABLE"
+><I
+>C</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>v</I
+></TT
+>
+where <TT
+CLASS="REPLACEABLE"
+><I
+>C</I
+></TT
+> is a standard class,
+and at least one of these classes is a numeric class, or is
+<TT
+CLASS="LITERAL"
+>Show</TT
+>, <TT
+CLASS="LITERAL"
+>Eq</TT
+> or <TT
+CLASS="LITERAL"
+>Ord</TT
+>.
+(This is an extension of the Haskell 98 rule applied to top-level definitions
+in modules, which requires a numeric class.)
+It is an error if any ambiguous type variables cannot be handled in this way.
+For example, consider
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; reverse []
+  []</PRE
+></TD
+></TR
+></TABLE
+>
+Here a <TT
+CLASS="LITERAL"
+>Show</TT
+> constraint on the list elements arises
+from Hugs's use of <TT
+CLASS="LITERAL"
+>show</TT
+> to display the result,
+so the type of the elements defaults to <TT
+CLASS="LITERAL"
+>Integer</TT
+>,
+removing the ambiguity.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="TYPE-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:type</B
+>   <TT
+CLASS="REPLACEABLE"
+><I
+>expr</I
+></TT
+> </P
+></A
+></DT
+><DD
+><P
+>Print the type of <TT
+CLASS="REPLACEABLE"
+><I
+>expr</I
+></TT
+>,
+without evaluating it.
+Usually the defaulting rules (discussed above) are not applied to the type
+before printing,
+but this can be changed with the
+<A
+HREF="options.html#OPTION-DEFAULT-TYPES"
+><TT
+CLASS="OPTION"
+>+T</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-EVALUATION"
+>Section 3.1.4</A
+>).</P
+></DD
+><DT
+><A
+NAME="SET-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:set</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+>...]</P
+></A
+></DT
+><DD
+><P
+>Set command line options.
+See <A
+HREF="options.html#OPTIONS-LIST"
+>Section 3.1</A
+> for a list of available options.
+On Win32, the new option settings are saved to the registry,
+and so persist across Hugs sessions.
+To make settings persistent on other systems,
+put them in the <TT
+CLASS="LITERAL"
+>HUGSFLAGS</TT
+> environment variable.</P
+><P
+>If no options are given, list the available options and their current settings.</P
+></DD
+><DT
+><A
+NAME="QUIT-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:quit</B
+> </P
+></A
+></DT
+><DD
+><P
+>Exit the interpreter.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="introduction.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="module-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Introduction</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Loading and editing Haskell module files</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

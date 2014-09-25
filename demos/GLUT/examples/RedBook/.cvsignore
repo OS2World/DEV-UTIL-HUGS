@@ -1,0 +1,17 @@
+*_split
+*_stub.c
+*_stub.h
+*.hs.tmp
+*.raw-hs
+BezCurve
+BezMesh
+BezSurf
+Feedback
+Fog
+Hello
+PickDepth
+PickSquare
+Select
+Smooth
+Tess
+TessWind

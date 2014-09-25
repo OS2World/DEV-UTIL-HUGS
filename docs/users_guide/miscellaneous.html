@@ -1,0 +1,648 @@
+<HTML
+><HEAD
+><TITLE
+>Miscellaneous</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Hugs debugging primitives"
+HREF="observe.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="observe.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="MISCELLANEOUS"
+>Chapter 7. Miscellaneous</A
+></H1
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="HISTORY"
+>7.1. Hugs 98 release history</A
+></H1
+><P
+>These are the release notes for the program since it was renamed Hugs 98,
+reflecting substantial compliance with Haskell 98
+(though with numerous optional extensions).
+Archives of older versions of
+<A
+HREF="http://www.cse.ogi.edu/~mpj/goferarc/index.html"
+TARGET="_top"
+>Gofer</A
+>
+and
+<A
+HREF="http://www.cse.ogi.edu/~mpj/hugsarc/index.html"
+TARGET="_top"
+>Hugs</A
+>
+are still available from Mark Jones's web page.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1591"
+>7.1.1. January 1999 (Beta release)</A
+></H2
+><P
+>Headline news for this release includes:</P
+><P
+></P
+><UL
+><LI
+><P
+>Hugs goes Haskell 98!  Hugs 98 is the first released Haskell system
+to support the new standard for Haskell 98.</P
+></LI
+><LI
+><P
+>Hugs goes Open Source!  Hugs 98 is the first Hugs release to be
+distributed as Open source software.  Responding to requests from
+users, this relaxes the conditions of use and distribution of
+previous releases, and will hopefully make it easier to use Hugs
+for a wide range of projects.</P
+></LI
+></UL
+><P
+>This release of Hugs also merges the features of several earlier releases
+into one single system. This includes:</P
+><P
+></P
+><UL
+><LI
+><P
+>The module system and dynamic linking facilities of Hugs 1.4 (June 1998);</P
+></LI
+><LI
+><P
+>The type system extensions (multi-parameter classes, TREX, rank-2
+polymorphism, existentials, etc.) of Hugs 1.3c p1 (March 1998);</P
+></LI
+><LI
+><P
+>New features and modifications to support the draft Haskell 98 standard;</P
+></LI
+><LI
+><P
+>A whole range of bug fixes and additions for all of the above.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1609"
+>7.1.2. May 1999</A
+></H2
+><P
+>This release is largely conformant with Haskell 98, including
+monad and record syntax, newtypes, strictness annotations, and
+modules.  In addition, it comes packaged with the libraries defined
+in the most recent version of the Haskell Library Report and with
+extension libraries that are compatible with GHC 3.0 and later.</P
+><P
+>Additional features of the system include:</P
+><P
+></P
+><UL
+><LI
+><P
+><SPAN
+CLASS="QUOTE"
+>"Import chasing"</SPAN
+>: a single module may be loaded, and Hugs will
+chase down all imports as long as module names are the same as
+file names and the files are found in the current path.</P
+></LI
+><LI
+><P
+>A simple GUI for Windows to facilitate program development.</P
+></LI
+><LI
+><P
+>Library extensions to support concepts such as concurrency,
+mutable variables and arrays, monadic parsing, tracing (for
+debugging), graphics, and lazy state threads.</P
+></LI
+><LI
+><P
+>A Win32 library for complete access to windows, graphics, and
+other important OS functionalities and a graphics library for
+easy access to Win32 graphics.</P
+></LI
+><LI
+><P
+>A <SPAN
+CLASS="QUOTE"
+>"foreign interface"</SPAN
+> mechanism to facilitate interoperability
+with C.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1626"
+>7.1.3. November 1999</A
+></H2
+><P
+></P
+><UL
+><LI
+><P
+>BSD-style license (replacing the Artistic License)</P
+></LI
+><LI
+><P
+>new commands <B
+CLASS="COMMAND"
+>:browse</B
+> and <B
+CLASS="COMMAND"
+>:version</B
+></P
+></LI
+><LI
+><P
+>experimental multi-instance resolution and <B
+CLASS="COMMAND"
+>:xplain</B
+> command</P
+></LI
+><LI
+><P
+>functional dependencies</P
+></LI
+><LI
+><P
+>zero parameter type classes</P
+></LI
+><LI
+><P
+>better handling of overlapping instances</P
+></LI
+><LI
+><P
+>various bug fixes</P
+></LI
+></UL
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1646"
+>7.1.3.1. February 2000</A
+></H3
+><P
+>This is purely a bug-fix release of Hugs98 November 99.
+It fixes the following problems:</P
+><P
+></P
+><UL
+><LI
+><P
+>If you defined an instance which inherited a method via a
+superclass, hugs would go into an infinite loop.  Fortunately,
+most people weren't doing this (except Chris Okasaki...).</P
+></LI
+><LI
+><P
+>There were a couple of holes in the implementation of implicit parameters
+(<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>with</TT
+>"</SPAN
+> wasn't always being scoped properly,
+sometimes capturing implicit parameters outside of its scope).</P
+></LI
+><LI
+><P
+>Functional dependencies weren't being properly propagated in
+some cases with derived instances
+(<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>instance P ... =&#62; Q ...</TT
+>"</SPAN
+>).</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1660"
+>7.1.3.2. July 2000</A
+></H3
+><P
+>This is purely a bug-fix release of Hugs98 February 2000.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1663"
+>7.1.4. February 2001</A
+></H2
+><P
+>This is a major release that incorporates bug fixes as well as
+several new features and enhancements that have been developed for
+Hugs over the last year. It is announced with the intention that
+it will remain a stable and lightweight implementation of Haskell 98
++ extensions for some considerable time.</P
+><P
+>A list of the most important new features looks as follows:</P
+><P
+></P
+><UL
+><LI
+><P
+>A Foreign Function Interface closely modelled after the one
+provided by GHC.</P
+></LI
+><LI
+><P
+>Built-in, Hood-like debugging support.</P
+></LI
+><LI
+><P
+>Parallel list comprehensions, a.k.a. zip-comprehensions.</P
+></LI
+><LI
+><P
+>A new syntax for recursive monad bindings.</P
+></LI
+><LI
+><P
+>A new GUI under Windows that doesn't consume all CPU time.</P
+></LI
+><LI
+><P
+>Support for the MacOS platform integrated into the main distribution.</P
+></LI
+><LI
+><P
+>Corrections of all bugs reported for the January 2001 beta
+release.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1682"
+>7.1.5. December 2001</A
+></H2
+><P
+>The most important features of this new release are:</P
+><P
+></P
+><UL
+><LI
+><P
+>The incompatibilities between Hugs and the Haskell Graphics Library
+have been fixed, and binaries for the HGL are now available on the
+Hugs download page.</P
+></LI
+><LI
+><P
+>The missing standard libraries <TT
+CLASS="LITERAL"
+>Directory</TT
+>,
+<TT
+CLASS="LITERAL"
+>CPUTime</TT
+>, <TT
+CLASS="LITERAL"
+>Time</TT
+> and
+<TT
+CLASS="LITERAL"
+>Locale</TT
+>
+have been added along with a complete implementation of
+Haskell 98 <TT
+CLASS="LITERAL"
+>IO</TT
+>.</P
+></LI
+><LI
+><P
+>Hugs is now delivered with most of the <TT
+CLASS="LITERAL"
+>hslibs</TT
+> libraries
+installed in the <TT
+CLASS="LITERAL"
+>lib/exts/</TT
+> directory.
+The added modules cover the <TT
+CLASS="LITERAL"
+>Edison</TT
+>,
+<TT
+CLASS="LITERAL"
+>Parsec</TT
+>, <TT
+CLASS="LITERAL"
+>HaXml</TT
+>,
+<TT
+CLASS="LITERAL"
+>QuickCheck</TT
+>, <TT
+CLASS="LITERAL"
+>concurrent</TT
+>,
+<TT
+CLASS="LITERAL"
+>monad</TT
+> and <TT
+CLASS="LITERAL"
+>html</TT
+> subdirectories
+of <TT
+CLASS="LITERAL"
+>hslibs</TT
+>.</P
+></LI
+><LI
+><P
+>The <B
+CLASS="COMMAND"
+>:set</B
+> option now refuses the user to set a module
+search path that doesn't contain the <TT
+CLASS="LITERAL"
+>Prelude</TT
+>.
+This is to protect users from accidentally rendering their Hugs setups
+unusable, esp. so on Windows machines where the options are persisted
+to the Registry.</P
+></LI
+><LI
+><P
+>MacOS X is now one of the supported unix ports, with pre-built
+binaries available on the download page.</P
+></LI
+><LI
+><P
+>Experimental support is provided for hierarchical module names,
+where a module name <TT
+CLASS="LITERAL"
+>A.B.C</TT
+> is mapped onto the file path
+<TT
+CLASS="LITERAL"
+>A/B/C</TT
+>{<TT
+CLASS="LITERAL"
+>.hs</TT
+>,<TT
+CLASS="LITERAL"
+>.lhs</TT
+>}
+and appended to each of the path prefixes in
+<TT
+CLASS="LITERAL"
+>HUGSPATH</TT
+> until the name of a readable file is found.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1720"
+>7.1.6. November 2002</A
+></H2
+><P
+>Feature highlights of this new release are:</P
+><P
+></P
+><UL
+><LI
+><P
+>Much improved FFI support (contributed by Alastair Reid), bringing
+Hugs really very close to the Haskell FFI specification.</P
+></LI
+><LI
+><P
+>Adoption of a significant subset of GHC's hierarchical libraries
+(contributed by Ross Paterson).</P
+></LI
+><LI
+><P
+>An (allegedly) complete implementation of the Haskell98 module
+system (Sigbjorn Finne).</P
+></LI
+><LI
+><P
+>Numerous bug fixes since the previous major release in Dec 2001.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1732"
+>7.1.7. November 2003</A
+></H2
+><P
+>There has been substantial internal restructuring.
+In addition to numerous bug fixes, user-visible changes include:</P
+><P
+></P
+><UL
+><LI
+><P
+>The beginnings of a User's Guide (though still incomplete).</P
+></LI
+><LI
+><P
+>The <TT
+CLASS="LITERAL"
+>Double</TT
+> type is now double-precision
+on most architectures.</P
+></LI
+><LI
+><P
+>Hugs now relies on the same hierarchical libraries as GHC and Nhc98,
+and provides almost all of them.
+For now, compatibility with the old libraries is provided by stub
+modules, but users are encouraged to migrate to the new libraries.</P
+></LI
+><LI
+><P
+>Full support for imprecise exceptions (but not asynchronous ones).
+Most runtime errors are now reported by applying <TT
+CLASS="LITERAL"
+>print</TT
+>
+to an <TT
+CLASS="LITERAL"
+>Exception</TT
+>
+(formerly the built-in printer was applied to the faulty redex).</P
+></LI
+><LI
+><P
+>Integrated .NET support (on Windows platforms).</P
+></LI
+><LI
+><P
+>The <TT
+CLASS="OPTION"
+>-e</TT
+>, <TT
+CLASS="OPTION"
+>-f</TT
+>, <TT
+CLASS="OPTION"
+>-i</TT
+>,
+<TT
+CLASS="OPTION"
+>-N</TT
+>, <TT
+CLASS="OPTION"
+>-W</TT
+> and <TT
+CLASS="OPTION"
+>-X</TT
+> options
+and the <B
+CLASS="COMMAND"
+>:project</B
+> command have been removed.</P
+></LI
+></UL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="observe.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Hugs debugging primitives</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

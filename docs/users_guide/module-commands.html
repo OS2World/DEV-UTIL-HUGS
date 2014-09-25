@@ -1,0 +1,515 @@
+<HTML
+><HEAD
+><TITLE
+>Loading and editing Haskell module files</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Using Hugs"
+HREF="using-hugs.html"><LINK
+REL="PREVIOUS"
+TITLE="Using Hugs"
+HREF="using-hugs.html"><LINK
+REL="NEXT"
+TITLE="Getting information"
+HREF="info-commands.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. Using Hugs</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="info-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="MODULE-COMMANDS"
+>2.2. Loading and editing Haskell module files</A
+></H1
+><P
+>The Hugs prompt accepts expressions, but not Haskell definitions.
+These should be placed in text files containing Haskell modules,
+and these modules loaded into Hugs either by listing them on the command line,
+or by using the commands listed here.
+Hugs assumes that each Haskell module is in a separate file.
+You can load these files by name, or by specifying a module name.</P
+><P
+>Hugs maintains a notion of a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>current module</I
+></SPAN
+>,
+initially the <TT
+CLASS="LITERAL"
+>Prelude</TT
+> and normally indicated by the prompt.
+Expressions presented to Hugs are interpreted within the scope of the
+current module, i.e. they may refer to unexported names within the module.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LOAD-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:load</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>file-or-module</I
+></TT
+>...]</P
+></A
+></DT
+><DD
+><P
+>Clear all files except the <TT
+CLASS="LITERAL"
+>Prelude</TT
+> and modules it uses,
+and then load the specified files or modules (if any).
+The last module loaded becomes the current module.</P
+><P
+>You may specify a literal filename.
+The named file may contain a Haskell module with any name,
+but you can't load two modules with the same name together.
+To include a literal space in a filename, either precede it with a backslash
+or wrap the whole filename double quotes.
+Double quoted filenames may also contain the escape sequences
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\ </TT
+>"</SPAN
+>,
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\"</TT
+>"</SPAN
+> and
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\\</TT
+>"</SPAN
+>.
+Other bachslashes are interpreted literally.</P
+><P
+>When asked to load a module <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+>,
+Hugs looks for a file
+<TT
+CLASS="REPLACEABLE"
+><I
+>dir</I
+></TT
+><TT
+CLASS="LITERAL"
+>/</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.hs</TT
+>
+or
+<TT
+CLASS="REPLACEABLE"
+><I
+>dir</I
+></TT
+><TT
+CLASS="LITERAL"
+>/</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.lhs</TT
+>,
+where <TT
+CLASS="REPLACEABLE"
+><I
+>dir</I
+></TT
+> is a directory in its search path.
+(The <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>/</TT
+>"</SPAN
+> is used on Unix systems;
+Windows systems use <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\</TT
+>"</SPAN
+>.)
+The search path may be changed using the
+<A
+HREF="options.html#OPTION-SEARCH-PATH"
+><TT
+CLASS="OPTION"
+>-P</TT
+></A
+> option,
+while the set of suffixes tried may be changed using the
+<A
+HREF="options.html#OPTION-SUFFIXES"
+><TT
+CLASS="OPTION"
+>-S</TT
+></A
+> option
+(see <A
+HREF="options.html#OPTIONS-LOADING"
+>Section 3.1.2</A
+>).
+The file found should contain a Haskell module called
+<TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+>.</P
+><P
+>In mapping compound module names like <TT
+CLASS="LITERAL"
+>A.B.C</TT
+> to files,
+the dots are interpreted as slashes, leading to filenames
+<TT
+CLASS="REPLACEABLE"
+><I
+>dir</I
+></TT
+><TT
+CLASS="LITERAL"
+>/A/B/C.hs</TT
+>
+or
+<TT
+CLASS="REPLACEABLE"
+><I
+>dir</I
+></TT
+><TT
+CLASS="LITERAL"
+>/A/B/C.lhs</TT
+>.</P
+><P
+>Modules imported by Haskell modules are resolved to filenames in the same way,
+except that an extra directory is searched first when</P
+><P
+></P
+><UL
+><LI
+><P
+>the importing module was loaded by specifying a filename in that directory, or</P
+></LI
+><LI
+><P
+>the importing module was found relative to that directory.</P
+></LI
+></UL
+><P
+>This fits nicely with the scenario where you load a module
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :load /path/to/my/project/code.hs
+  Main&#62;</PRE
+></TD
+></TR
+></TABLE
+>
+where the directory <TT
+CLASS="LITERAL"
+>/path/to/my/project</TT
+> contains other
+modules used directly or indirectly by the module <TT
+CLASS="LITERAL"
+>Main</TT
+>
+in <TT
+CLASS="LITERAL"
+>code.hs</TT
+>.
+For example, suppose <TT
+CLASS="LITERAL"
+>Main</TT
+> imports <TT
+CLASS="LITERAL"
+>A.B.C</TT
+>,
+which in turn imports <TT
+CLASS="LITERAL"
+>D</TT
+>.
+These may be resolved to filenames
+<TT
+CLASS="LITERAL"
+>/path/to/my/project/A/B/C.hs</TT
+>,
+and (assuming that is found), <TT
+CLASS="LITERAL"
+>/path/to/my/project/D.hs</TT
+>.
+However imports from modules found on the search path do not use the extra
+directory.</P
+></DD
+><DT
+><A
+NAME="ALSO-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:also</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>file-or-module</I
+></TT
+>...]</P
+></A
+></DT
+><DD
+><P
+>Read the specified additional files or modules.
+The last module loaded becomes the current module.</P
+></DD
+><DT
+><A
+NAME="RELOAD-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:reload</B
+> </P
+></A
+></DT
+><DD
+><P
+>Clear all files except the <TT
+CLASS="LITERAL"
+>Prelude</TT
+> and modules it uses,
+and then reload all the previously loaded modules.</P
+></DD
+><DT
+><A
+NAME="MODULE-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:module</B
+>   <TT
+CLASS="REPLACEABLE"
+><I
+>module</I
+></TT
+> </P
+></A
+></DT
+><DD
+><P
+>Set the current module for evaluating expressions.</P
+></DD
+><DT
+><A
+NAME="EDIT-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:edit</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>file</I
+></TT
+>]</P
+></A
+></DT
+><DD
+><P
+>The <TT
+CLASS="LITERAL"
+>:edit</TT
+> command starts an editor program to modify
+or view a Haskell module.
+Hugs suspends until the editor terminates,
+and then reloads the currently loaded modules.
+The <TT
+CLASS="OPTION"
+>-E</TT
+> option (see <A
+HREF="options.html#OPTIONS-EDITOR"
+>Section 3.1.3</A
+>)
+can be used to configure Hugs to your editor of choice.</P
+><P
+>If no filename is specified, Hugs edits the current module.</P
+></DD
+><DT
+><A
+NAME="FIND-COMMAND"
+><P
+><B
+CLASS="COMMAND"
+>:find</B
+>   <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> </P
+></A
+></DT
+><DD
+><P
+>Edit the module containing the definition of <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="info-commands.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Using Hugs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Getting information</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,252 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="commands.html">back</a> | <a href="exts.html">next</a>  <br><hr>
+<a name="libs"></a><a name="sect6"></a>
+<h2>6<tt>&nbsp;&nbsp;</tt>Library overview</h2>
+Haskell 98 places much greater emphasis on the use
+of libraries than early versions of
+the language.  Following that lead, the Hugs 98
+distribution includes most of the official libraries defined in the
+Haskell Library Report [<a href="hugs.html#$Haskell98libs">Haskell98libs</a>].
+The distribution also includes a number of unofficial libraries, which
+fall into two categories: portable libraries, which are implemented using
+standard Haskell or widely implemented Haskell extensions; and Hugs-specific
+libraries, which use features that are not available in other Haskell
+implementations.  <p>
+All that you need to do to use libraries is to import them 
+using an <tt>import</tt> declaration.  
+For example:
+
+<tt><br>
+&nbsp;module&nbsp;MandlebrotSet&nbsp;where<br>
+&nbsp;import&nbsp;Array<br>
+&nbsp;import&nbsp;Complex<br>
+&nbsp;...<br>
+
+
+</tt>Of course, this assumes
+that <tt>HUGSPATH</tt> has
+been set to point to the directories where the libraries are
+stored, and
+that import chasing is enabled.
+The default search path includes the
+directories containing both the standard and unofficial libraries.<p>
+<a name="sect6.1"></a>
+<h3>6.1<tt>&nbsp;&nbsp;</tt>Standard Libraries</h3>
+The Hugs 98 distribution includes the following standard
+libraries: <tt>Array</tt>, <tt>Char</tt>, <tt>Complex</tt>, <tt>IO</tt>, <tt>Ix</tt>, <tt>List</tt>, <tt>Locale</tt>, <tt>Maybe</tt>, <tt>Monad</tt>, <tt>Numeric</tt>, <tt>Prelude</tt>, <tt>Random</tt>, <tt>Ratio</tt>, and <tt>System</tt>.
+The libraries <tt>Directory</tt>, <tt>Time</tt>, and <tt>CPUTime</tt>, are not currently supported.
+The library report [<a href="hugs.html#$Haskell98libs">Haskell98libs</a>] contains full descriptions of all
+of theses standard libraries.   Differences between the library report and
+the libraries supplied with Hugs are described in Section <a href="diffs.html#diffs">9</a>.<p>
+<a name="sect6.2"></a>
+<h3>6.2<tt>&nbsp;&nbsp;</tt>The Hugs-GHC Extension Libraries</h3>
+Hugs and GHC provide a common set of libraries to aid portability; detailed
+specifications for these libraries are described elsewhere [<a href="hugs.html#$HugsGHClibs">HugsGHClibs</a>].
+The Hugs-GHC modules included in the current distribution
+include <tt>Addr</tt>, <tt>Bits</tt>, <tt>Channel</tt>, <tt>ChannelVar</tt>, <tt>Concurrent</tt>, <tt>Dynamic</tt>, <tt>Foreign</tt>, <tt>IOExts</tt>, <tt>Int</tt>, <tt>GetOpt</tt>, <tt>NumExts</tt>, <tt>Pretty</tt>, <tt>ST</tt>, <tt>LazyST</tt>, <tt>Weak</tt>, and <tt>Word</tt>.
+The <tt>Exception</tt> and <tt>Stable</tt> libraries are
+not currently supported.  Note that the <tt>ST</tt> and <tt>LazyST</tt> libraries
+cannot be used when the interpreter is running in Haskell 98 mode; the type
+for <tt>runST</tt> requires support for rank-2 polymorphism, which is only
+available in Hugs mode.   (See Section <a href="exts.html#ranktwo">7.3.2</a> for further details.)<p>
+The specifications and implementations of all of these libraries are still
+evolving, and are subject to change.<p>
+<a name="sect6.3"></a>
+<h3>6.3<tt>&nbsp;&nbsp;</tt>Portable Libraries</h3>
+These libraries are not part of the Haskell standard but can be ported
+to most Haskell systems.
+
+<UL><LI><tt>ListUtils
+</tt>This module provides list functions that were removed
+from the Prelude in the move from Haskell 1.2 to Haskell 1.3.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;ListUtils&nbsp;where<br>
+<br>
+&nbsp;&nbsp;sums,&nbsp;products&nbsp;&nbsp;&nbsp;::&nbsp;Num&nbsp;a&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]<br>
+&nbsp;&nbsp;subsequences&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;[a]&nbsp;-&gt;&nbsp;[[a]]<br>
+&nbsp;&nbsp;permutations&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;[a]&nbsp;-&gt;&nbsp;[[a]]<br>
+
+
+</tt><LI><tt>ParseLib
+</tt>This module provides a library of parser combinators,
+as described in the paper on <I>Monadic Parser Combinators</I> by
+Graham Hutton and Erik Meijer [<a href="hugs.html#$MonParse">MonParse</a>].
+<LI><tt>Interact</tt>:
+This library provides facilities for writing simple interactive
+programs.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;Interact&nbsp;where<br>
+<br>
+&nbsp;&nbsp;type&nbsp;Interact&nbsp;=&nbsp;String&nbsp;-&gt;&nbsp;String<br>
+<br>
+&nbsp;&nbsp;end&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Interact<br>
+&nbsp;&nbsp;readChar,&nbsp;peekChar&nbsp;::&nbsp;Interact&nbsp;-&gt;&nbsp;(Char&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;pressAnyKey&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;unreadChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Char&nbsp;-&gt;&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;writeChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Char&nbsp;-&gt;&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;writeStr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;ringBell&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;readLine&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;(String&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;Interact<br>
+
+
+</tt>An expression <tt>e</tt> of type <tt>Interact</tt> can be executed as a
+program by evaluating <tt>run&nbsp;e</tt>.
+
+<LI><tt>AnsiScreen
+</tt>This library defines some basic ANSI escape seqences for terminal control.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;AnsiScreen&nbsp;where<br>
+<br>
+&nbsp;&nbsp;type&nbsp;Pos&nbsp;&nbsp;=&nbsp;(Int,Int)<br>
+<br>
+&nbsp;&nbsp;at&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;-&gt;&nbsp;String&nbsp;-&gt;&nbsp;String<br>
+&nbsp;&nbsp;highlight&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;String<br>
+&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Int&nbsp;-&gt;&nbsp;Int&nbsp;-&gt;&nbsp;String<br>
+&nbsp;&nbsp;home&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;String<br>
+&nbsp;&nbsp;cls&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;String<br>
+
+
+</tt>The definitions in this module will need to be adapted to work with
+terminals that do not support ANSI escape sequences.
+<LI><tt>AnsiInteract
+</tt>This library includes both <tt>Interact</tt> and <tt>AnsiScreen</tt>, and
+also contains further support for screen oriented interactive I/O.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;AnsiInteract(module&nbsp;AnsiInteract,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;module&nbsp;Interact,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;module&nbsp;AnsiScreen)&nbsp;where<br>
+&nbsp;&nbsp;import&nbsp;AnsiScreen<br>
+&nbsp;&nbsp;import&nbsp;Interact<br>
+<br>
+&nbsp;&nbsp;clearScreen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;writeAt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;-&gt;&nbsp;String&nbsp;-&gt;&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;moveTo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;-&gt;&nbsp;Interact&nbsp;-&gt;&nbsp;Interact<br>
+&nbsp;&nbsp;readAt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;start&nbsp;coords<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;max&nbsp;input&nbsp;length<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(String&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;--&nbsp;continuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interact<br>
+&nbsp;&nbsp;defReadAt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;start&nbsp;coords<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;max&nbsp;input&nbsp;length<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;default&nbsp;value<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(String&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;--&nbsp;continuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interact<br>
+&nbsp;&nbsp;promptReadAt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;start&nbsp;coords<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;max&nbsp;input&nbsp;length&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;prompt<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(String&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;--&nbsp;continuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interact<br>
+&nbsp;&nbsp;defPromptReadAt&nbsp;&nbsp;&nbsp;::&nbsp;Pos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;start&nbsp;coords<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;max&nbsp;input&nbsp;length&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;prompt<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;&nbsp;--&nbsp;default&nbsp;value<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(String&nbsp;-&gt;&nbsp;Interact)&nbsp;-&gt;&nbsp;--&nbsp;continuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interact<br>
+
+
+</tt></UL><p>
+<a name="sect6.4"></a>
+<h3>6.4<tt>&nbsp;&nbsp;</tt>Hugs-Specific Libraries</h3>
+These libraries provide several non-standard facilities for Hugs programmers.
+Other Haskell implementations may provide similar features, but this is
+not guaranteed, and there may be significant differences in organization,
+naming, semantics, or functionality.
+
+<UL><LI><tt>Number
+</tt>  This library defines a numeric datatype of
+  fixed width integers (whatever <tt>Int</tt> supplies).  However,
+  unlike the built-in <tt>Int</tt> type, overflows are detected and 
+  cause a run-time error.  To ensure that all
+  integer arithmetic in a given module includes overflow protection
+  you must include a default declaration for <tt>Number</tt>.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;Number&nbsp;where<br>
+&nbsp;&nbsp;data&nbsp;Number&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;fixed&nbsp;width&nbsp;integers<br>
+&nbsp;&nbsp;instance&nbsp;Eq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;--&nbsp;class&nbsp;instances<br>
+&nbsp;&nbsp;instance&nbsp;Ord&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Show&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Enum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Num&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Bounded&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Real&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Ix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number<br>
+&nbsp;&nbsp;instance&nbsp;Integral&nbsp;Number<br>
+
+
+</tt>This library cannot be used when Hugs is running in Haskell 98 mode
+because it requires features that are only supported in full Hugs mode.
+<LI><tt>IOExtensions
+</tt>This module provides non-standard extensions to
+the <tt>IO</tt> monad.
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;IOExtensions&nbsp;where<br>
+<br>
+&nbsp;&nbsp;readBinaryFile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;FilePath&nbsp;-&gt;&nbsp;IO&nbsp;String<br>
+&nbsp;&nbsp;writeBinaryFile&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;FilePath&nbsp;-&gt;&nbsp;String&nbsp;-&gt;&nbsp;IO&nbsp;()<br>
+&nbsp;&nbsp;appendBinaryFile&nbsp;&nbsp;&nbsp;::&nbsp;FilePath&nbsp;-&gt;&nbsp;String&nbsp;-&gt;&nbsp;IO&nbsp;()<br>
+&nbsp;&nbsp;openBinaryFile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;FilePath&nbsp;-&gt;&nbsp;IOMode&nbsp;-&gt;&nbsp;IO&nbsp;Handle<br>
+<br>
+&nbsp;&nbsp;getCh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;IO&nbsp;Char<br>
+&nbsp;&nbsp;argv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;[String]<br>
+
+
+</tt><LI><tt>Trace</tt>: This library provides
+a single function, that can sometimes be useful for debugging:
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;Trace&nbsp;where<br>
+&nbsp;&nbsp;trace&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;&nbsp;traceShow&nbsp;::&nbsp;Show&nbsp;a&nbsp;=&gt;&nbsp;String&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+
+
+</tt>When called, <tt>trace</tt> prints the string in its first argument, and then
+returns the second argument as its result.  The <tt>traceShow</tt> function is
+a variant of <tt>trace</tt> that generates its output message by concatenating
+the supplied <tt>String</tt> argument with the result of applying <tt>show</tt> to
+its value argument.  These functions are not
+referentially transparent, and should only be used for debugging, or for
+monitoring execution.  You should also be warned that, unless you understand
+some of the details about the way that Hugs programs are executed, results
+obtained using <tt>trace</tt> can be rather confusing.  For example, the
+messages may not appear in the order that you expect.  Even ignoring the
+output that they produce, adding calls to <tt>trace</tt> can change the
+semantics of your program.  Consider this a warning!
+<LI><tt>Trex
+</tt>This library supports Trex extensible records.  These can
+only be used when Hugs is compiled with Trex support using
+the <tt>-enable-TREX</tt> configuration option.  Trex is described in
+more details in Section <a href="exts.html#trex">7.2</a>.
+<LI><tt>HugsInternals
+</tt>This library provides primitives for accessing Hugs internals; for example,
+they  provide the means with which to implement simple error-recovery and
+debugging facilities in Haskell.  
+They should be regarded as
+an <I>experimental</I> feature and may not be supported in future
+versions of Hugs. They can only be used if hugs was configured with
+the <tt>--enable-internal-prims</tt> flag.
+<LI><tt>GenericPrint
+</tt>This library provides a "generic" (or "polymorphic") print function
+in Haskell, that works in essentially the same way as Hugs' builtin
+printer when the <tt>-u</tt> option is used.
+The module <tt>HugsInternals</tt> is required.
+<LI><tt>CVHAssert
+</tt>This library provides a simple implementation of Cordy Hall's assertions
+for performance debugging.  These primitives are
+an <I>experimental</I> feature that may be removed in future versions of Hugs.
+They can only be used if hugs was configured with
+the <tt>--enable-internal-prims</tt> flag.
+<LI><tt>Win32
+</tt>This library contains Haskell versions for many of the functions in
+the Microsoft Win32 library.  It is only available on Windows 95/NT.
+The <tt>--with-plugins</tt> configuration option must be used in conjunction
+with this and the other Microsoft libraries.
+</UL>
+Other libraries included in the standard distribution, but not further
+documented here are <tt>Sequence</tt>, <tt>Pretty</tt>, <tt>HugsDynamic</tt>, <tt>HugsLibs</tt>, <tt>StdLibs</tt>, 
+and <tt>OldWeak</tt>.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="commands.html">back</a> | <a href="exts.html">next</a>  <br><font size=2>May 22, 1999</font>

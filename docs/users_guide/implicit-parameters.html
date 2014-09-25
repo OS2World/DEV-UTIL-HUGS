@@ -1,0 +1,549 @@
+<HTML
+><HEAD
+><TITLE
+>Implicit parameters</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"><LINK
+REL="PREVIOUS"
+TITLE="Type annotations in patterns"
+HREF="type-annotations.html"><LINK
+REL="NEXT"
+TITLE="Hugs-specific language extensions"
+HREF="hugs-only.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="type-annotations.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 5. Language extensions supported by Hugs and GHC</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="IMPLICIT-PARAMETERS"
+>5.5. Implicit parameters</A
+></H1
+><P
+> Implicit parameters are implemented as described in
+<I
+CLASS="CITETITLE"
+>Implicit parameters: dynamic scoping with static types</I
+>,
+J Lewis, MB Shields, E Meijer, J Launchbury,
+<I
+CLASS="CITETITLE"
+>27th ACM Symposium on Principles of Programming Languages (POPL'00)</I
+>,
+Boston, Jan 2000.
+Note however that the binding syntax in that paper,
+using keywords <TT
+CLASS="LITERAL"
+>dlet</TT
+> and <TT
+CLASS="LITERAL"
+>with</TT
+>,
+has been replaced by the form presented below.</P
+><P
+>(Most of the following, still rather incomplete,
+documentation is due to Jeff Lewis.)</P
+><P
+>A variable is called <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>dynamically bound</I
+></SPAN
+> when it is
+bound by the calling context of a function and
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>statically bound</I
+></SPAN
+> when bound by the callee's context.
+In Haskell, all variables are statically bound.
+Dynamic binding of variables is a notion that goes back to Lisp,
+but was later discarded in more modern incarnations, such as Scheme,
+as dynamic binding can be very confusing in an untyped language.
+Unfortunately typed languages,
+in particular Hindley-Milner typed languages like Haskell,
+only support static scoping of variables.</P
+><P
+>However, by a simple extension to the type class system of Haskell,
+we can support dynamic binding.
+Basically, we express the use of a dynamically bound variable
+as a constraint on the type.
+These constraints lead to types of the form <TT
+CLASS="LITERAL"
+>(?x::t') =&#62; t</TT
+>,
+which says
+<SPAN
+CLASS="QUOTE"
+>"this function uses a dynamically-bound variable <TT
+CLASS="LITERAL"
+>?x</TT
+>
+of type <TT
+CLASS="LITERAL"
+>t'</TT
+>"</SPAN
+>.
+For example,
+the following expresses the type of a <TT
+CLASS="LITERAL"
+>sort</TT
+> function,
+implicitly parameterized by a comparison function named <TT
+CLASS="LITERAL"
+>cmp</TT
+>.
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  sort :: (?cmp :: a -&#62; a -&#62; Bool) =&#62; [a] -&#62; [a]</PRE
+></TD
+></TR
+></TABLE
+>
+The dynamic binding constraints are just a new form of predicate
+in the type class system.</P
+><P
+>An implicit parameter occurs in an expression using the special form
+<TT
+CLASS="LITERAL"
+>?x</TT
+>,
+where <TT
+CLASS="LITERAL"
+>x</TT
+> is any valid identifier
+(e.g. <TT
+CLASS="LITERAL"
+>ord ?x</TT
+> is a valid expression).
+Use of this construct also introduces a new
+dynamic-binding constraint in the type of the expression.
+For example, the following definition
+shows how we can define an implicitly parameterized sort function in
+terms of an explicitly parameterized <TT
+CLASS="LITERAL"
+>sortBy</TT
+> function:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  sortBy :: (a -&#62; a -&#62; Bool) -&#62; [a] -&#62; [a]
+
+  sort   :: (?cmp :: a -&#62; a -&#62; Bool) =&#62; [a] -&#62; [a]
+  sort    = sortBy ?cmp</PRE
+></TD
+></TR
+></TABLE
+></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1324"
+>5.5.1. Implicit-parameter type constraints</A
+></H2
+><P
+>Dynamic binding constraints behave just like other type class
+constraints in that they are automatically propagated.
+Thus, when a function is used,
+its implicit parameters are inherited by the function that called it.
+For example, our <TT
+CLASS="LITERAL"
+>sort</TT
+> function might be used
+to pick out the least value in a list:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  least   :: (?cmp :: a -&#62; a -&#62; Bool) =&#62; [a] -&#62; a
+  least xs = fst (sort xs)</PRE
+></TD
+></TR
+></TABLE
+>
+Without lifting a finger, the <TT
+CLASS="LITERAL"
+>?cmp</TT
+> parameter is
+propagated to become a parameter of <TT
+CLASS="LITERAL"
+>least</TT
+> as well.
+With explicit parameters,
+the default is that parameters must always be explicit propagated.
+With implicit parameters, the default is to always propagate them.</P
+><P
+>An implicit-parameter type constraint differs from other type class
+constraints in the following way:
+all uses of a particular implicit parameter must have the same type.
+This means that the type of <TT
+CLASS="LITERAL"
+>(?x, ?x)</TT
+>
+is <TT
+CLASS="LITERAL"
+>(?x::a) =&#62; (a,a)</TT
+>, and not
+<TT
+CLASS="LITERAL"
+>(?x::a, ?x::b) =&#62; (a, b)</TT
+>, as would be the case for type
+class constraints.</P
+><P
+>You can't have an implicit parameter in the context of a class or instance
+declaration.  For example, both these declarations are illegal:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class (?x::Int) =&#62; C a where ...
+  instance (?x::a) =&#62; Foo [a] where ...</PRE
+></TD
+></TR
+></TABLE
+>
+Reason: exactly which implicit parameter you pick up depends on exactly where
+you invoke a function.
+But the <SPAN
+CLASS="QUOTE"
+>"invocation"</SPAN
+> of instance declarations is done behind
+the scenes by the compiler,
+so it's hard to figure out exactly where it is done.
+The easiest thing is to outlaw the offending types.</P
+><P
+>Implicit-parameter constraints do not cause ambiguity.
+For example, consider:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f :: (?x :: [a]) =&#62; Int -&#62; Int
+  f n = n + length ?x
+
+  g :: (Read a, Show a) =&#62; String -&#62; String
+  g s = show (read s)</PRE
+></TD
+></TR
+></TABLE
+>
+Here, <TT
+CLASS="LITERAL"
+>g</TT
+> has an ambiguous type, and is rejected,
+but <TT
+CLASS="LITERAL"
+>f</TT
+> is fine.
+The binding for <TT
+CLASS="LITERAL"
+>?x</TT
+> at <TT
+CLASS="LITERAL"
+>f</TT
+>'s call site is
+quite unambiguous, and fixes the type <TT
+CLASS="LITERAL"
+>a</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1345"
+>5.5.2. Implicit-parameter bindings</A
+></H2
+><P
+>An implicit parameter is <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>bound</I
+></SPAN
+> using the standard
+<TT
+CLASS="LITERAL"
+>let</TT
+> or <TT
+CLASS="LITERAL"
+>where</TT
+> binding forms.
+For example, we define the <TT
+CLASS="LITERAL"
+>min</TT
+> function by binding
+<TT
+CLASS="LITERAL"
+>cmp</TT
+>:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  min :: [a] -&#62; a
+  min  = let ?cmp = (&#60;=) in least</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>A group of implicit-parameter bindings may occur anywhere a normal group
+of Haskell bindings can occur, except at top level.
+That is, they can occur in a <TT
+CLASS="LITERAL"
+>let</TT
+>
+(including in a list comprehension or do-notation),
+or a <TT
+CLASS="LITERAL"
+>where</TT
+> clause.
+Note the following points:
+<P
+></P
+><UL
+><LI
+><P
+>An implicit-parameter binding group must be a
+collection of simple bindings to implicit-style variables
+(no function-style bindings, and no type signatures);
+these bindings are neither polymorphic or recursive.</P
+></LI
+><LI
+><P
+>You may not mix implicit-parameter bindings with ordinary bindings in a
+single <TT
+CLASS="LITERAL"
+>let</TT
+> expression;
+use two nested <TT
+CLASS="LITERAL"
+>let</TT
+>s instead.
+(In the case of <TT
+CLASS="LITERAL"
+>where</TT
+> you are stuck,
+since you can't nest <TT
+CLASS="LITERAL"
+>where</TT
+> clauses.)</P
+></LI
+><LI
+><P
+>You may put multiple implicit-parameter bindings in a single binding group;
+but they are <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>not</I
+></SPAN
+> treated as a mutually recursive group
+(as ordinary <TT
+CLASS="LITERAL"
+>let</TT
+> bindings are).
+Instead they are treated as a non-recursive group,
+simultaneously binding all the implicit parameters.
+The bindings are not nested, and may be re-ordered without changing
+the meaning of the program.
+For example, consider:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f t = let { ?x = t; ?y = ?x+(1::Int) } in ?x + ?y</PRE
+></TD
+></TR
+></TABLE
+>
+The use of <TT
+CLASS="LITERAL"
+>?x</TT
+> in the binding for <TT
+CLASS="LITERAL"
+>?y</TT
+>
+does not <SPAN
+CLASS="QUOTE"
+>"see"</SPAN
+> the binding for <TT
+CLASS="LITERAL"
+>?x</TT
+>,
+so the type of <TT
+CLASS="LITERAL"
+>f</TT
+> is
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  f :: (?x::Int) =&#62; Int -&#62; Int</PRE
+></TD
+></TR
+></TABLE
+></P
+></LI
+></UL
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="type-annotations.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Type annotations in patterns</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Hugs-specific language extensions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

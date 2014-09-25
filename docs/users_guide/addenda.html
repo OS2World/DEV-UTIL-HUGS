@@ -1,0 +1,228 @@
+<HTML
+><HEAD
+><TITLE
+>Addenda to Haskell 98</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Hugs vs Haskell 98 and addenda"
+HREF="haskell98.html"><LINK
+REL="PREVIOUS"
+TITLE="Hugs vs Haskell 98 and addenda"
+HREF="haskell98.html"><LINK
+REL="NEXT"
+TITLE="Language extensions supported by Hugs and GHC"
+HREF="hugs-ghc.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="haskell98.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 4. Hugs <I
+CLASS="FOREIGNPHRASE"
+>vs</I
+> Haskell 98 and addenda</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ADDENDA"
+>4.2. Addenda to Haskell 98</A
+></H1
+><P
+>These addenda describe extensions that have been standardized
+across haskell implementations.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FFI"
+>4.2.1. Foreign Function Interface</A
+></H2
+><P
+>The Haskell Foreign Function Interface, as described in the
+<A
+HREF="http://www.cse.unsw.edu.au/~chak/haskell/ffi/"
+TARGET="_top"
+>FFI addendum</A
+>
+is implemented except for the following limitations:</P
+><P
+></P
+><UL
+><LI
+><P
+>Only the <TT
+CLASS="LITERAL"
+>ccall</TT
+> calling convention is supported.
+All others are flagged as errors.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>foreign export</TT
+> is not implemented.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>foreign import wrapper</TT
+> are only implemented for the
+x86, PowerPC and Sparc architectures and has been most thoroughly tested on
+Windows and Linux using gcc.</P
+></LI
+></UL
+><P
+>Modules containing <TT
+CLASS="LITERAL"
+>foreign</TT
+> declarations must be compiled
+with <B
+CLASS="COMMAND"
+>ffihugs</B
+> before use (see <A
+HREF="ffihugs.html"
+>Section 3.4</A
+>).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="HIERARCHICAL-LIBRARIES"
+>4.2.2. Hierarchical Namespace Extension</A
+></H2
+><P
+>The
+<A
+HREF="http://www.haskell.org/hierarchical-modules/"
+TARGET="_top"
+>Haskell Hierarchical Namespace Extension</A
+>
+allows dots in module names, e.g. <TT
+CLASS="LITERAL"
+>System.IO.Error</TT
+>,
+creating a hierarchical module namespace.
+Hugs has supported this since the December 2001 release.
+When searching for the source file corresponding to a hierarchical name,
+Hugs replaces the dots with slashes.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="haskell98.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="hugs-ghc.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Hugs <I
+CLASS="FOREIGNPHRASE"
+>vs</I
+> Haskell 98 and addenda</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="haskell98.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Language extensions supported by Hugs and GHC</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

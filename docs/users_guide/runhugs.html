@@ -1,0 +1,194 @@
+<HTML
+><HEAD
+><TITLE
+>Standalone programs</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Changing the behaviour of Hugs"
+HREF="options.html"><LINK
+REL="PREVIOUS"
+TITLE="Environment variables used by Hugs"
+HREF="environment-variables.html"><LINK
+REL="NEXT"
+TITLE="Compiling modules that use the Foreign Function Interface"
+HREF="ffihugs.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="environment-variables.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. Changing the behaviour of Hugs</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ffihugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNHUGS"
+>3.3. Standalone programs</A
+></H1
+><P
+><B
+CLASS="COMMAND"
+>runhugs</B
+>  [<TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+>...]  <TT
+CLASS="REPLACEABLE"
+><I
+>file</I
+></TT
+> </P
+><P
+>The <B
+CLASS="COMMAND"
+>runhugs</B
+> command is an interpreter for an executable Hugs
+script, which must be a file containing a Haskell
+<TT
+CLASS="LITERAL"
+>Main</TT
+> module.
+For example, an executable file might contain the lines
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+  #!/usr/local/bin/runhugs +l
+
+  &#62; module Main where
+  &#62; main = putStr "Hello, World\n"</PRE
+></TD
+></TR
+></TABLE
+> 
+When this file is executed, <B
+CLASS="COMMAND"
+>runhugs</B
+> will invoke
+the <TT
+CLASS="LITERAL"
+>main</TT
+> function.
+Any arguments given on the command line will be available through
+the <TT
+CLASS="LITERAL"
+>getArgs</TT
+> action.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="environment-variables.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ffihugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Environment variables used by Hugs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="options.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Compiling modules that use the Foreign Function Interface</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

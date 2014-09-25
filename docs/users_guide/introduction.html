@@ -1,0 +1,434 @@
+<HTML
+><HEAD
+><TITLE
+>Introduction</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="The Hugs 98 License"
+HREF="license.html"><LINK
+REL="NEXT"
+TITLE="Using Hugs"
+HREF="using-hugs.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="license.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="INTRODUCTION"
+>Chapter 1. Introduction</A
+></H1
+><P
+>In September 1991, Mark Jones released a functional programming system called
+<I
+CLASS="FIRSTTERM"
+>Gofer</I
+>, which provided a compact, portable implementation
+of a Haskell-like language.
+The system also included experimental type system extensions,
+many of which later became part of Haskell.
+On Valentine's Day 1995, Mark released
+<I
+CLASS="FIRSTTERM"
+>Hugs</I
+> (Haskell User's Gofer System),
+a derivative of Gofer with greater Haskell compliance.
+Hugs versions are named after the version of Haskell they support;
+Hugs 98 was released in January 1999.
+Mark gave up the maintainership of Hugs in January 2000.</P
+><P
+>Hugs 98 still aims to be a fairly lightweight, portable implementation,
+and now adheres closely to Haskell 98.
+It also supports several extensions shared with other Haskell implementations:
+<P
+></P
+><UL
+><LI
+><P
+>Hugs supports standardized extensions (addenda) to Haskell 98,
+for interfacing to foreign languages and structuring the module space.</P
+></LI
+><LI
+><P
+>With the appropriate options (see <A
+HREF="options.html#OPTIONS-LANGUAGE"
+>Section 3.1.1</A
+>),
+it is also possible to turn on a number of language extensions,
+most of which are also supported by the
+<A
+HREF="http://www.haskell.org/ghc/"
+TARGET="_top"
+>Glasgow Haskell Compiler</A
+> (GHC),
+though some are specific to Hugs.</P
+></LI
+><LI
+><P
+>Hugs comes with a large collection of libraries,
+also shared with other Haskell implementations,
+and described in <A
+HREF="http://www.haskell.org/ghc/docs/latest/html/libraries.html"
+TARGET="_top"
+>separate documentation</A
+>.</P
+></LI
+></UL
+>
+Though these features make Hugs highly compatible with other implementations,
+it is primarily intended as interpreter and programming environment
+for developing Haskell programs.
+If your application involves large programs or speed is critical,
+you may strike Hugs's limitations, and may wish to try a Haskell compiler.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="OTHER"
+>1.1. Other sources of information</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OTHER-DOCUMENTATION"
+>1.1.1. Other documentation</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="USER-MANUAL"
+><I
+CLASS="CITETITLE"
+>The Hugs 98 User Manual</I
+></A
+></DT
+><DD
+><P
+>This was the definitive reference for earlier versions of Hugs,
+though parts of it are now out-of-date.
+Much of it remains relevant, particularly Section 7 on Hugs extensions,
+and it should be consulted in several areas that this Guide does not cover well.
+The manual is available in several formats:
+<A
+HREF="http://cvs.haskell.org/Hugs/pages/hugsman/index.html"
+TARGET="_top"
+>HTML</A
+>,
+<A
+HREF="http://cvs.haskell.org/Hugs/downloads/hugs.pdf"
+TARGET="_top"
+>PDF</A
+>,
+<A
+HREF="http://cvs.haskell.org/Hugs/downloads/hugs.ps.gz"
+TARGET="_top"
+>gzipped Postscript</A
+>, 
+<A
+HREF="http://cvs.haskell.org/Hugs/downloads/html.tar.gz"
+TARGET="_top"
+>gzipped tar-ed html</A
+>,
+<A
+HREF="http://cvs.haskell.org/Hugs/downloads/hugs.dvi"
+TARGET="_top"
+>dvi</A
+>,
+<A
+HREF="http://cvs.haskell.org/Hugs/downloads/hugs-hlp.zip"
+TARGET="_top"
+>WinHelp(zipped)</A
+> and
+<A
+HREF="http://www.galois.com/~sof/hugs98.chm"
+TARGET="_top"
+>HTMLHelp(win32 help format)</A
+>.</P
+></DD
+><DT
+><A
+NAME="HASKELL98-REPORT"
+><I
+CLASS="CITETITLE"
+>Haskell 98 Language and Libraries: the Revised Report</I
+></A
+></DT
+><DD
+><P
+>The definitive reference for the Haskell 98 language and standard libraries,
+published by Cambridge University Press, and also available
+<A
+HREF="http://www.haskell.org/definition/"
+TARGET="_top"
+>online</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBRARIES"
+><A
+HREF="http://www.haskell.org/ghc/docs/latest/html/libraries.html"
+TARGET="_top"
+>Haskell Core Libraries</A
+></A
+></DT
+><DD
+><P
+>A collection of libraries shared by Haskell implementations, including Hugs.</P
+></DD
+><DT
+><A
+HREF="http://www.cs.nott.ac.uk/Department/Staff/mpj/faq.html"
+TARGET="_top"
+>comp.lang.functional FAQ</A
+></DT
+><DD
+><P
+>General information about functional programming.</P
+></DD
+></DL
+></DIV
+><P
+>More information about Haskell may be found on the Haskell home page
+<A
+HREF="http://www.haskell.org/"
+TARGET="_top"
+>http://www.haskell.org/</A
+>
+and the Hugs home page
+<A
+HREF="http://www.haskell.org/hugs/"
+TARGET="_top"
+>http://www.haskell.org/hugs/</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="MAILING-LISTS"
+>1.1.2. Mailing lists</A
+></H2
+><P
+>There are a number of mailing lists where people discuss Hugs and Haskell,
+all with archives of past postings:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+HREF="http://www.haskell.org/mailman/listinfo/hugs-users"
+TARGET="_top"
+>hugs-users</A
+>:</DT
+><DD
+><P
+>This is the place for general discussion about using Hugs.</P
+></DD
+><DT
+><A
+HREF="http://www.haskell.org/mailman/listinfo/hugs-bugs"
+TARGET="_top"
+>hugs-bugs</A
+>:</DT
+><DD
+><P
+>Use this list for reporting bugs.
+This is more likely to be effective than direct mail to the authors
+or maintainers of Hugs.
+We do read this mailing list – but so do many other people,
+who might be able to give you more appropriate or timely advice than us!
+Before reporting a bug, check the list of known deviations from Haskell 98
+(see <A
+HREF="haskell98.html#BUGS-HASKELL98"
+>Section 4.1</A
+>).</P
+></DD
+><DT
+><A
+HREF="http://www.haskell.org/mailman/listinfo/cvs-hugs"
+TARGET="_top"
+>cvs-hugs</A
+>:</DT
+><DD
+><P
+>Discussion of the development of Hugs takes place on this list.
+This list also receives commit messages from the
+<A
+HREF="http://cvs.haskell.org/cgi-bin/cvsweb.cgi/hugs98/"
+TARGET="_top"
+>Hugs CVS repository</A
+>.</P
+></DD
+><DT
+><A
+HREF="http://www.haskell.org/mailman/listinfo/haskell-cafe"
+TARGET="_top"
+>haskell-cafe</A
+>:</DT
+><DD
+><P
+>An informal list for chatting about Haskell.
+This is an ideal place for beginners to get help with Haskell,
+but Hugs-specific questions would be better directed at the Hugs lists.</P
+></DD
+><DT
+><A
+HREF="http://www.haskell.org/mailman/listinfo/haskell"
+TARGET="_top"
+>haskell</A
+>:</DT
+><DD
+><P
+>A lower-volume list for more technical discussion of Haskell.
+Please do not post beginner questions or Hugs-specific questions to this list.</P
+></DD
+></DL
+></DIV
+><P
+>There are several other Haskell-related mailing lists served by
+<TT
+CLASS="LITERAL"
+>www.haskell.org</TT
+>.
+See <A
+HREF="http://www.haskell.org/mailman/listinfo/"
+TARGET="_top"
+><TT
+CLASS="LITERAL"
+>http://www.haskell.org/mailman/listinfo/</TT
+></A
+>
+for the full list.</P
+><P
+>Some Haskell-related discussion also takes place in the Usenet newsgroup
+<A
+HREF="news:comp.lang.functional"
+TARGET="_top"
+><TT
+CLASS="LITERAL"
+>comp.lang.functional</TT
+></A
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="license.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="using-hugs.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The Hugs 98 License</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Using Hugs</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

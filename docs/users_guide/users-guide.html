@@ -1,0 +1,485 @@
+<HTML
+><HEAD
+><TITLE
+>The Hugs 98 User's Guide</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="NEXT"
+TITLE="The Hugs 98 License"
+HREF="license.html"></HEAD
+><BODY
+CLASS="BOOK"
+><DIV
+CLASS="BOOK"
+><A
+NAME="USERS-GUIDE"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+><A
+NAME="AEN2"
+>The Hugs 98 User's Guide</A
+></H1
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="license.html"
+>The Hugs 98 License</A
+></DT
+><DT
+>1. <A
+HREF="introduction.html"
+>Introduction</A
+></DT
+><DD
+><DL
+><DT
+>1.1. <A
+HREF="introduction.html#OTHER"
+>Other sources of information</A
+></DT
+><DD
+><DL
+><DT
+>1.1.1. <A
+HREF="introduction.html#OTHER-DOCUMENTATION"
+>Other documentation</A
+></DT
+><DT
+>1.1.2. <A
+HREF="introduction.html#MAILING-LISTS"
+>Mailing lists</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>2. <A
+HREF="using-hugs.html"
+>Using Hugs</A
+></DT
+><DD
+><DL
+><DT
+>2.1. <A
+HREF="using-hugs.html#BASIC-COMMANDS"
+>Basic operation</A
+></DT
+><DT
+>2.2. <A
+HREF="module-commands.html"
+>Loading and editing Haskell module files</A
+></DT
+><DT
+>2.3. <A
+HREF="info-commands.html"
+>Getting information</A
+></DT
+><DT
+>2.4. <A
+HREF="misc-commands.html"
+>Miscellaneous commands</A
+></DT
+></DL
+></DD
+><DT
+>3. <A
+HREF="options.html"
+>Changing the behaviour of Hugs</A
+></DT
+><DD
+><DL
+><DT
+>3.1. <A
+HREF="options.html#OPTIONS-LIST"
+>Hugs options</A
+></DT
+><DD
+><DL
+><DT
+>3.1.1. <A
+HREF="options.html#OPTIONS-LANGUAGE"
+>Language options</A
+></DT
+><DT
+>3.1.2. <A
+HREF="options.html#OPTIONS-LOADING"
+>Module loading options</A
+></DT
+><DT
+>3.1.3. <A
+HREF="options.html#OPTIONS-EDITOR"
+>Specifying a source file editor</A
+></DT
+><DT
+>3.1.4. <A
+HREF="options.html#OPTIONS-EVALUATION"
+>Evaluation and printing options</A
+></DT
+><DT
+>3.1.5. <A
+HREF="options.html#OPTIONS-RESOURCE"
+>Resource usage options</A
+></DT
+></DL
+></DD
+><DT
+>3.2. <A
+HREF="environment-variables.html"
+>Environment variables used by Hugs</A
+></DT
+><DT
+>3.3. <A
+HREF="runhugs.html"
+>Standalone programs</A
+></DT
+><DT
+>3.4. <A
+HREF="ffihugs.html"
+>Compiling modules that use the Foreign Function Interface</A
+></DT
+></DL
+></DD
+><DT
+>4. <A
+HREF="haskell98.html"
+>Hugs <I
+CLASS="FOREIGNPHRASE"
+>vs</I
+> Haskell 98 and addenda</A
+></DT
+><DD
+><DL
+><DT
+>4.1. <A
+HREF="haskell98.html#BUGS-HASKELL98"
+>Haskell 98 non-compliance</A
+></DT
+><DD
+><DL
+><DT
+>4.1.1. <A
+HREF="haskell98.html#BUGS-LEXICAL"
+>Lexical structure</A
+></DT
+><DT
+>4.1.2. <A
+HREF="haskell98.html#BUGS-SYNTAX"
+>Expressions</A
+></DT
+><DT
+>4.1.3. <A
+HREF="haskell98.html#BUGS-TYPES"
+>Declarations and bindings</A
+></DT
+><DT
+>4.1.4. <A
+HREF="haskell98.html#BUGS-MODULES"
+>Modules</A
+></DT
+><DT
+>4.1.5. <A
+HREF="haskell98.html#BUGS-PRIMITIVES"
+>Predefined types and classes</A
+></DT
+></DL
+></DD
+><DT
+>4.2. <A
+HREF="addenda.html"
+>Addenda to Haskell 98</A
+></DT
+><DD
+><DL
+><DT
+>4.2.1. <A
+HREF="addenda.html#FFI"
+>Foreign Function Interface</A
+></DT
+><DT
+>4.2.2. <A
+HREF="addenda.html#HIERARCHICAL-LIBRARIES"
+>Hierarchical Namespace Extension</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>5. <A
+HREF="hugs-ghc.html"
+>Language extensions supported by Hugs and GHC</A
+></DT
+><DD
+><DL
+><DT
+>5.1. <A
+HREF="hugs-ghc.html#SYNTAX-EXTENSIONS"
+>Syntactic extensions</A
+></DT
+><DD
+><DL
+><DT
+>5.1.1. <A
+HREF="hugs-ghc.html#RECURSIVE-DO"
+>Recursive do-notation</A
+></DT
+><DT
+>5.1.2. <A
+HREF="hugs-ghc.html#ZIP-COMPREHENSION"
+>Parallel list comprehensions (a.k.a. zip-comprehensions)</A
+></DT
+></DL
+></DD
+><DT
+>5.2. <A
+HREF="class-extensions.html"
+>Type class extensions</A
+></DT
+><DD
+><DL
+><DT
+>5.2.1. <A
+HREF="class-extensions.html#FLEXIBLE-CONTEXTS"
+>More flexible contexts</A
+></DT
+><DT
+>5.2.2. <A
+HREF="class-extensions.html#FLEXIBLE-INSTANCES"
+>More flexible instance declarations</A
+></DT
+><DT
+>5.2.3. <A
+HREF="class-extensions.html#OVERLAPPING-INSTANCES"
+>Overlapping instances</A
+></DT
+><DT
+>5.2.4. <A
+HREF="class-extensions.html#MULTI-PARAM"
+>Multiple parameter type classes</A
+></DT
+><DT
+>5.2.5. <A
+HREF="class-extensions.html#FUNCTIONAL-DEPENDENCIES"
+>Functional dependencies</A
+></DT
+></DL
+></DD
+><DT
+>5.3. <A
+HREF="quantified-types.html"
+>Quantified types</A
+></DT
+><DD
+><DL
+><DT
+>5.3.1. <A
+HREF="quantified-types.html#RANK-2-TYPES"
+>Rank 2 types</A
+></DT
+><DT
+>5.3.2. <A
+HREF="quantified-types.html#POLYMORPHIC-COMPONENTS"
+>Polymorphic components</A
+></DT
+><DT
+>5.3.3. <A
+HREF="quantified-types.html#EXISTENTIAL-QUANTIFICATION"
+>Existential quantification</A
+></DT
+></DL
+></DD
+><DT
+>5.4. <A
+HREF="type-annotations.html"
+>Type annotations in patterns</A
+></DT
+><DT
+>5.5. <A
+HREF="implicit-parameters.html"
+>Implicit parameters</A
+></DT
+><DD
+><DL
+><DT
+>5.5.1. <A
+HREF="implicit-parameters.html#AEN1324"
+>Implicit-parameter type constraints</A
+></DT
+><DT
+>5.5.2. <A
+HREF="implicit-parameters.html#AEN1345"
+>Implicit-parameter bindings</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>6. <A
+HREF="hugs-only.html"
+>Hugs-specific language extensions</A
+></DT
+><DD
+><DL
+><DT
+>6.1. <A
+HREF="hugs-only.html#TREX"
+>Typed extensible records</A
+></DT
+><DT
+>6.2. <A
+HREF="restricted-synonyms.html"
+>Restricted type synonyms</A
+></DT
+><DT
+>6.3. <A
+HREF="here-documents.html"
+>Here documents</A
+></DT
+><DT
+>6.4. <A
+HREF="observe.html"
+>Hugs debugging primitives</A
+></DT
+><DD
+><DL
+><DT
+>6.4.1. <A
+HREF="observe.html#AEN1457"
+>Using HugsHood</A
+></DT
+><DT
+>6.4.2. <A
+HREF="observe.html#AEN1513"
+>Differences from Hood</A
+></DT
+><DT
+>6.4.3. <A
+HREF="observe.html#AEN1578"
+>Reporting HugsHood bugs</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>7. <A
+HREF="miscellaneous.html"
+>Miscellaneous</A
+></DT
+><DD
+><DL
+><DT
+>7.1. <A
+HREF="miscellaneous.html#HISTORY"
+>Hugs 98 release history</A
+></DT
+><DD
+><DL
+><DT
+>7.1.1. <A
+HREF="miscellaneous.html#AEN1591"
+>January 1999 (Beta release)</A
+></DT
+><DT
+>7.1.2. <A
+HREF="miscellaneous.html#AEN1609"
+>May 1999</A
+></DT
+><DT
+>7.1.3. <A
+HREF="miscellaneous.html#AEN1626"
+>November 1999</A
+></DT
+><DT
+>7.1.4. <A
+HREF="miscellaneous.html#AEN1663"
+>February 2001</A
+></DT
+><DT
+>7.1.5. <A
+HREF="miscellaneous.html#AEN1682"
+>December 2001</A
+></DT
+><DT
+>7.1.6. <A
+HREF="miscellaneous.html#AEN1720"
+>November 2002</A
+></DT
+><DT
+>7.1.7. <A
+HREF="miscellaneous.html#AEN1732"
+>November 2003</A
+></DT
+></DL
+></DD
+></DL
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="license.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The Hugs 98 License</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

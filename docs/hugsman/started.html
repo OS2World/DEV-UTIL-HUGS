@@ -1,0 +1,838 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="basics.html">back</a> | <a href="commands.html">next</a>  <br><hr>
+<a name="started"></a><a name="sect4"></a>
+<h2>4<tt>&nbsp;&nbsp;</tt>Starting Hugs</h2>
+On Unix machines, the Hugs interpreter is usually started with a
+command line of the form: 
+
+<tt><br>
+&nbsp;&nbsp;hugs&nbsp;[option&nbsp;|&nbsp;file]&nbsp;...<br>
+
+
+</tt>On Windows 95/NT, Hugs may be started by selecting it from the
+start menu or by double clicking on a file with the
+<tt>.hs</tt> or <tt>.lhs</tt> extension. 
+(This manual assumes that Hugs has already been successfully
+installed on your system.)  <p>
+Hugs uses <I>options</I> to set system parameters.  These options are
+distinguished by a leading <tt>+</tt> or <tt>-</tt> and are
+used to customize the behaviour of the interpreter.  
+When Hugs starts, the interpreter
+performs the following tasks:
+
+<UL><LI>Options in the environment are processed.  The variable
+<tt>HUGSFLAGS</tt> holds these options.  On Windows 95/NT, the registry is
+also queried for Hugs option settings.
+<LI>Command line options are processed.
+<LI>Internal data structures are initialized.  In
+particular, the heap is initialized, and its size is
+fixed at this point; if you want to run the interpreter with a heap
+size other than the default, then this must be specified using
+options on the command line, in the environment or in the registry.
+<LI>The prelude file is loaded.  The interpreter will
+look for the prelude file on the path specified by
+the <tt>-P</tt> option. If the prelude, located in the file
+<tt>Prelude.hs</tt>, cannot be found in one of the path directories or
+in the current directory, then Hugs will terminate;
+Hugs will not run without the prelude file.
+<LI>Program files specified on the command line are loaded.  The
+effect of a command <tt>hugs&nbsp;f1&nbsp;...&nbsp;fn</tt> is the same as starting up
+Hugs with the <tt>hugs</tt> command and then typing <tt>:load&nbsp;f1&nbsp;...&nbsp;fn</tt>.
+In particular, the interpreter will not terminate if a problem occurs
+while it is trying to load one of the specified files, but it will
+abort the attempted load command.
+</UL>
+The environment variables and command line options used by Hugs are
+described in the following sections.<a name="secenv"></a><p>
+<a name="sect4.1"></a>
+<h3>4.1<tt>&nbsp;&nbsp;</tt>Environment options</h3>
+Before options on the command line are processed, initial option
+values are set from the environment.  On Windows 95/NT, these
+settings are added to the registry during setup.
+On other systems, the initial settings are
+determined by the <tt>HUGSFLAGS</tt> environment
+variable.  The syntax used in this case
+is the same as on the command line: options are single letters,
+preceeded by <tt>+</tt> or <tt>-</tt>, and sometimes followed by a value. 
+Option settings are separated by
+spaces; option values containing spaces are encoded using
+Haskell string syntax.  The environment should be set up before
+the interpreter is used so 
+that the search path is correctly defined to include the prelude.
+The built-in defaults, however, may allow Hugs to be run without any
+help from the environment on some systems.<p>
+It is usually more convenient to save preferred option settings in
+the environment rather than specifying them on the command line;
+they will then be used
+automatically each time the 
+interpreter is started.  The method for setting these options depends on
+the machine and operating system that you are using, and on the way that
+the Hugs system was installed.  The following examples show some typical
+settings for Unix machines and PCs:
+
+<UL><LI>The method for setting <tt>HUGSFLAGS</tt> on a Unix
+machine depends on the choice of shell.  For example, a C-shell user might
+add something like the following to their <tt>.cshrc</tt> file:
+
+<tt><br>
+&nbsp;set&nbsp;HUGSFLAGS&nbsp;-P/usr/Hugs/lib:/usr/Hugs/libhugs&nbsp;-E"vi&nbsp;+%d&nbsp;%s"<br>
+
+
+</tt>The <tt>P</tt> option is used to set the search path and the <tt>E</tt> is
+used to set the editor.  The string quotes are necessary for the
+value of the <tt>E</tt> option becauses it contains spaces.  The setting
+for the path assumes that the system has been 
+installed in <tt>/usr/local/Hugs</tt> and will need to
+be modified accordingly if a different directory was chosen.
+The editor specified here is <tt>vi</tt>, which allows the
+user to specify a startup line number by preceding it with
+a <tt>+</tt> character.  The settings are easily changed to accommodate
+other editors.<p>
+If you are installing Hugs for the benefit of several different
+users, then you should probably use a script
+file that sets appropriate values for the environment variables, and
+then invokes the interpreter:
+
+<tt><br>
+&nbsp;#!/bin/sh<br>
+&nbsp;HUGSFLAGS=/usr/Hugs/lib:/usr/Hugs/libhugs&nbsp;-E"vi&nbsp;+%d&nbsp;%s"&nbsp;+s<br>
+&nbsp;export&nbsp;HUGSFLAGS<br>
+&nbsp;exec&nbsp;/usr/local/bin/hugs&nbsp;$*<br>
+
+
+</tt>One advantage of this approach is that individual users do not have
+to worry about setting the environment variables themselves.  In
+addition to the <tt>E</tt> and <tt>P</tt> options, other options---such as 
+<tt>+s</tt> in this example---can be set.
+It is easy for more advanced users to copy and customize a script like
+this to suit their own needs.
+<LI>Users of DOS or Windows 3.1 might add the following line
+to <tt>autoexec.bat</tt>:
+
+<tt><br>
+&nbsp;set&nbsp;HUGSFLAGS=-P\hugs\lib;\hugs\libhugs&nbsp;-E"vi&nbsp;+%%d&nbsp;%%s"<br>
+
+
+</tt>The setting for the path assumes that the system has been
+installed in a top-level <tt>hugs</tt> directory, and will need to
+be modified accordingly if a different directory was chosen.
+In a similar way, the setting for the editor will only work if
+you have installed the editor program, in this case <tt>vi</tt>, that it
+refers to.
+<LI>On Windows 95/NT, the setup program initializes the
+environment, and this can be changed subsequently (on these systems only)
+by using either the <tt>:set</tt> command or a registry editor.  The
+InstallShield script that performs the installation
+initializes the path using the installation directory; other
+directories can be added using <tt>-P</tt>.  Installed options are stored
+under the <tt>HKEY_LOCAL_MACHINE</tt> key; changes to these options
+using <tt>:set</tt> are placed under <tt>HKEY_CURRENT_USER</tt> so that
+different users do not alter each other's options.
+</UL><p>
+For completeness, we should also mention the other environment variables
+that are used by Hugs:
+
+<UL><LI>The <tt>SHELL</tt> variable on a Unix machine, or
+the <tt>COMSPEC</tt> variable on a DOS machine, determines which
+shell is used by the <tt>:!</tt> command.
+<LI>The <tt>EDITOR</tt> variable is used to try and locate an editor
+if no editor option has been set.  Note, however, that
+this variable does not normally provide the extra information that is
+needed to be able to start the editor at a specific line in the input file.
+</UL><a name="secoptions"></a><p>
+<a name="sect4.2"></a>
+<h3>4.2<tt>&nbsp;&nbsp;</tt>Options</h3>
+
+The behaviour of the interpreter, particularly the read-eval-print loop,
+can be customized using options.  For example, you might use:
+
+<tt><br>
+&nbsp;hugs&nbsp;-i&nbsp;+g&nbsp;+h30K<br>
+
+
+</tt>to start the interpreter with the <tt>i</tt> option (import chasing) disabled,
+the <tt>g</tt> option (garbage collector messages) enabled, and with a heap
+of thirty thousand cells.  As this example suggests, many of the 
+options are toggles, meaning that they can either be switched on (by
+preceding the option with a <tt>+</tt> character) or off (by using
+a <tt>-</tt> character).  Options may also be grouped together.
+For example, <tt>hugs&nbsp;+stf&nbsp;-le</tt> is equivalent
+to <tt>hugs&nbsp;+s&nbsp;+t&nbsp;+f&nbsp;-l&nbsp;-e</tt>.<p>
+Option settings can be specified in a number of different
+ways---the <tt>HUGSFLAGS</tt> environment variable, the Windows
+registry, the command line, and the <tt>:set</tt> command---but the
+same syntax is used in each case.
+To avoid any confusion with filenames entered on the command line, option
+settings must always begin with a leading <tt>+</tt> or <tt>-</tt> character.
+However, in some cases---the <tt>h</tt>, <tt>p</tt>, <tt>r</tt>, <tt>P</tt>,
+and <tt>E</tt> options---the choice is not significant. 
+With the exception of
+the heap size option, <tt>h</tt>, all 
+options can be changed while the interpreter is running using
+the <tt>:set</tt> command.
+The same command can be used (without any arguments) to display a summary
+of the available options and to inspect their current settings.<p>
+The complete set of Hugs options is described in the sections below.
+The only omission here is the <tt>-98</tt> and <tt>+98</tt> options that
+are used to set the Haskell 98 compatability mode.  These are discussed
+in Section <a href="exts.html#exts">7</a>.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set search path</I> -Ppath</td></tr></table>
+
+The <tt>-P</tt>path option changes the Hugs
+search path to the specified path.
+The search path is usually initialized in the environment and should
+always include the directory containing the Hugs prelude and the
+standard libraries.    
+When an unknown module is imported, Hugs searches for a file with the
+same name as the module along this path.  The current directory is
+always searched before the path is used.
+Directory names should be separated by colons or, on
+Windows/DOS machines, by semicolons.  Empty components in the path
+refer to the prior value of the path.  For example, setting the path to
+<tt>dir:</tt> (<tt>dir;</tt> on Windows/DOS) would add <tt>dir</tt> to the
+front of the current path.  Within the path, <tt>{Hugs}</tt> refers
+to the directory containing the Hugs libraries so one might use a path 
+such as <tt>{Hugs}/lib:{Hugs}/lib/hugs</tt>.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set editor </I> -Ecmd</td></tr></table>
+
+A <tt>-E</tt>cmd option can be used to change the editor
+string to the specified cmd while the interpreter
+is running.  The editor  string is usually initialized
+from the environment
+when the interpreter starts running.<p>
+Any occurrences of <tt>%d</tt> and <tt>%s</tt> in
+the editor option are replaced by the start line
+number and the name of the file to be edited, respectively, when the
+editor is invoked.  If specified, the line number parameter is used
+to let the interpreter start the editor at the line where an error was
+detected, or, in the case of the <tt>:find</tt> command,
+where a specified variable was defined.<p>
+Other editors can be selected.
+For example, you can use the following value to
+configure Hugs to use <tt>emacs</tt>:
+
+<tt><br>
+&nbsp;-E"emacs&nbsp;+%d&nbsp;%s"<br>
+
+
+</tt>More commonly, <tt>emacsclient</tt> or <tt>gnuclient</tt> is used to avoid
+starting a new <tt>emacs</tt> with every edit.<p>
+On Windows/DOS, you can use <tt>-Eedit</tt> for the standard DOS editor,
+or <tt>-Enotepad</tt> for the Windows notepad editor.
+However, neither <tt>edit</tt> or <tt>notepad</tt> allow you
+to specify a start line number, so you may prefer to install
+a different editor.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Print statistics</I> +s,-s</td></tr></table>
+
+Normally, Hugs just shows the result of evaluating each expression:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;map&nbsp;(\x&nbsp;-&gt;&nbsp;x*x)&nbsp;[1..10]<br>
+&nbsp;[1,&nbsp;4,&nbsp;9,&nbsp;16,&nbsp;25,&nbsp;36,&nbsp;49,&nbsp;64,&nbsp;81,&nbsp;100]<br>
+&nbsp;Prelude&gt;&nbsp;[1..]<br>
+&nbsp;[1,&nbsp;2,&nbsp;3,&nbsp;4,&nbsp;{Interrupted!}<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>With the <tt>+s</tt> option, the interpreter will also display statistics
+about the total number of <I>reductions</I> and <I>cells</I>; the
+former gives a measure of the work done, while the latter gives an
+indication of the amount of memory used.  For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;+s<br>
+&nbsp;Prelude&gt;&nbsp;map&nbsp;(\x&nbsp;-&gt;&nbsp;x*x)&nbsp;[1..10]<br>
+&nbsp;[1,&nbsp;4,&nbsp;9,&nbsp;16,&nbsp;25,&nbsp;36,&nbsp;49,&nbsp;64,&nbsp;81,&nbsp;100]<br>
+&nbsp;(248&nbsp;reductions,&nbsp;429&nbsp;cells)<br>
+&nbsp;Prelude&gt;&nbsp;[1..]<br>
+&nbsp;[1,&nbsp;2,&nbsp;3,&nbsp;4,&nbsp;{Interrupted!}<br>
+&nbsp;(18&nbsp;reductions,&nbsp;54&nbsp;cells)<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Note that the statistics produced by <tt>+s</tt> are an extremely crude
+measure of the behaviour of a program, and can easily be misinterpreted.
+For example:
+
+<UL><LI>The fact that one expression requires more reductions than another does
+not necessarily mean that the first is slower; some reductions
+require much more work than others, and it may be that the average cost
+of reductions in the first expression is much lower than the average
+for the second.
+<LI>The cell count does not give any information about <I>residency</I>,
+which is the number of cells that are being used at any given time.  For
+example, it does not distinguish between computations that run in constant
+space and computations with residency proportional to the size of the
+input.
+</UL>
+One reasonable use of the statistics produced by <tt>+s</tt> would be to
+observe general trends in the behaviour of a single algorithm with
+variations in its input.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Print type after evaluation</I> +t,-t</td></tr></table>
+
+With the <tt>+t</tt> option, the interpreter will display both the result
+and type of each expression entered at the Hugs prompt:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;+t<br>
+&nbsp;Prelude&gt;&nbsp;map&nbsp;(\x&nbsp;-&gt;&nbsp;x*x)&nbsp;[1..10]<br>
+&nbsp;[1,&nbsp;4,&nbsp;9,&nbsp;16,&nbsp;25,&nbsp;36,&nbsp;49,&nbsp;64,&nbsp;81,&nbsp;100]&nbsp;::&nbsp;[Int]<br>
+&nbsp;Prelude&gt;&nbsp;not&nbsp;True<br>
+&nbsp;False&nbsp;::&nbsp;Bool<br>
+&nbsp;Prelude&gt;&nbsp;\x&nbsp;-&gt;&nbsp;x<br>
+&nbsp;&lt;&lt;function&gt;&gt;&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Note that the interpreter will not display the type of an expression
+if its evaluation is interrupted or fails with a run-time error.
+In addition, the interpreter will not print the type, <tt>IO&nbsp;()</tt>, of
+a program in the <tt>IO</tt> monad;
+the interpreter treats these as a special case, giving the programmer more
+control over the output that is produced.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Terminate on error</I> +f,-f</td></tr></table>
+
+In normal use, the evaluation of an expression is abandoned completely
+if a run-time error occurs, such as a failed pattern match or an attempt
+to divide by zero.  For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;[1&nbsp;`div`&nbsp;0]<br>
+&nbsp;[<br>
+&nbsp;Program&nbsp;error:&nbsp;{primDivInt&nbsp;1&nbsp;0}<br>
+<br>
+&nbsp;Prelude&gt;&nbsp;[1&nbsp;`div`&nbsp;0,&nbsp;2]<br>
+&nbsp;[<br>
+&nbsp;Program&nbsp;error:&nbsp;{primDivInt&nbsp;1&nbsp;0}<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>This is often useful during program development because it means that
+errors are detected as soon as they occur.
+However, technically speaking, the two expressions above have different
+meanings; the first is a singleton list, while the second has two elements.
+Unfortunately, the output produced by Hugs does not allow us to distinguish
+between the values.<p>
+The <tt>-f</tt> option can be used to make the Hugs printing option
+a little more accurate; this should normally be combined
+with <tt>-u</tt> because
+the built-in printer is better than the user-defined <tt>show</tt> functions
+at recovering from evaluation errors.  With these settings, if the interpreter
+encounters an irreducible subexpression, then it prints the expression
+between a matching pair of braces and attempts to continue with the evaluation
+of other parts of the original expression.  For the examples above, we get:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;-u&nbsp;-f<br>
+&nbsp;Prelude&gt;&nbsp;[1&nbsp;`div`&nbsp;0]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;value&nbsp;is&nbsp;[bottom]<br>
+&nbsp;[{primDivInt&nbsp;1&nbsp;0}]<br>
+&nbsp;Prelude&gt;&nbsp;[1&nbsp;`div`&nbsp;0,&nbsp;2]<br>
+&nbsp;[{primDivInt&nbsp;1&nbsp;0},&nbsp;2]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;value&nbsp;is&nbsp;[bottom,&nbsp;2]<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Reading an expression in braces as
+bottom, the output produced here
+shows the correct values, according to the semantics of
+Haskell.  Of course, it is not possible to
+detect all occurrences of bottom like this, such as those produced by
+a nonterminating computation:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;last&nbsp;[1..]<br>
+&nbsp;^C{Interrupted!}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;nothing&nbsp;printed&nbsp;until&nbsp;interrupted<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Note that the basic method of evaluation is the same with both
+the <tt>+f</tt> and <tt>-f</tt> options; all that changes is the way that
+the printing mechanism deals with certain kinds of runtime error.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Garbage collector notification</I> +g,-g</td></tr></table>
+
+It is sometimes useful to monitor uses of the garbage collector, and to
+determine how many cells are recovered with each collection.
+If the <tt>+g</tt> option is set, then the interpreter will print a message
+of the form <tt>{{Gc:num}}</tt> each time that the garbage collector is
+invoked.  The number after the colon indicates the total number of
+cells that are recovered.<p>
+As a simple application, we can use garbage collector messages to observe
+that an attempt to sum an infinite list, although non-terminating, will
+at least run in constant space:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;+g<br>
+&nbsp;Prelude&gt;&nbsp;sum&nbsp;[1..]<br>
+&nbsp;{{Gc:95763}}{{Gc:95760}}{{Gc:95760}}{{Gc:95760}}{Interrupted!}<br>
+<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Garbage collector messages may be printed at almost any stage in a
+computation (or indeed while loading, type checking or compiling a
+file of definitions).  For this reason, it is often best to turn
+garbage collector messages off (using <tt>:set&nbsp;-g</tt>, for example)
+if they are not required.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Literate modules</I> +l,-l,+e,-e</td></tr></table>
+
+
+
+Like most programming languages, Hugs usually treats source file input
+as a sequence of lines in which program text is the norm,
+and comments play a secondary role.  In Hugs, as in Haskell, comments
+are introduced by the character sequences <tt>--</tt> and <tt>{-&nbsp;...&nbsp;-}</tt>.<p>
+An alternative approach, using an idea described by Knuth as "literate
+programming," gives more emphasis to comments and documentation, with
+additional characters needed to distinguish program text from comments.
+Hugs supports a form of literate programming based on an idea due to
+Richard Bird and originally implemented as part of the functional
+programming language Orwell.<p>
+In a Hugs literate module, program lines are marked by a <tt>&gt;</tt> character
+in the first column; any other line is treated as a program comment.
+This makes it particularly easy to write a document which is both an
+executable Hugs module and, at the same time, without need for any
+preprocessing, suitable for use with document preparation software such
+as LaTeX.<p>
+Hugs will treat any input file with a name ending in <tt>.hs</tt> as a normal
+module and any input file with a name ending in <tt>.lhs</tt> as a literate
+module.  If the <tt>-l</tt> option is selected, then any other file loaded
+into Hugs will be treated as a normal module.  Conversely, if <tt>+l</tt> is
+selected, then these files will be treated as literate modules.
+ 
+The effect of using literate modules can be thought of as applying a
+preprocessor to each input file that is loaded into Hugs.  This
+has a particularly simple definition in Hugs:
+
+<tt><br>
+&nbsp;illiterate&nbsp;&nbsp;&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;String<br>
+&nbsp;illiterate&nbsp;cs&nbsp;=&nbsp;unlines&nbsp;[&nbsp;"&nbsp;"&nbsp;++&nbsp;xs&nbsp;|&nbsp;('&gt;':xs)&nbsp;&lt;-&nbsp;lines&nbsp;cs&nbsp;]<br>
+
+
+</tt>The system of literate modules that was used in Orwell is a
+little more complicated than this and requires the programmer to adopt
+two further conventions in an attempt to catch simple errors in literate
+modules:
+
+<UL><LI>Every input file must contain at least one line whose first
+character is <tt>&gt;</tt>.  This prevents modules with no
+definitions (because the programmer has forgotten to use
+the <tt>&gt;</tt> character to mark definitions) from being accepted.
+<LI>Lines containing definitions must be separated from comment lines
+by one or more blank lines (i.e., lines containing only space and
+tab characters).  This is useful for catching programs where the
+leading <tt>&gt;</tt> character has been omitted from one or more lines in
+the definition of a function.  For example:
+
+<tt>&nbsp;<br>
+&gt;&nbsp;map&nbsp;f&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;[]<br>
+&nbsp;&nbsp;map&nbsp;f&nbsp;(x:xs)&nbsp;=&nbsp;f&nbsp;x&nbsp;:&nbsp;map&nbsp;f&nbsp;xs<br>
+
+
+</tt>would be treated as an error.
+</UL>
+Hugs will report on errors of this kind whenever the <tt>-e</tt> option is
+enabled (the default setting).<p>
+The Haskell Report defines a second style of literate programming in
+which code is surrounded by <tt>\begin{code}</tt> and <tt>\end{code}</tt>.
+See Appendix C of the Haskell Report for more information about
+literate programming in Haskell. <p>
+<table border=2 cellpadding=3>
+<tr><td><I>Display dots while loading</I> +.,-.</td></tr></table>
+
+As Hugs loads each file into the interpreter, it prints a short
+sequence of messages to indicate progress through the various stages
+of parsing the module, dependency analysis, type checking, and compilation.
+With the default setting, <tt>-.</tt>, the interpreter prints the name of
+each stage, backspacing over it to erase it from the screen when the
+stage is complete.  If you are fortunate enough to be using a
+fast machine, you may not always see the individual words as they flash
+past.  After loading a file, your screen will typically look something
+like this:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:l&nbsp;Array<br>
+&nbsp;Reading&nbsp;file&nbsp;"/Hugs/lib/Array.hs":<br>
+<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;/Hugs/lib/Array.hs<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>On some systems, the use of backspace characters to erase a line may
+not work properly---for example, if you try to run Hugs from
+within <tt>emacs</tt>.  In this case, you may prefer
+to use the <tt>+.</tt> setting which prints a separate line for each stage,
+with a row of dots to indicate progress:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:load&nbsp;Array<br>
+&nbsp;Reading&nbsp;file&nbsp;"/Hugs/lib/Array.hs":<br>
+&nbsp;Parsing....................................................<br>
+&nbsp;Dependency&nbsp;analysis........................................<br>
+&nbsp;Type&nbsp;checking..............................................<br>
+&nbsp;Compiling..................................................<br>
+<br>
+&nbsp;Hugs&nbsp;session&nbsp;for:<br>
+&nbsp;/Hugs/lib/Prelude.hs<br>
+&nbsp;/Hugs/lib/Array.hs<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>This setting can also be useful on very slow machines where the growing
+line of dots provides confirmation that the interpreter is making progress
+through the various stages involved in loading a file.  You should note,
+however, that the mechanisms used to display the rows of dots can add
+a substantial overhead to the time that it takes to load files;
+in one experiment, a particular program took nearly five times longer
+to load when the <tt>+.</tt> option was used.  In this case, users might
+prefer to use the <tt>-q</tt> option described below.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Display nothing while loading</I> +q,-q</td></tr></table>
+
+The <tt>+q</tt> (quiet) option supresses the messages used to indicate
+progress while Hugs is loading files.  If this option is turned off
+using the <tt>-q</tt>, then the format of output messages is determined
+by the current <tt>+.</tt> or <tt>-.</tt> setting.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>List files loaded</I> +w,-w</td></tr></table>
+
+By default, Hugs prints a complete list of all the files that have
+been loaded into the system after every successful load or reload command.
+The <tt>-w</tt> option can be used to turn this feature off.  Note that
+the <tt>:info</tt> command, without any arguments, can also be used to list
+the names of currently loaded files.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Detailed kind errors</I> +k,-k</td></tr></table>
+
+Haskell uses a system of kinds to ensure that type expressions are well-formed:
+for example, to make sure that each type constructor is applied to the
+appropriate number of arguments.  For example, the following program:
+
+<tt><br>
+&nbsp;module&nbsp;Main&nbsp;where<br>
+&nbsp;data&nbsp;Tree&nbsp;a&nbsp;&nbsp;=&nbsp;Leaf&nbsp;a&nbsp;|&nbsp;Tree&nbsp;a&nbsp;:^:&nbsp;Tree&nbsp;a<br>
+&nbsp;type&nbsp;Example&nbsp;=&nbsp;Tree&nbsp;Int&nbsp;Bool<br>
+
+
+</tt>will cause an error:
+
+<tt><br>
+&nbsp;ERROR&nbsp;"Main.hs"&nbsp;(line&nbsp;3):&nbsp;Illegal&nbsp;type&nbsp;"Tree&nbsp;Int&nbsp;Bool"&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor&nbsp;application<br>
+
+
+</tt>The problem here is that <tt>Tree</tt> is a unary constructor
+of kind <tt>*&nbsp;-&gt;&nbsp;*</tt>, but the definition of <tt>Example</tt> uses
+it as a binary constructor with at least two arguments, and hence
+expecting a kind of the form <tt>(*&nbsp;-&gt;&nbsp;*&nbsp;-&gt;&nbsp;k)</tt>, for some kind <tt>k</tt>.<p>
+By default, Hugs reports problems like this with a simple message like the
+one shown above.  However, if the <tt>+k</tt> option is selected, then the
+interpreter will print a more detailed version of the error message,
+including details about the kinds of the type expressions that are involved:
+
+<tt><br>
+&nbsp;ERROR&nbsp;"Main.hs"&nbsp;(line&nbsp;3):&nbsp;Kind&nbsp;error&nbsp;in&nbsp;constructor&nbsp;application<br>
+&nbsp;***&nbsp;expression&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Tree&nbsp;Int&nbsp;Bool<br>
+&nbsp;***&nbsp;constructor&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Tree<br>
+&nbsp;***&nbsp;kind&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;*&nbsp;-&gt;&nbsp;*<br>
+&nbsp;***&nbsp;does&nbsp;not&nbsp;match&nbsp;:&nbsp;*&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;b<br>
+<br>
+
+
+</tt>In addition, if the <tt>+k</tt> option is used, then Hugs will also
+include information about kinds in the information produced by
+the <tt>:info</tt> command:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:info&nbsp;Tree<br>
+&nbsp;--&nbsp;type&nbsp;constructor&nbsp;with&nbsp;kind&nbsp;*&nbsp;-&gt;&nbsp;*<br>
+&nbsp;data&nbsp;Tree&nbsp;a<br>
+<br>
+&nbsp;--&nbsp;constructors:<br>
+&nbsp;Leaf&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Tree&nbsp;a<br>
+&nbsp;(:^:)&nbsp;::&nbsp;Tree&nbsp;a&nbsp;-&gt;&nbsp;Tree&nbsp;a&nbsp;-&gt;&nbsp;Tree&nbsp;a<br>
+<br>
+&nbsp;--&nbsp;instances:<br>
+&nbsp;instance&nbsp;Eval&nbsp;(Tree&nbsp;a)<br>
+<br>
+&nbsp;Prelude&gt;<br>
+<br>
+<p>
+</tt><table border=2 cellpadding=3>
+<tr><td><I>Use "show" to display results</I> +u,-u</td></tr></table>
+
+In normal use, Hugs displays the value of each expression entered into the
+interpreter by applying the standard prelude function:
+
+<tt><br>
+&nbsp;show&nbsp;::&nbsp;Show&nbsp;a&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;String<br>
+
+
+</tt>to it and displaying the resulting string of characters.  This approach works
+well for any value whose type is an instance of the standard <tt>Show</tt> class;
+for example, the prelude defines instances of <tt>Show</tt> for all of the
+built-in datatypes.  It is also easy for users to extend the class with new
+datatypes, either by providing a handwritten instance declaration, or by
+requesting an automatically derived instance as part of the datatype
+definition, as in:
+
+<tt><br>
+&nbsp;data&nbsp;Rainbow&nbsp;=&nbsp;Red&nbsp;|&nbsp;Orange&nbsp;|&nbsp;Yellow&nbsp;|&nbsp;Green&nbsp;|&nbsp;Blue&nbsp;|&nbsp;Indigo&nbsp;|&nbsp;Violet<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deriving&nbsp;Show<br>
+
+
+</tt>The advantage of using <tt>show</tt> is that it allows programmers to
+display the results of evaluations in whatever form is most convenient
+for users---which is not always the same as the way in which the values
+are represented.<p>
+This is probably all that most users will ever need.  However, there are
+some circumstances where it is not convenient, for example, for certain
+kinds of debugging or for work with datatypes that are not instances
+of <tt>Show</tt>.  In these situations, the <tt>-u</tt> option can be used
+to prevent the use of <tt>show</tt>.  In its place, Hugs will use a
+built-in printing mechanism that works for <I>all</I> datatypes, and
+uses the representation of a value to determine what gets printed.
+At any point, the default printing mechanism can be restored by
+setting <tt>+u</tt>.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Import chasing</I> +i,-i</td></tr></table>
+
+Import chasing is a simple, but flexible mechanism for dealing with
+programs that involve multiple modules.  It works in a natural
+way, using the information in import statements at the beginning of
+modules, and is particularly useful for large programs, or for
+programs that use standard Hugs libraries.<p>
+For example, consider a module <tt>Demo.hs</tt> that requires the
+facilities provided by the <tt>STArray</tt> library.
+This dependency might be reflected by including
+the following import statement at the beginning of <tt>Demo.hs</tt>:
+
+<tt><br>
+&nbsp;import&nbsp;STArray<br>
+
+
+</tt>Now, if we try to load this module into Hugs, then the system will
+automatically search for
+the <tt>STArray</tt> library and load it
+into Hugs, before <tt>Demo.hs</tt> is loaded.  In fact,
+the <tt>STArray</tt> library module also begins with some import statements:
+
+<tt><br>
+&nbsp;import&nbsp;ST<br>
+&nbsp;import&nbsp;Array<br>
+
+
+</tt>So, Hugs will actually load the <tt>ST</tt> and <tt>Array</tt> libraries
+first, then the <tt>STArray</tt> library, and only then will it try to
+read the rest of <tt>Demo.hs</tt>:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:load&nbsp;Demo<br>
+&nbsp;Reading&nbsp;file&nbsp;"Demo.hs":<br>
+&nbsp;Reading&nbsp;file&nbsp;"/hugs/libhugs/STArray.hs":<br>
+&nbsp;Reading&nbsp;file&nbsp;"/hugs/libhugs/ST.hs":<br>
+&nbsp;Reading&nbsp;file&nbsp;"/hugs/lib/Array.hs":<br>
+&nbsp;Reading&nbsp;file&nbsp;"/hugs/libhugs/STArray.hs":<br>
+&nbsp;Reading&nbsp;file&nbsp;"Demo.hs":<br>
+&nbsp;Demo&gt;<br>
+
+
+</tt>Initially, the interpreter reads only the first part of any module
+loaded into the system, upto and including any import statements.
+Only one module is allowed in each file; files with no module
+declaration are assumed to declare the <tt>Main</tt> module.
+If there are no imports, or if the modules specified as imports
+have already been loaded, then the system carries on and loads the
+module as normal.
+On the other hand, if the module includes import statements for modules that
+have not already been loaded, then the interpreter postpones the task of
+reading the current module until all of the specified imports have
+been successfully loaded.  This explains
+why <tt>Demo.hs</tt> and <tt>STArray.hs</tt> are read twice in the example above;
+first to determine which imports are required, and then to read in the
+rest of the file once the necessary imports have been loaded.<p>
+The list of directories and filenames that Hugs tries in an attempt
+to locate the source for a module <tt>Mod</tt> named in an import statement
+can be specified by:
+
+<tt><br>
+&nbsp;[&nbsp;(dir,"Mod"++suf)&nbsp;|&nbsp;dir&nbsp;&lt;-&nbsp;[d]&nbsp;++&nbsp;path&nbsp;++&nbsp;[""],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;suf&nbsp;&lt;-&nbsp;["",&nbsp;".hs",&nbsp;".lhs"]]<br>
+
+
+</tt>The search starts in the directory <tt>d</tt> where the file containing
+the import statement was found, then tries each of the directories in
+the current path (as defined by the <tt>-P</tt> option),
+represented here by <tt>path</tt>, and ends with <tt>""</tt>, which gives
+a search relative to the current directory.
+The fact that the search starts in <tt>d</tt> is particularly important
+because it means that you can load a multi-file program into Hugs without
+having to change to the directory where its source code is located.
+For example, suppose that <tt>/tmp</tt> contains the
+files, <tt>A.hs</tt>, <tt>B.hs</tt>, and <tt>C.hs</tt>, 
+that <tt>B</tt> imports <tt>A</tt>, and that <tt>C</tt> imports <tt>B</tt>.
+Now, regardless of the current working directory, you can load the
+whole program with the command <tt>:load&nbsp;/tmp/C</tt>; the
+import in <tt>C</tt> will be taken as a reference to <tt>/tmp/B.hs</tt>,
+while the import in that file will be taken as a reference
+to <tt>/tmp/A.hs</tt>.<p>
+Import chasing is often very useful, but you should also be aware of its
+limitations:
+
+<UL><LI>Mutually recursive modules are not supported;
+if <tt>A</tt> imports <tt>B</tt>, then <tt>B</tt> must not import <tt>A</tt>,
+either directly or indirectly through another one of its imports.
+<LI>Import chasing assumes a direct mapping from module names to
+the names 
+of the files that they are stored in.  If <tt>A</tt> imports <tt>B</tt>, then
+the code for <tt>B</tt> must be in a file called
+either <tt>B</tt>, <tt>B.hs</tt>, or <tt>B.lhs</tt>, and must be located in
+one of the directories specified above.<p>
+On rare occasions, it is useful to specify a particular pathname as the
+target for an import statement; Hugs allows string literals to be used
+as module identifiers for this purpose:
+
+<tt><br>
+&nbsp;import&nbsp;"../TypeChecker/Types.hs"<br>
+
+
+</tt>Note, however, that this is a nonstandard feature of Hugs, and that it is
+not valid Haskell syntax.  You should also be aware that Hugs uses the
+names of files in deciding whether a particular import has already
+been loaded, so you should avoid situations where a single file is referred
+to by more than one name.  For example, you should not assume that Hugs
+will be able to determine whether <tt>Demo.hs</tt> and <tt>./Demo.hs</tt> are
+references to the same file.
+</UL><p>
+Import chasing is usually enabled by default (setting <tt>+i</tt>), but it can
+also be disabled using the <tt>-i</tt> option.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set heap size</I> -hsize</td></tr></table>
+
+A <tt>-h</tt>size  option can be used to request
+a particular heap size for the interpreter---the total number of
+cells that are available at any one time---when Hugs is
+first loaded.  The request will only be honoured if it falls within a
+certain range, which depends on the machine, and the version of Hugs that
+is used.  The size parameter may include
+a <tt>K</tt> or <tt>k</tt> suffix, which acts as a multiplier by 1,000.
+For example, either of the following commands:
+
+<tt><br>
+&nbsp;hugs&nbsp;-h25000<br>
+&nbsp;hugs&nbsp;-h25K<br>
+
+
+</tt>will usually start the Hugs interpreter with a heap of 25,000 cells.
+Cells are generally 8 bytes wide (except on the 16 bit Hugs running on
+DOS) and Hugs allocates a single heap.
+Note that the heap is used to hold an intermediate (parsed) form of
+each module while it is being read, type checked
+and compiled.  It follows that, the larger the module, the larger
+the heap required to enable that module to be loaded into Hugs.  In practice,
+most large programs are written (and loaded) as a number of separate modules
+which means that this does not usually cause problems.<p>
+Unlike all of the other  options described here, the heap
+size setting cannot be changed from within the interpreter using
+a <tt>:set</tt> command.
+However, on Window 95/NT, changing the heap size with <tt>:set</tt> will
+affect the next running of Hugs since it saves all options in the
+registry. <p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set prompt</I> -pstring</td></tr></table>
+
+A <tt>-p</tt>str option can be used to change the
+prompt to the specified string, str:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;-p"Hugs&gt;&nbsp;"<br>
+&nbsp;Hugs&gt;&nbsp;:set&nbsp;-p"?&nbsp;"<br>
+&nbsp;?<br>
+
+
+</tt>Note that you will need to use quotes around the prompt string if you
+want to include spaces or special characters.  Any <tt>%s</tt> in the
+prompt will be replaced by the current module name.
+The default prompt is <tt>"%s&gt;&nbsp;"</tt>.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set repeat string</I> -rstring</td></tr></table>
+
+Hugs allows the user to recall the last expression entered into the
+interpreter by typing the characters <tt>$$</tt> as part of the next
+expression:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;map&nbsp;(1+)&nbsp;[1..10]<br>
+&nbsp;[2,&nbsp;3,&nbsp;4,&nbsp;5,&nbsp;6,&nbsp;7,&nbsp;8,&nbsp;9,&nbsp;10,&nbsp;11]<br>
+&nbsp;Prelude&gt;&nbsp;filter&nbsp;even&nbsp;$$<br>
+&nbsp;[2,&nbsp;4,&nbsp;6,&nbsp;8,&nbsp;10]<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>A <tt>-r</tt>str option can be used to change the
+repeat string---the symbol used to recall the last
+expression---to str.  For example,
+users of Standard ML might be more comfortable using:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:set&nbsp;-rit<br>
+&nbsp;Prelude&gt;&nbsp;6&nbsp;*&nbsp;7<br>
+&nbsp;42<br>
+&nbsp;Prelude&gt;&nbsp;it&nbsp;+&nbsp;it<br>
+&nbsp;84<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>Another reason to change the repeat string is to avoid clashes with uses
+of the same symbol in a particular program; for example, if <tt>$$</tt> is
+defined as an operator in a program.<p>
+Note that the repeat string must be a valid Haskell identifier or
+symbol, although it will always be parsed as an identifier.  If the
+repeat string is set to a value that is neither an identifier or symbol
+(for example, <tt>-r0</tt>), then the repeat last expression facility
+will be disabled.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set preprocessor string</I> -Fcmd</td></tr></table>
+
+Although it is not needed very often, there are sometimes applications
+where it useful to arrange for input files to be preprocessed before
+they are passed to the Hugs interpreter.  This might be used,
+for example, to make use of filters to support conditional compilation,
+language extensions, literate programming systems, or format conversion.
+The <tt>-F</tt> option can be used to set a particular command
+string <tt>cmd</tt> as the name for a preprocessor.  If set, then for
+any source file, say <tt>file.hs</tt>, that the user tries to load
+into Hugs, the interpreter will use the output from the
+command <tt>cmd&nbsp;file.hs</tt> instead of the contents of
+the file <tt>file.hs</tt> itself.<p>
+Note that the <tt>-F</tt> option is system dependent, and is not supported
+on all platforms.<p>
+<table border=2 cellpadding=3>
+<tr><td><I>Set constraint cutoff limit</I> -cnum</td></tr></table>
+
+The <tt>-c</tt> parameter controls the complexity of constraint satisfaction
+searches in the Hugs type checker.  This is a technical mechanism to ensure
+that type checking terminates, and can safely be ignored by most users.
+However, in programs that make significant use of complex type class
+hierarchies, it may sometimes be necessary to increase the setting for
+the <tt>-c</tt> option to enable the Hugs type checker to explore a larger
+search space.<p>
+The usual default for this setting is 40, which corresponds to the
+command line option <tt>-c40</tt>, and we have not yet seen any examples
+of valid Hugs programs that are rejected with this setting.  (It is
+possible to construct artificial programs that do require higher values,
+but such examples are pathological and they do not seem to appear in
+practice.)  There is no practical benefit in choosing a lower value for
+this parameter.  Note that, if the value used is too low, then Hugs
+will not be able to load some standard files and libraries, including
+the prelude.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="basics.html">back</a> | <a href="commands.html">next</a>  <br><font size=2>May 22, 1999</font>

@@ -1,0 +1,42 @@
+HUGS - Haskell User's Gofer System, Version: Nov 2003
+Version for OS/2 and eComstation by Per Johansson 2004-09-18
+
+
+This is a copy of a win32 installation of HUGS 98, with added OS/2 command line 
+executables (hugs.exe and runhugs.exe), an example command file to start HUGS 
+in a correct environment (hugsos2.cmd), and slightly modified source code 
+(from http://cvs.haskell.org/Hugs/downloads/Nov2003/hugs98-Nov2003.tar.gz). 
+The graphical version (winhugs.exe) can be run using Odin.
+
+
+Requirements: InnoTek GCC Runtime Library version 0.5, libc-0.5.1.exe from
+http://www.innotek.de/. It will install the file libc05.dll.
+
+For Winhugs, Odin is required, from http://odin.netlabs.org/.
+
+
+To install HUGS, just unzip the file hugs-nov-2003.zip to any directory.
+Then edit the file "hugsos2.cmd" so the drive letters and paths are correct
+on your system.
+
+
+Run HUGS with "hugsos2.cmd".
+
+
+Official HUGS site: http://www.haskell.org/hugs/
+
+
+Problems: Bugs from the official win32 version remain. Example: fromInt does 
+not work in functions. Use fromInteger instead.
+
+OS/2 problems: repeat commands (history) by up arrow does not work.
+However, right arrow will repeat the last command on OS/2.
+
+There may be more, but I haven't found any yet.
+
+
+
+To compile the sources, see src\readme-src.os2
+
+
+Please report any problems related to this port to me: per@johansson.name

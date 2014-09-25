@@ -1,0 +1,1760 @@
+<HTML
+><HEAD
+><TITLE
+>Changing the behaviour of Hugs</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="PREVIOUS"
+TITLE="Miscellaneous commands"
+HREF="misc-commands.html"><LINK
+REL="NEXT"
+TITLE="Environment variables used by Hugs"
+HREF="environment-variables.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="misc-commands.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="environment-variables.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="OPTIONS"
+>Chapter 3. Changing the behaviour of Hugs</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>3.1. <A
+HREF="options.html#OPTIONS-LIST"
+>Hugs options</A
+></DT
+><DT
+>3.2. <A
+HREF="environment-variables.html"
+>Environment variables used by Hugs</A
+></DT
+><DT
+>3.3. <A
+HREF="runhugs.html"
+>Standalone programs</A
+></DT
+><DT
+>3.4. <A
+HREF="ffihugs.html"
+>Compiling modules that use the Foreign Function Interface</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="OPTIONS-LIST"
+>3.1. Hugs options</A
+></H1
+><P
+>The behaviour of Hugs may be modified by options.
+These are initially set to default values,
+and then read from the following sources in order:
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>(Windows only) the registry under the <TT
+CLASS="LITERAL"
+>HKEY_LOCAL_MACHINE</TT
+> key.</P
+></LI
+><LI
+><P
+>(Windows only) the registry under the <TT
+CLASS="LITERAL"
+>HKEY_CURRENT_USER</TT
+> key.
+This step is skipped if the environment variable
+<TT
+CLASS="ENVAR"
+>IGNORE_USER_REGISTRY</TT
+> is set,
+providing an emergency workaround if the settings are invalid.</P
+></LI
+><LI
+><P
+>(Hugs for Windows only)
+the GUI settings.</P
+></LI
+><LI
+><P
+>(Mac OS prior to Mac OS X)
+the preferences file <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="FILENAME"
+>Hugs Preferences</TT
+>"</SPAN
+>.</P
+></LI
+><LI
+><P
+>The environment variable <TT
+CLASS="ENVAR"
+>HUGSFLAGS</TT
+>, if set.</P
+></LI
+><LI
+><P
+>The Hugs command line.</P
+></LI
+></OL
+>
+Most options can be changed within Hugs using the <B
+CLASS="COMMAND"
+>:set</B
+>
+command (see <A
+HREF="using-hugs.html#BASIC-COMMANDS"
+>Section 2.1</A
+>).</P
+><P
+>Hugs takes two kinds of options:
+<P
+></P
+><UL
+><LI
+><P
+>Toggles like <TT
+CLASS="OPTION"
+>+t</TT
+> or <TT
+CLASS="OPTION"
+>-t</TT
+>,
+which start with <TT
+CLASS="LITERAL"
+>+</TT
+> or <TT
+CLASS="LITERAL"
+>-</TT
+>
+to turn them on  or  off,  respectively.</P
+></LI
+><LI
+><P
+>Options that set a parameter value, like
+<TT
+CLASS="OPTION"
+>-P</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+>,
+in which <TT
+CLASS="LITERAL"
+>-</TT
+> could be replaced by <TT
+CLASS="LITERAL"
+>+</TT
+>,
+the choice making no difference.</P
+></LI
+></UL
+></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OPTIONS-LANGUAGE"
+>3.1.1. Language options</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="OPTION-98"
+><TT
+CLASS="OPTION"
+>+98</TT
+></A
+></DT
+><DD
+><P
+>Accept only Haskell 98.
+This is on by default, and cannot be changed within Hugs.
+Turning this off enables several special Hugs extensions,
+which are described in <A
+HREF="hugs-ghc.html"
+>Chapter 5</A
+>, <A
+HREF="hugs-only.html"
+>Chapter 6</A
+>
+and the <I
+CLASS="CITETITLE"
+>Hugs 98 User Manual</I
+>.</P
+></DD
+><DT
+><A
+NAME="OPTION-CONSTRAINT-CUTOFF"
+><TT
+CLASS="OPTION"
+>-c</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>num</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set constraint cutoff limit in the type checker to
+<TT
+CLASS="REPLACEABLE"
+><I
+>num</I
+></TT
+> (default: 40).
+See <A
+HREF="class-extensions.html#FLEXIBLE-INSTANCES"
+>Section 5.2.2</A
+>.</P
+></DD
+><DT
+><A
+NAME="OPTION-OVERLAPPING"
+><TT
+CLASS="OPTION"
+>+o</TT
+></A
+></DT
+><DD
+><P
+>Allow certain overlapping instances (a Hugs extension; default: off).
+See <A
+HREF="class-extensions.html#OVERLAPPING-INSTANCES"
+>Section 5.2.3</A
+> for details.</P
+></DD
+><DT
+><A
+NAME="OPTION-UNSAFE-OVERLAPPING"
+><TT
+CLASS="OPTION"
+>+O</TT
+></A
+></DT
+><DD
+><P
+>Allow certain overlapping instances (a Hugs extension; default: off).
+These are the same overlapping instances as accepted by <TT
+CLASS="OPTION"
+>+o</TT
+>,
+but <TT
+CLASS="OPTION"
+>+O</TT
+> also accepts ambiguous uses of these instances,
+even though this is unsafe (see <A
+HREF="class-extensions.html#OVERLAPPING-INSTANCES"
+>Section 5.2.3</A
+>).</P
+></DD
+><DT
+><A
+NAME="OPTION-HERE-DOCUMENTS"
+><TT
+CLASS="OPTION"
+>+H</TT
+></A
+></DT
+><DD
+><P
+>Support <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>here documents</I
+></SPAN
+>
+(named after similar things in Unix shells),
+another way of writing large string literals
+(see <A
+HREF="here-documents.html"
+>Section 6.3</A
+>).
+This extension is turned off by default.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OPTIONS-LOADING"
+>3.1.2. Module loading options</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="OPTION-LITERATE"
+><TT
+CLASS="OPTION"
+>+l</TT
+></A
+></DT
+><DD
+><P
+>Literate scripts as default (default: off).</P
+><P
+>Files with names ending in <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.hs</TT
+>"</SPAN
+>
+are always treated as ordinary Haskell,
+while those ending in <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.lhs</TT
+>"</SPAN
+>
+are always treated as literate scripts.
+This option determines whether other files are literate scripts or not.
+(See <A
+HREF="runhugs.html"
+>Section 3.3</A
+> for an example.)</P
+></DD
+><DT
+><A
+NAME="OPTION-DOTS"
+><TT
+CLASS="OPTION"
+>+.</TT
+></A
+></DT
+><DD
+><P
+>Print dots to show progress while loading modules (default: off).</P
+></DD
+><DT
+><A
+NAME="OPTION-QUIET"
+><TT
+CLASS="OPTION"
+>+q</TT
+></A
+></DT
+><DD
+><P
+>Print nothing to show progress while loading modules (default: on).</P
+></DD
+><DT
+><A
+NAME="OPTION-SHOW-LOADED"
+><TT
+CLASS="OPTION"
+>+w</TT
+></A
+></DT
+><DD
+><P
+>Always show which files were loaded (default: off).</P
+></DD
+><DT
+><A
+NAME="OPTION-PREPROCESSOR"
+><TT
+CLASS="OPTION"
+>-F</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>cmd</I
+></TT
+></A
+></DT
+><DD
+><P
+>Preprocess source files before loading.
+Instead of reading a source file directly, Hugs will
+execute <TT
+CLASS="REPLACEABLE"
+><I
+>cmd</I
+></TT
+> with the source file name as argument,
+and read the standard output.</P
+><P
+>This is handy for preprocessing source files with the C preprocessor,
+or some preprocessor implementing a language extension.
+However it is slower.
+In particular (because of the way Hugs handles imports),
+the preprocessor will be run twice on files that import modules
+that have not been loaded yet.</P
+></DD
+><DT
+><A
+NAME="OPTION-SEARCH-PATH"
+><TT
+CLASS="OPTION"
+>-P</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set search path for source files to <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+>,
+which should be a list of directories separated by colons
+(semicolons on Windows, DOS or Macs).
+A null entry in this list will be replaced by the previous search path;
+a null <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+> means the default path.
+Any occurrences of <TT
+CLASS="LITERAL"
+>{Hugs}</TT
+> in this string will be replaced
+by the Hugs library directory.
+Similarly, <TT
+CLASS="LITERAL"
+>{Home}</TT
+> is expanded to your home directory.
+An entry of the form
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="REPLACEABLE"
+><I
+>directory</I
+></TT
+><TT
+CLASS="LITERAL"
+>/*</TT
+>"</SPAN
+>
+means all the immediate subdirectories of <TT
+CLASS="REPLACEABLE"
+><I
+>directory</I
+></TT
+>.
+The default value is
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>.:{Hugs}/libraries:{Hugs}/oldlib</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>The interpreter won't let you change the search path if that would
+prevent it from reading the <TT
+CLASS="LITERAL"
+>Prelude</TT
+>.</P
+></DD
+><DT
+><A
+NAME="OPTION-SUFFIXES"
+><TT
+CLASS="OPTION"
+>-S</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set list of filename suffixes.</P
+><P
+>Normally, when you import a module <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+>,
+Hugs looks for files <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.hs</TT
+>
+and <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.lhs</TT
+>
+in each directory in you search path.
+With this option, you can change this list,
+in a similar way to the <TT
+CLASS="OPTION"
+>-P</TT
+> option for the search path.
+By default, the suffix list is <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.hs:.lhs</TT
+>"</SPAN
+>,
+which gives the behaviour just described.
+(NB: the <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>:</TT
+>"</SPAN
+> is the Unix separator.
+Windows or Macs use <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>;</TT
+>"</SPAN
+> instead.)
+If you use <TT
+CLASS="LITERAL"
+>-S:.xhs</TT
+> then the suffix
+list becomes <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.hs:.lhs:.xhs</TT
+>"</SPAN
+>,
+so Hugs will look for
+<TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.hs</TT
+>,
+<TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.lhs</TT
+>
+and <TT
+CLASS="REPLACEABLE"
+><I
+>M</I
+></TT
+><TT
+CLASS="LITERAL"
+>.xhs</TT
+>.</P
+><P
+>A null entry in this list will be replaced by the previous suffix list;
+a null <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+> means the default list.</P
+><P
+>The interpreter won't let you change the suffix list if that would
+prevent it from reading the <TT
+CLASS="LITERAL"
+>Prelude</TT
+>,
+i.e. you must include <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.hs</TT
+>"</SPAN
+>.
+Note also that the interpreter knows that files ending in
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.lhs</TT
+>"</SPAN
+> are literate scripts;
+no other suffix is treated that way.</P
+><P
+>This option can be useful in conjunction with the preprocessor option
+(<TT
+CLASS="OPTION"
+>-F</TT
+>).
+The preprocessor can examine the filename to decide what to do with the file.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OPTIONS-EDITOR"
+>3.1.3. Specifying a source file editor</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="OPTION-EDITOR"
+><TT
+CLASS="OPTION"
+>-E</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+></A
+></DT
+><DD
+><P
+>Specify the editor used by the <TT
+CLASS="LITERAL"
+>:edit</TT
+> command
+(see <A
+HREF="module-commands.html"
+>Section 2.2</A
+>).
+For example, to have Hugs invoke <TT
+CLASS="LITERAL"
+>vi</TT
+> to edit your files,
+use
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  -Evi</PRE
+></TD
+></TR
+></TABLE
+>
+The argument string is actually a template string that gets expanded
+by Hugs, via the following rules:
+<P
+></P
+><UL
+><LI
+><P
+>all occurrences of <TT
+CLASS="LITERAL"
+>%d</TT
+> are replaced by the line number
+of where the last error occurred (if any).
+Please consult your editor's documentation for ways of specifying the
+line number.</P
+></LI
+><LI
+><P
+>all occurrences of <TT
+CLASS="LITERAL"
+>%s</TT
+> are replaced by the name of the file.
+If an occurrence of <TT
+CLASS="LITERAL"
+>%s</TT
+> is both preceded by and followed
+by space, the filename is enclosed in double-quotes.</P
+></LI
+><LI
+><P
+>all occurrences of <TT
+CLASS="LITERAL"
+>%f</TT
+> are replaced by the absolute filename
+(provided your platform lets you find the absolute path to a file.)
+Most of the time, <TT
+CLASS="LITERAL"
+>%s</TT
+> will be just fine, but in case your
+editor doesn't handle relative filenames correctly, try
+using <TT
+CLASS="LITERAL"
+>%f</TT
+>.</P
+></LI
+><LI
+><P
+>all occurrences of <TT
+CLASS="LITERAL"
+>%%</TT
+> are replaced by <TT
+CLASS="LITERAL"
+>%</TT
+>.</P
+></LI
+><LI
+><P
+>(win32 only): if the <TT
+CLASS="OPTION"
+>-E</TT
+> string is prefixed with
+the character <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>&#38;</TT
+>"</SPAN
+>,
+then the invocation is asynchronous, that is, the editor process
+is created, but Hugs won't wait for the editor to terminate.</P
+></LI
+><LI
+><P
+>(win32 only): if the <TT
+CLASS="OPTION"
+>-E</TT
+> string is prefixed with
+the character <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>!</TT
+>"</SPAN
+>,
+then the invocation will be asynchronous and use the underlying
+command processor/shell to execute the command.</P
+></LI
+></UL
+>
+If neither <TT
+CLASS="LITERAL"
+>%s</TT
+> nor <TT
+CLASS="LITERAL"
+>%f</TT
+> occurs within
+the <TT
+CLASS="OPTION"
+>-E</TT
+> string,
+then the filename is appended before invoking the editor.</P
+><P
+>Here are some example editor configurations:
+<P
+></P
+><UL
+><LI
+><P
+>TextPad
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  -E"c:/Program Files/TextPad 4/textpad \"%s\"(%d)"</PRE
+></TD
+></TR
+></TABLE
+></P
+></LI
+><LI
+><P
+>vi and clones
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  -E"vi +%d %s"</PRE
+></TD
+></TR
+></TABLE
+></P
+></LI
+><LI
+><P
+>gnuclient (for use with (X)Emacs)
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  -E"gnuclient +%d %s"</PRE
+></TD
+></TR
+></TABLE
+></P
+></LI
+></UL
+>&#13;</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OPTIONS-EVALUATION"
+>3.1.4. Evaluation and printing options</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="OPTION-PROMPT"
+><TT
+CLASS="OPTION"
+>-p</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set prompt string to <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+>
+(default: <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>%s&#62; </TT
+>"</SPAN
+>).
+Any <TT
+CLASS="LITERAL"
+>%s</TT
+> in <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+>
+will be replaced by the current module name.</P
+></DD
+><DT
+><A
+NAME="OPTION-REPEAT-STRING"
+><TT
+CLASS="OPTION"
+>-r</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set the string denoting the last expression to <TT
+CLASS="REPLACEABLE"
+><I
+>str</I
+></TT
+>
+(default: <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>$$</TT
+>"</SPAN
+>).</P
+></DD
+><DT
+><A
+NAME="OPTION-FULL-KIND-ERRORS"
+><TT
+CLASS="OPTION"
+>+k</TT
+></A
+></DT
+><DD
+><P
+>Show kind errors in full (default: off).</P
+><P
+>In Haskell, each type expression has a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>kind</I
+></SPAN
+>.
+These kinds do not appear in the source language,
+but they are checked for consistency.
+By default, Hugs reports such errors as an <TT
+CLASS="LITERAL"
+>Illegal type</TT
+>.
+For example, the declaration
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  instance Monad Int</PRE
+></TD
+></TR
+></TABLE
+>
+gives rise to the error
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  ERROR "Test.hs":4 - Illegal type in class constraint</PRE
+></TD
+></TR
+></TABLE
+>
+However if <TT
+CLASS="OPTION"
+>+k</TT
+> is given,
+the error message is identified as a <TT
+CLASS="LITERAL"
+>Kind error</TT
+>,
+and is expanded to include the conflicting kinds:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  ERROR "Test.hs":4 - Kind error in class constraint
+  *** constructor    : Int
+  *** kind           : *
+  *** does not match : * -&#62; *</PRE
+></TD
+></TR
+></TABLE
+>
+Also, when <TT
+CLASS="OPTION"
+>+k</TT
+> is given,
+the output of the <B
+CLASS="COMMAND"
+>:info</B
+> will include kind information
+for classes and type constructors:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :info Monad
+  -- constructor class with arity * -&#62; *
+  ...
+  Prelude&#62; :info Int
+  -- type constructor with kind *</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+><A
+NAME="OPTION-DEFAULT-TYPES"
+><TT
+CLASS="OPTION"
+>+T</TT
+></A
+></DT
+><DD
+><P
+>Apply defaulting rules to types before printing (default: off).</P
+><P
+>When printing out types, the interpreter will normally not try to
+simplify types by applying defaulting rules, e.g.,
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :t 1
+  1 :: Num a =&#62; a
+  Prelude&#62;</PRE
+></TD
+></TR
+></TABLE
+>
+With the <TT
+CLASS="OPTION"
+>+T</TT
+> option,
+the interpreter attempts to <SPAN
+CLASS="QUOTE"
+>"default"</SPAN
+> types first,
+using the same rules as for expressions (see <A
+HREF="using-hugs.html#BASIC-COMMANDS"
+>Section 2.1</A
+>):
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set +T
+  Prelude&#62; :t 1
+  1 :: Integer
+  Prelude&#62;</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+><A
+NAME="OPTION-QUALIFY-NAMES"
+><TT
+CLASS="OPTION"
+>+Q</TT
+></A
+></DT
+><DD
+><P
+>Qualify names when printing (default: off).</P
+><P
+>By default, the interpreter will print out names without qualifying
+them with their defining modules.
+Most of the time that's exactly what you want,
+but can become confusing if you re-define types and functions;
+the error messages not pinning down what entity it is referring to.
+To have the interpreter qualify the names, use <TT
+CLASS="OPTION"
+>+Q</TT
+>.
+Typically, you use <TT
+CLASS="OPTION"
+>+Q</TT
+> when resolving errors,
+but turn it back off again afterwards.</P
+></DD
+><DT
+><A
+NAME="OPTION-PRINT-TYPE"
+><TT
+CLASS="OPTION"
+>+t</TT
+></A
+></DT
+><DD
+><P
+>Print the type of each expression evaluated (default: off).</P
+><P
+>Normally Hugs merely prints the value of each expression evaluated:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; 1+2
+  3</PRE
+></TD
+></TR
+></TABLE
+>
+With the <TT
+CLASS="OPTION"
+>+t</TT
+> option, it also adds the type of the expression:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set +t
+  Prelude&#62; 1+2
+  3 :: Integer</PRE
+></TD
+></TR
+></TABLE
+>
+Note that defaulting has been applied to the type of the expression in order
+to evaluate it, so the type differs from that reported by the
+<B
+CLASS="COMMAND"
+>:type</B
+> command (assuming that the
+<A
+HREF="options.html#OPTION-DEFAULT-TYPES"
+><TT
+CLASS="OPTION"
+>+T</TT
+></A
+> option
+is not used):
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :type 1+2
+  1 + 2 :: Num a =&#62; a</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+><A
+NAME="OPTION-USE-SHOW"
+><TT
+CLASS="OPTION"
+>+u</TT
+></A
+></DT
+><DD
+><P
+>Use <TT
+CLASS="LITERAL"
+>show</TT
+> to display results (default: on).</P
+><P
+>By default, the values of expressions typed at the prompt are printed using
+the <TT
+CLASS="LITERAL"
+>show</TT
+> member of the <TT
+CLASS="LITERAL"
+>Show</TT
+> class:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; [Just (2+3), Nothing]
+  [Just 5,Nothing]</PRE
+></TD
+></TR
+></TABLE
+>
+You can define this function as desired for any new datatype.
+If the type of the expression is not an instance of the
+<TT
+CLASS="LITERAL"
+>Show</TT
+> class, an error results:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; id
+  ERROR - Cannot find "show" function for:
+  *** Expression : id
+  *** Of type    : a -&#62; a</PRE
+></TD
+></TR
+></TABLE
+>
+With the <TT
+CLASS="OPTION"
+>-u</TT
+> option, a built-in printer is used instead,
+and this works for any type:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set -u
+  Prelude&#62; id
+  id
+  Prelude&#62; \x -&#62; x
+  v1497
+  Prelude&#62; [Just (2+3), Nothing]
+  [Maybe_Just 5,Maybe_Nothing]</PRE
+></TD
+></TR
+></TABLE
+>
+Another feature of the built-in printer is its treatment of failures
+(or exceptions).
+Normally, an exception causes immediate failure of the expression:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set +u
+  Prelude&#62; 1 + 2/0
+
+  Program error: divide by zero
+
+  Prelude&#62; [1, 2 + error "foo", 3]
+  [1,
+  Program error: foo</PRE
+></TD
+></TR
+></TABLE
+>
+However the built-in printer prints the whole value, with embedded exceptions:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set -u
+  Prelude&#62; [1, 2 + error "foo", 3]
+  [1,{error "foo"},3]</PRE
+></TD
+></TR
+></TABLE
+>
+Sometimes a component could produce one of two or more exceptions,
+but the built-in printer shows only one of them:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; 1 + error "foo" + error "bar"
+  {error "foo"}</PRE
+></TD
+></TR
+></TABLE
+></P
+></DD
+><DT
+><A
+NAME="OPTION-DISPLAY-IO"
+><TT
+CLASS="OPTION"
+>+I</TT
+></A
+></DT
+><DD
+><P
+>Display results of IO programs (default: off).</P
+><P
+>By default, an expression of <TT
+CLASS="LITERAL"
+>IO</TT
+> type typed at the prompt
+is executed for effect, but the final value it produces is discarded.
+When <TT
+CLASS="OPTION"
+>+I</TT
+> is used, such an expression is evaluated,
+and then its result is printed with <TT
+CLASS="LITERAL"
+>Prelude.print</TT
+>:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set +I
+  Prelude&#62; (return 'a' :: IO Char)
+  'a'
+  Prelude&#62;</PRE
+></TD
+></TR
+></TABLE
+>
+i.e., evaluating an IO action <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>
+with <TT
+CLASS="OPTION"
+>+I</TT
+> in effect is equivalent to evaluating
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>do { x &#60;- m ; print x }</TT
+>"</SPAN
+>
+with <TT
+CLASS="OPTION"
+>-I</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="OPTIONS-RESOURCE"
+>3.1.5. Resource usage options</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="OPTION-HEAP-SIZE"
+><TT
+CLASS="OPTION"
+>-h</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>num</I
+></TT
+></A
+></DT
+><DD
+><P
+>Set the maximum size in the Hugs heap (default: <TT
+CLASS="LITERAL"
+>250k</TT
+>).
+The argument should be a decimal number, and may by suffixed with
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>k</TT
+>"</SPAN
+> (thousands),
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>M</TT
+>"</SPAN
+> (millions) or
+<SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>G</TT
+>"</SPAN
+>
+(billions, if your machine has that much memory).
+Case is not significant.
+The heap size is measured in cells,
+each of which usually comprises two <TT
+CLASS="LITERAL"
+>int</TT
+>s
+(taking up 8 bytes on most common architectures).</P
+><P
+>Setting this option with <B
+CLASS="COMMAND"
+>:set</B
+> does not change the heap
+size for the current execution of Hugs.
+On Win32, however, all options are saved to the registry,
+so it will take effect the next time Hugs is run.</P
+></DD
+><DT
+><A
+NAME="OPTION-PRINT-REDUCTIONS"
+><TT
+CLASS="OPTION"
+>+s</TT
+></A
+></DT
+><DD
+><P
+>Print statistics after each evaluation (default: off).</P
+><P
+>For each evaluation, this option shows
+<P
+></P
+><UL
+><LI
+><P
+>the number of reductions performed (a crude measure of the amount of
+work performed by the interpreter),</P
+></LI
+><LI
+><P
+>the total number of cells allocated during evaluation, and</P
+></LI
+><LI
+><P
+>the number of garbage collections that occurred during evaluation (if any).</P
+></LI
+></UL
+>
+Note that even the most trivial evaluation involves several reductions and
+cells, because Hugs wraps the expression in code to print the value and
+catch exceptions:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; True
+  True
+  (25 reductions, 46 cells)</PRE
+></TD
+></TR
+></TABLE
+>
+Note that the cell count measures the total amount of allocation,
+rather than the number of cells in use at any time
+(the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>residency</I
+></SPAN
+>).
+For that, the <A
+HREF="options.html#OPTION-PRINT-GC"
+><TT
+CLASS="OPTION"
+>+g</TT
+></A
+>
+option may be more useful.
+In general these statistics cannot be safely used for much more than
+spotting general trends.</P
+></DD
+><DT
+><A
+NAME="OPTION-PRINT-GC"
+><TT
+CLASS="OPTION"
+>+g</TT
+></A
+></DT
+><DD
+><P
+>Print the number of cells recovered after each garbage collection
+(default: off).
+This can be useful for analysing the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>residency</I
+></SPAN
+> of an
+algorithm, the amount of memory is is actually using at each point in time.
+For example,
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; :set +g
+  Prelude&#62; length [1..60000]
+  {{Gc:237618}}{{Gc:237617}}{{Gc:237616}}{{Gc:237623}}{{Gc:237621}}
+  {{Gc:237628}}{{Gc:237623}}{{Gc:237618}}60000</PRE
+></TD
+></TR
+></TABLE
+>
+We see that the computation creates a lot of cells, but the number recovered
+on each garbage collection is roughly the same, so its residency is constant.
+In contrast, with
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>  Prelude&#62; let xs = [1..60000] in sum xs `div` length xs
+  {{Gc:237510}}{{Gc:213862}}{{Gc:190948}}{{Gc:170500}}{{Gc:152225}}
+  {{Gc:135925}}{{Gc:121350}}{{Gc:108350}}{{Gc:96750}}{{Gc:86375}}
+  {{Gc:77125}}{{Gc:68860}}{{Gc:61490}}{{Gc:72948}}{{Gc:97265}}{{Gc:129688}}
+  {{Gc:172916}}{{Gc:230551}}30000</PRE
+></TD
+></TR
+></TABLE
+>
+we see that the amount reclaimed by each garbage collection is steadily
+falling until a certain point (because the original list is retained).
+These examples use the default heap size of 250000 cells;
+this may be changed with the
+<A
+HREF="options.html#OPTION-HEAP-SIZE"
+><TT
+CLASS="OPTION"
+>-h</TT
+></A
+> option.</P
+><P
+>Since these garbage collection messages will be unpredictably interleaved
+with the desired output, you would usually only turn <TT
+CLASS="OPTION"
+>+g</TT
+>
+on to analyse memory problems, and then turn it off afterwards.</P
+></DD
+><DT
+><A
+NAME="OPTION-ROOT-OPTIMISATION"
+><TT
+CLASS="OPTION"
+>+R</TT
+></A
+></DT
+><DD
+><P
+>Enable root optimisation (default: on).</P
+><P
+>This usually gives a small gain in speed, but you might want to turn it off
+if you're using the observation-based debugger
+(see <A
+HREF="observe.html#OBSERVE-AND-ROOT-OPTIMISATION"
+>Section 6.4.2.3</A
+>).</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="misc-commands.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="environment-variables.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Miscellaneous commands</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Environment variables used by Hugs</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

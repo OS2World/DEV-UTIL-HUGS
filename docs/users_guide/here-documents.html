@@ -1,0 +1,278 @@
+<HTML
+><HEAD
+><TITLE
+>Here documents</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="The Hugs 98 User's Guide"
+HREF="users-guide.html"><LINK
+REL="UP"
+TITLE="Hugs-specific language extensions"
+HREF="hugs-only.html"><LINK
+REL="PREVIOUS"
+TITLE="Restricted type synonyms"
+HREF="restricted-synonyms.html"><LINK
+REL="NEXT"
+TITLE="Hugs debugging primitives"
+HREF="observe.html"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Hugs 98 User's Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="restricted-synonyms.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 6. Hugs-specific language extensions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="observe.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="HERE-DOCUMENTS"
+>6.3. Here documents</A
+></H1
+><P
+>These expressions
+(named after similar things in Unix shells)
+are another way of writing string literals, often useful for large strings.
+Everything from <TT
+CLASS="LITERAL"
+>``</TT
+> to <TT
+CLASS="LITERAL"
+>''</TT
+>
+(including newlines and backslashes, but not <TT
+CLASS="LITERAL"
+>$</TT
+> characters)
+is treated as literal text, and layout is ignored.
+The exception is the <TT
+CLASS="LITERAL"
+>$</TT
+> character,
+so that you can embed the value of the variable <TT
+CLASS="REPLACEABLE"
+><I
+>var</I
+></TT
+>
+in the string by writing
+<TT
+CLASS="LITERAL"
+>$(</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>var</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+>.
+To get a literal <TT
+CLASS="LITERAL"
+>$</TT
+> character,
+write <TT
+CLASS="LITERAL"
+>$$</TT
+> —
+single <TT
+CLASS="LITERAL"
+>$</TT
+> characters are not allowed.</P
+><P
+>When the
+<A
+HREF="options.html#OPTION-HERE-DOCUMENTS"
+><TT
+CLASS="OPTION"
+>+H</TT
+></A
+> option
+is given, the following
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  letter name = ``Dear $(name),
+Here are some characters: \ ' ` ".
+To learn more, send $$10 to the address below.''</PRE
+></TD
+></TR
+></TABLE
+>
+is equivalent the Haskell 98 declaration
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  letter name = "Dear " ++ quote name ++ ",\n\
+                \Here are some characters: \\ ' ` \".\n\
+                \To learn more, send $10 to the address below."</PRE
+></TD
+></TR
+></TABLE
+>
+The function
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  class Quote where
+      quote :: a -&#62; String</PRE
+></TD
+></TR
+></TABLE
+>
+(basically no change for <TT
+CLASS="LITERAL"
+>String</TT
+> and <TT
+CLASS="LITERAL"
+>Char</TT
+>,
+and <TT
+CLASS="LITERAL"
+>show</TT
+> for everything else)
+comes from the <TT
+CLASS="LITERAL"
+>Hugs.Quote</TT
+> module,
+which also defines several common instances,
+and should be imported if you use the
+<TT
+CLASS="LITERAL"
+>$(</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>var</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> form.
+(This module also requires the <TT
+CLASS="OPTION"
+>-98</TT
+> option.)</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="restricted-synonyms.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="users-guide.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="observe.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Restricted type synonyms</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="hugs-only.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Hugs debugging primitives</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

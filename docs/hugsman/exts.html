@@ -1,0 +1,1327 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="libs.html">back</a> | <a href="windows.html">next</a>  <br><hr>
+<a name="exts"></a><a name="sect7"></a>
+<h2>7<tt>&nbsp;&nbsp;</tt>An overview of Hugs extensions</h2>
+The Hugs interpreter can be run in two different modes.
+
+<UL><LI>Haskell 98 mode: This should be used for the highest level of compatibility
+with the Haskell 98 standard; known deviations
+from the standard are documented in Section <a href="diffs.html#diffs">9</a>.  In this mode,
+any attempt to use Hugs specific extensions should trigger an error
+message.  Although there are some fairly substantial differences
+between Haskell 1.4 and Haskell 98, our experience is that most
+programs written for Haskell 1.4 or earlier will need only minor
+modifications before they can be loaded and used from Hugs in
+Haskell 98 mode.  Note, however, that some of the demo programs
+included in the standard Hugs distribution <I>will not</I>work
+in Haskell 98 mode.
+<LI>Hugs mode: This enables a number of advanced Hugs features such as
+type system extensions, restricted type synonyms, etc.  Most of
+these features
+are described in more detail in the following sections.  The
+underlying core language remains as in Haskell 98 mode: For example,
+the member function of the <tt>Functor</tt> class is still
+called <tt>fmap</tt>, there is no <tt>Eval</tt> class, fixity declarations
+can appear anywhere that a type signature is permitted, comprehension
+syntax is still restricted to lists, and so on.
+</UL>
+The choice between the two modes is made when the interpreter is started,
+and it is (by design) not possible to change mode without exiting and
+restarting Hugs. 
+The default mode is usually Haskell 98; this can also be set explicitly
+by starting Hugs with the command line option <tt>+98</tt>.  To select
+the Hugs mode, you should start the interpreter with the command line
+option <tt>-98</tt>.  The mode in which the interpreter is running is
+displayed as part of the startup banner, and is also included in the
+information produced by using the <tt>:set</tt> command without any arguments. 
+The intention here is that beginners will get Haskell 98 mode by
+default, while more experienced users will be able to set up alias,
+batch or script files, or file associations, etc. to provide simple
+ways of invoking the interpreter in either mode.  On Win 32 machines,
+for example, one can set up file associations so that you can right click on
+a <tt>.hs</tt> or <tt>.lhs</tt> file and get a choice of loading the file into
+either a Haskell 98 or Hugs mode session. <p>
+The remainder of this section sketches some of the extensions that are
+currently supported when the interpreter is running in Hugs mode.<a name="classexts"></a><p>
+<a name="sect7.1"></a>
+<h3>7.1<tt>&nbsp;&nbsp;</tt>Type class extensions</h3>
+In Hugs mode, several of the Haskell 98 restrictions on type classes
+are relaxed.  This allows the use of multiple parameter classes, and
+more flexible forms of instance declarations.<a name="sec-mpc"></a><p>
+<a name="sect7.1.1"></a>
+<h4>7.1.1<tt>&nbsp;&nbsp;</tt>Multiple parameter classes</h4>
+Haskell 98 allows only one type argument to be specified for any given
+type class.  As a result, each type class corresponds to a set of types.
+For example, a class constraint <tt>Eq&nbsp;t</tt> tells us that the
+type <tt>t</tt> is assumed or required to be an instance of the
+class <tt>Eq</tt>, and the class <tt>Eq</tt> itself corresponds to the set
+of all equality types.  In Hugs mode, this restriction is relaxed so
+that programmers can also define classes with multiple parameters, each
+of which corresponds to a multi-place relation on types.<p>
+Multiple parameter type classes seem to have many potentially interesting
+applications [<a href="hugs.html#$multi">multi</a>].  However, some practical attempts to use them
+have failed as a result of frustrating ambiguity problems.  This occurs
+because the mechanisms that are used to resolve overloading are not
+aggressive enough.  Or, to put it another way, the type relations that
+are defined by a collection of class and instance declarations are often
+too general for practical applications, where programmers might expect
+stronger dependencies between parameters.  In the rest of this section
+we will describe these problems in more detail.  We will also describe
+the mechanisms introduced in the September 1999 release of Hugs that
+allow programmers to declare explicit dependencies between parameters,
+avoiding these difficulties in many cases, and making multiple parameter
+classes more useful for some important practical applications.<a name="sec-ambig-problems"></a><p>
+<a name="sect7.1.1.1"></a>
+<h5>7.1.1.1<tt>&nbsp;&nbsp;</tt>Ambiguity problems</h5>
+During the past ten years, many Haskell users have looked into the
+possibility of building a library for collection types, using a
+multiple parameter type class that looks something like the
+following:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;Collects&nbsp;e&nbsp;ce&nbsp;where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;empty&nbsp;&nbsp;::&nbsp;ce<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;ce&nbsp;-&gt;&nbsp;ce<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;member&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;ce&nbsp;-&gt;&nbsp;Bool<br>
+
+
+</tt>The type variable <tt>e</tt> used here represents the element type,
+while <tt>ce</tt> is the type of the container itself.  Within this
+framework, we might want to define instances of this class for
+lists or characteristic functions (both of which can be used to
+represent collections of any equality type), bit sets (which can
+be used to represent collections of characters), or hash tables
+(which can be used to represent any collection whose elements
+have a hash function).  Omitting standard implementation details,
+this would lead to the following declarations:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Eq&nbsp;e&nbsp;=&gt;&nbsp;Collects&nbsp;e&nbsp;[e]&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Eq&nbsp;e&nbsp;=&gt;&nbsp;Collects&nbsp;e&nbsp;(e&nbsp;-&gt;&nbsp;Bool)&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Collects&nbsp;Char&nbsp;BitSet&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;(Hashable&nbsp;e,&nbsp;Collects&nbsp;a&nbsp;ce)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;Collects&nbsp;e&nbsp;(Array&nbsp;Int&nbsp;ce)&nbsp;where&nbsp;...<br>
+
+
+</tt>All this looks quite promising; we have a class and a range
+of interesting implementations.  Unfortunately, there are
+some serious problems with the class declaration.  First,
+the <tt>empty</tt> function has an ambiguous type:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;empty&nbsp;::&nbsp;Collects&nbsp;e&nbsp;ce&nbsp;=&gt;&nbsp;ce<br>
+
+
+</tt>By `ambiguous' we mean that there is a type variable <tt>e</tt> that
+appears on the left of the <tt>=&gt;</tt> symbol, but not on the right.
+The problem with this is that, according to the theoretical foundations
+of Haskell overloading, we cannot guarantee a well-defined semantics
+for any term with an ambiguous type.  For this reason, Hugs rejects
+any attempt to define or use such terms:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;ERROR:&nbsp;Ambiguous&nbsp;type&nbsp;signature&nbsp;in&nbsp;class&nbsp;declaration<br>
+&nbsp;&nbsp;&nbsp;***&nbsp;ambiguous&nbsp;type&nbsp;:&nbsp;Collects&nbsp;a&nbsp;b&nbsp;=&gt;&nbsp;b<br>
+&nbsp;&nbsp;&nbsp;***&nbsp;assigned&nbsp;to&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;empty<br>
+
+
+</tt>We can sidestep this specific problem by removing the <tt>empty</tt> member
+from the class declaration.  However, although the remaining
+members, <tt>insert</tt> and <tt>member</tt>, do not have ambiguous types, we
+still run into problems when we try to use them.  For example, consider
+the following two functions:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;x&nbsp;y&nbsp;=&nbsp;insert&nbsp;x&nbsp;.&nbsp;insert&nbsp;y<br>
+&nbsp;&nbsp;&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;f&nbsp;True&nbsp;'a'<br>
+
+
+</tt>for which Hugs infers the following types:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;::&nbsp;(Collects&nbsp;a&nbsp;c,&nbsp;Collects&nbsp;b&nbsp;c)&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;b&nbsp;-&gt;&nbsp;c&nbsp;-&gt;&nbsp;c<br>
+&nbsp;&nbsp;&nbsp;g&nbsp;::&nbsp;(Collects&nbsp;Bool&nbsp;c,&nbsp;Collects&nbsp;Char&nbsp;c)&nbsp;=&gt;&nbsp;c&nbsp;-&gt;&nbsp;c<br>
+
+
+</tt>Notice that the type for <tt>f</tt> allows the two
+parameters <tt>x</tt> and <tt>y</tt> to be assigned different
+types, even though it attempts to insert each of the two
+values, one after the other, into the same collection.
+If we're trying to model collections that contain only
+one type of value, then this is clearly an inaccurate
+type.  Worse still, the definition for <tt>g</tt> is
+accepted, without causing a type error.  As a result,
+the error in this code will not be flagged at the point
+where it appears.  Instead, it will show up only when
+we try to use <tt>g</tt>, which might even be in a different
+module.<p>
+<a name="sect7.1.1.2"></a>
+<h5>7.1.1.2<tt>&nbsp;&nbsp;</tt>An attempt to use constructor classes</h5>
+Faced with the problems described above, some Haskell programmers
+might be tempted to use something like the following version of
+the class declaration:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;Collects&nbsp;e&nbsp;c&nbsp;where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;empty&nbsp;&nbsp;::&nbsp;c&nbsp;e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;c&nbsp;e&nbsp;-&gt;&nbsp;c&nbsp;e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;member&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;c&nbsp;e&nbsp;-&gt;&nbsp;Bool<br>
+
+
+</tt>The key difference here is that we abstract over the type
+constructor <tt>c</tt> that is used to form the collection
+type <tt>c&nbsp;e</tt>, and not over that collection type itself,
+represented by <tt>ce</tt> in the original class declaration.
+This avoids the immediate problems that we mentioned above:
+
+<UL><LI><tt>empty</tt> has type <tt>Collects&nbsp;e&nbsp;c&nbsp;=&gt;&nbsp;c&nbsp;e</tt>,
+      which is not ambiguous.
+<LI>The function <tt>f</tt> from the previous section has a
+      more accurate type:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;::&nbsp;(Collects&nbsp;e&nbsp;c)&nbsp;=&gt;&nbsp;e&nbsp;-&gt;&nbsp;e&nbsp;-&gt;&nbsp;c&nbsp;e&nbsp;-&gt;&nbsp;c&nbsp;e<br>
+
+
+</tt><LI>The function <tt>g</tt> from the previous section is now
+      rejected with a type error as we would hope because the type
+      of <tt>f</tt> does not allow the two arguments to have different
+      types.
+</UL>
+This, then, is an example of a multiple parameter class that does
+actually work quite well in practice, without ambiguity problems.<p>
+There is, however, a catch.  This version of the <tt>Collects</tt> class
+is nowhere near as general as the original class seemed to be: only
+one of the four instances in Section <a href="exts.html#sec-ambig-problems">7.1.1</a> can be
+used with this version of <tt>Collects</tt> because only one of
+them---the instance for lists---has a collection type
+that can be written in the form <tt>c&nbsp;e</tt>, for some type
+constructor <tt>c</tt>, and element type <tt>e</tt>.<p>
+<a name="sect7.1.1.3"></a>
+<h5>7.1.1.3<tt>&nbsp;&nbsp;</tt>Adding dependencies</h5>
+To get a more useful version of the <tt>Collects</tt> class, Hugs provides a
+mechanism that allows programmers to specify dependencies between the
+parameters of a multiple parameter class (For readers with an
+interest in theoretical foundations and previous work: The use of
+dependency information can be seen both as a
+generalization of the proposal for `parametric type classes' that was
+put forward by Chen, Hudak, and Odersky [<a href="hugs.html#$paramTC">paramTC</a>], or as a special
+case of the later framework for <I>improvement</I> [<a href="hugs.html#$improvement">improvement</a>] of
+qualified types.  The underlying ideas are also discussed in a more
+theoretical and abstract setting in a manuscript [<a href="hugs.html#$implparam">implparam</a>], where
+they are identified as one point in a general design space for systems
+of implicit parameterization.).<p>
+To start with an abstract example, consider a declaration such as:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;C&nbsp;a&nbsp;b&nbsp;where&nbsp;...<br>
+
+
+</tt>which tells us simply that <tt>C</tt> can be thought of as a binary
+relation on types (or type constructors, depending on the kinds
+of <tt>a</tt> and <tt>b</tt>).  Extra clauses can be included in the
+definition of classes to add information about dependencies
+between parameters, as in the following examples:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;D&nbsp;a&nbsp;b&nbsp;|&nbsp;a&nbsp;-&gt;&nbsp;b&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;class&nbsp;E&nbsp;a&nbsp;b&nbsp;|&nbsp;a&nbsp;-&gt;&nbsp;b,&nbsp;b&nbsp;-&gt;&nbsp;a&nbsp;where&nbsp;...<br>
+
+
+</tt>The notation <tt>a&nbsp;-&gt;&nbsp;b</tt> used here between
+the <tt>|</tt> and <tt>where</tt> symbols---not to be confused with a
+function type---indicates that the <tt>a</tt> parameter
+uniquely determines the <tt>b</tt> parameter, and might be read
+as "<tt>a</tt> determines <tt>b</tt>."  Thus <tt>D</tt> is not just
+a relation, but actually a (partial) function.  Similarly, from the two
+dependencies that are included in the definition of <tt>E</tt>, we can
+see that <tt>E</tt> represents a (partial) one-one mapping between types.<p>
+More generally, dependencies take the form <tt>x1&nbsp;...&nbsp;xn&nbsp;-&gt;&nbsp;y1&nbsp;...&nbsp;ym</tt>,
+where <tt>x1</tt>, ..., <tt>xn</tt>, and <tt>y1</tt>, ..., <tt>yn</tt> are
+type variables with <tt>n</tt>&gt;0 and <tt>m</tt>&gt;=0, meaning that the
+<tt>y</tt> parameters are uniquely determined by the <tt>x</tt> parameters.
+Spaces can be used as separators if more than one variable appears 
+on any single side of a dependency, as in <tt>t&nbsp;-&gt;&nbsp;a&nbsp;b</tt>.  Note that a
+class may be annotated with multiple dependencies using commas as
+separators, as in the definition of <tt>E</tt> above.
+Some dependencies that we can write in this notation are redundant,
+and will be rejected by Hugs because they don't serve any useful purpose,
+and may instead indicate an error in the program.  Examples of dependencies
+like this include <tt>a&nbsp;-&gt;&nbsp;a</tt>, <tt>a&nbsp;-&gt;&nbsp;a&nbsp;a</tt>, <tt>a&nbsp;-&gt;</tt>, etc.
+There can also be some redundancy if multiple dependencies are given,
+as in <tt>a-&gt;b,&nbsp;b-&gt;c,&nbsp;a-&gt;c</tt>, and in which some subset implies the
+remaining dependencies.  Examples like this are not treated as errors.
+Note that dependencies appear only in class declarations, and not in
+any other part of the language.  In particular, the syntax for instance
+declarations, class constraints, and types is completely unchanged.<p>
+By including dependencies in a class declaration, we provide a
+mechanism for the programmer to specify each multiple parameter class
+more precisely.  The compiler, on the other hand, is responsible for
+ensuring that the set of instances that are in scope at any given
+point in the program is consistent with any declared dependencies.
+For example, the following pair of instance declarations cannot
+appear together in the same scope because they violate the dependency
+for <tt>D</tt>, even though either one on its own would be acceptable:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;D&nbsp;Bool&nbsp;Int&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;D&nbsp;Bool&nbsp;Char&nbsp;where&nbsp;...<br>
+
+
+</tt>Note also that the following declaration is not allowed, even by itself:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;D&nbsp;[a]&nbsp;b&nbsp;where&nbsp;...<br>
+
+
+</tt>The problem here is that this instance would allow one particular
+choice of <tt>[a]</tt> to be associated with more than one choice
+for <tt>b</tt>, which contradicts the dependency specified in the
+definition of <tt>D</tt>.  More generally, this means that, in
+any instance of the form:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;D&nbsp;t&nbsp;s&nbsp;where&nbsp;...<br>
+
+
+</tt>for some particular types <tt>t</tt> and <tt>s</tt>, the only variables
+that can appear in <tt>s</tt> are the ones that appear in <tt>t</tt>,
+and hence, if the type <tt>t</tt> is known, then <tt>s</tt> will be
+uniquely determined.<p>
+The benefit of including dependency information is that it allows us to
+define more general multiple parameter classes, without ambiguity
+problems, and with the benefit of more accurate types.  To illustrate
+this, we return to the collection class example, and annotate the
+original definition from Section <a href="exts.html#sec-ambig-problems">7.1.1</a> with a
+simple dependency:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;Collects&nbsp;e&nbsp;ce&nbsp;|&nbsp;ce&nbsp;-&gt;&nbsp;e&nbsp;where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;empty&nbsp;&nbsp;::&nbsp;ce<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;ce&nbsp;-&gt;&nbsp;ce<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;member&nbsp;::&nbsp;e&nbsp;-&gt;&nbsp;ce&nbsp;-&gt;&nbsp;Bool<br>
+
+
+</tt>The dependency <tt>ce&nbsp;-&gt;&nbsp;e</tt> here specifies that the
+type <tt>e</tt> of elements is uniquely determined by the
+type of the collection <tt>ce</tt>.  Note that both
+parameters of <tt>Collects</tt> are of kind <tt>*</tt>; there
+are no constructor classes here.  Note too that all of
+the instances of <tt>Collects</tt> that we gave in
+Section <a href="exts.html#sec-ambig-problems">7.1.1</a> can be used together
+with this new definition.<p>
+What about the ambiguity problems that we encountered
+with the original definition?  The <tt>empty</tt> function
+still has type <tt>Collects&nbsp;e&nbsp;ce&nbsp;=&gt;&nbsp;ce</tt>, but it is no
+longer necessary to regard that as an ambiguous type:
+Although the variable <tt>e</tt> does not appear on the
+right of the <tt>=&gt;</tt> symbol, the dependency for
+class <tt>Collects</tt> tells us that it is uniquely
+determined by <tt>ce</tt>, which <I>does</I> appear on the right
+of the <tt>=&gt;</tt> symbol.  Hence the context in
+which <tt>empty</tt> is used can still give enough information
+to determine types for both <tt>ce</tt> and <tt>e</tt>, without
+ambiguity.  More generally, we need only regard a type as
+ambiguous if it contains a variable on the left of the <tt>=&gt;</tt> that
+is not uniquely determined (either directly or indirectly) by
+the variables on the right.<p>
+Dependencies also help to produce more accurate types for user defined
+functions, and hence to provide earlier detection of errors, and less
+cluttered types for programmers to work with.  Recall the previous
+definition for a function <tt>f</tt>:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;x&nbsp;y&nbsp;=&nbsp;insert&nbsp;x&nbsp;y&nbsp;=&nbsp;insert&nbsp;x&nbsp;.&nbsp;insert&nbsp;y<br>
+
+
+</tt>for which we originally obtained a type:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;::&nbsp;(Collects&nbsp;a&nbsp;c,&nbsp;Collects&nbsp;b&nbsp;c)&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;b&nbsp;-&gt;&nbsp;c&nbsp;-&gt;&nbsp;c<br>
+
+
+</tt>Given the dependency information that we have for <tt>Collects</tt>,
+however, we can deduce that <tt>a</tt> and <tt>b</tt> must be equal
+because they both appear as the second parameter in
+a <tt>Collects</tt> constraint with the same first parameter <tt>c</tt>.
+Hence we can infer a shorter and more accurate type for <tt>f</tt>:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;f&nbsp;::&nbsp;(Collects&nbsp;a&nbsp;c)&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;c&nbsp;-&gt;&nbsp;c<br>
+
+
+</tt>In a similar way, the earlier definition of <tt>g</tt> will now be
+flagged as a type error.<p>
+Although we have given only a few examples here, it should be clear
+that the addition of dependency information can help to make multiple
+parameter classes more useful in practice, avoiding ambiguity problems,
+and allowing more general sets of instance declarations.<p>
+<a name="sect7.1.2"></a>
+<h4>7.1.2<tt>&nbsp;&nbsp;</tt>More flexible instance declarations</h4>
+Hugs mode does not place any syntactic restrictions on the form of
+type expression or class constraints that can be used in an instance
+declaration.  (Apart from the normal restrictions to ensure that such
+type expressions are well-formed, of course.)
+For example, the following definitions are all acceptable:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;(Eq&nbsp;[Tree&nbsp;a],&nbsp;Eq&nbsp;a)&nbsp;=&gt;&nbsp;Eq&nbsp;(Tree&nbsp;a)&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;Eq&nbsp;(Bool&nbsp;-&gt;&nbsp;a)&nbsp;where&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Num&nbsp;a&nbsp;=&gt;&nbsp;Num&nbsp;(String,[a])&nbsp;where&nbsp;...<br>
+
+
+</tt>Compare this with the restrictions of Haskell 98, which allow only
+variables (resp. `simple' types) as the arguments of classes on the
+left (resp. right) hand side of the <tt>=&gt;</tt> sign.  The price for
+this extra flexibility is that it is possible to code up arbitrarily
+complex instance entailments, which means that checking entailments,
+and hence calculating principal types, is, in the general case,
+undecidable.  The setting for the <tt>-c</tt> option, described
+in Section 4.2, will cause the type checker to fail if the complexity
+of checking of entailments rises above a certain level.  Usually, this
+results from examples that would otherwise cause the type checker
+to go into an infinite loop.<p>
+It is possible that some syntactic restrictions on instance declarations
+might be introduced at some point in the future in a way that will offer
+much of the flexibility of the current approach, but in a way that
+guarantees decidability.<p>
+<a name="sect7.1.3"></a>
+<h4>7.1.3<tt>&nbsp;&nbsp;</tt>Overlapping instances</h4>
+The command line option <tt>+o</tt> can be used to enable support for
+overlapping instance declarations, provided that one of each overlapping
+pair is strictly more specific than the other.  This facility has been
+introduced in a way that does not compromise the coherence of the type
+system.  However, its semantics differs slightly from the semantics of
+overlapping instances in Gofer, so users may sometimes be surprised with
+the results.  This is why we have decided to allow this feature to be
+turned on or off by a command line option (the default is off).
+If practical experience with overlapping instances is positive then
+we may change the current default, or even remove the option.<p>
+If the command line option <tt>+m</tt> is selected, then a lazier
+form of overlapping instances is supported, which we refer to
+as `multi instance resolution.'  The main idea is to omit the
+normal tests for overlapping instances, but to generate an
+error message if the type checker can find more than one way
+to resolve overloading for a particular instance of the class.
+For example, with the <tt>+m</tt> option selected, then the two
+instance declarations in the following program are accepted,
+even though they have overlapping (in fact, identical) constraints
+on the right of the <tt>=&gt;</tt> symbol: 
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;class&nbsp;Numeric&nbsp;a&nbsp;where&nbsp;describe&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;String<br>
+<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Integral&nbsp;a&nbsp;=&gt;&nbsp;Numeric&nbsp;a&nbsp;where&nbsp;describe&nbsp;n&nbsp;=&nbsp;"Integral"<br>
+&nbsp;&nbsp;&nbsp;instance&nbsp;Floating&nbsp;a&nbsp;=&gt;&nbsp;Numeric&nbsp;a&nbsp;where&nbsp;describe&nbsp;n&nbsp;=&nbsp;"Floating"<br>
+
+
+</tt>As it turns out, these instances do not cause any problems in
+practice because they can be distinguished by the contexts on
+the left of the <tt>=&gt;</tt> symbol; no standard type is an instance
+of both the <tt>Integral</tt> and the <tt>Floating</tt> classes:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;Main&gt;&nbsp;describe&nbsp;(23::Int)<br>
+&nbsp;&nbsp;&nbsp;"Integral"<br>
+&nbsp;&nbsp;&nbsp;Main&gt;&nbsp;describe&nbsp;(23::Float)<br>
+&nbsp;&nbsp;&nbsp;"Floating"<br>
+&nbsp;&nbsp;&nbsp;Main&gt;<br>
+
+
+</tt>Note that this experimental feature may not be supported
+in future releases.<p>
+<a name="sect7.1.4"></a>
+<h4>7.1.4<tt>&nbsp;&nbsp;</tt>More flexible contexts</h4>
+Haskell 98 allows only class constraints of the form <tt>C&nbsp;(a&nbsp;t1&nbsp;...&nbsp;tn)
+</tt>to appear in the context of any declared or inferred type, where <tt>C</tt> is
+a class, <tt>a</tt> is a variable, and <tt>t1</tt>, ..., <tt>tn</tt> are
+arbitrary types (n&gt;=0).  Class constraints of this form are sometimes
+characterized as being in head normal form.  In many practical cases, we
+have n=0, corresponding to class constraints of the form <tt>C&nbsp;a</tt>.<p>
+In Hugs mode, these restrictions are relaxed, and any type,
+whether in head normal form or not, is permitted to appear
+in a context.  For example, the principal type of an
+expression <tt>(\x&nbsp;-&gt;&nbsp;x==[])</tt> is  <tt>Eq&nbsp;[a]&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;Bool</tt>,
+reflecting the fact that the equality function is used to compare
+lists of type <tt>[a]</tt>.  In previous versions of Hugs, and in Haskell 98,
+an inferred type of <tt>Eq&nbsp;a&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;Bool</tt> would have been produced
+for this term.  The latter type can still be used if an explicit type
+signature is provided for the term, assuming that an instance declaration
+of the form: 
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;&nbsp;instance&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;Eq&nbsp;[a]&nbsp;where&nbsp;...<br>
+
+
+</tt>is in scope.  For example, the following program is valid:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;&nbsp;::&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;x&nbsp;=&nbsp;x==[]<br>
+
+
+</tt>Note that contexts are not reduced by default because this gives more
+general types (and potentially more efficient handling of overloading).<a name="trex"></a><p>
+<a name="sect7.2"></a>
+<h3>7.2<tt>&nbsp;&nbsp;</tt>Extensible records: Trex</h3>
+Hugs supports a flexible system of extensible records, sometimes
+referred to as "Trex".  The theoretical foundations for this,
+and a comparison with related work, is provided in a report by
+Gaster and Jones [<a href="hugs.html#$GasterJones">GasterJones</a>].  This section provides some
+background details for anybody wishing to experiment with the
+implementation of extensible records that is supported in the
+current distribution of Hugs.  Please note that support for this
+extension in any particular build of the Hugs system is determined
+by a compile-time setting.  If the version of Hugs that you are
+using was built without including support for extensible records,
+then you will not be able to use the features described here.<p>
+The current implementation does not use our prefered syntax for record
+operations; too many of the symbols that we would like to have used are
+already used in conflicting ways elsewhere in the syntax of Haskell 98.<p>
+<a name="sect7.2.1"></a>
+<h4>7.2.1<tt>&nbsp;&nbsp;</tt>Basic concepts</h4>
+In essence, records are just collections of values, each of which is
+associated with a particular label.  For example:
+
+<tt><br>
+&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+
+
+</tt>is a record with three components: an <tt>a</tt> field, containing a boolean
+value, a <tt>b</tt> field containing a string, and a <tt>c</tt> field containing
+the number <tt>12</tt>.  The order in which the fields are listed is not
+significant, so the same record value could also be written as:
+
+<tt><br>
+&nbsp;(c&nbsp;=&nbsp;12::Int,&nbsp;a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello")<br>
+
+
+</tt>These examples show simple ways to construct record values.  We can
+also inspect the values held in a record using selector functions.
+These are written with a <tt>#</tt> character, followed immediately
+by the name of a field.
+For example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;#a&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;True<br>
+&nbsp;Prelude&gt;&nbsp;#b&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;"Hello"<br>
+&nbsp;Prelude&gt;&nbsp;#c&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;12<br>
+&nbsp;Prelude&gt;&nbsp;&nbsp;<br>
+
+
+</tt>Note, howevever, that there is a conflict here
+with the syntax of Haskell 98 that you should be aware of if you are
+running in Hugs mode with an infix operator <tt>#</tt> and with support
+for records enabled.  Under these circumstances, an expression of
+the form <tt>f#g</tt> will parse as <tt>f&nbsp;(#g)</tt> --- the application
+of a function <tt>f</tt> to a selector function <tt>#g</tt> --- and not
+as <tt>f&nbsp;#&nbsp;g</tt> --- the application of an infix <tt>#</tt> operator to two
+arguments <tt>f</tt> and <tt>g</tt>.  To obtain the second of these
+interpretations, there must be at least
+one space between the <tt>#</tt> and <tt>g</tt> tokens.<p>
+Record values can also be inspected by using pattern matching, with a
+syntax that mirrors the notation used for constructing a record.  For
+example:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;(\(a=x,&nbsp;c=y,&nbsp;b=_)&nbsp;-&gt;&nbsp;(y,x))&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;(12,True)<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>The order of fields in a record pattern <I>is</I> significant because it
+determines the order---from left to right---in which they are
+matched.  In the following example, an attempt to match the
+
+pattern <tt>(a=[x],&nbsp;b=True)</tt> against the record <tt>(b=undefined,&nbsp;a=[])</tt>,
+fails because <tt>[x]</tt> does not match the empty list, but a match
+against <tt>(a=[2],b=True)</tt> succeeds, binding <tt>x</tt> to <tt>2</tt>:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;[&nbsp;x&nbsp;|&nbsp;(a=[x],&nbsp;b=True)&nbsp;&lt;-&nbsp;[(b=undefined,&nbsp;a=[]),&nbsp;(a=[2],b=True)]]<br>
+&nbsp;[2]<br>
+&nbsp;Prelude&gt;<br>
+
+
+</tt>Changing the order of the fields in the pattern
+to <tt>(b=True,&nbsp;a=[x])</tt> forces matching to start with
+the <tt>b</tt> component.  But the first element in the list
+of records used above has <tt>undefined</tt> in its <tt>b</tt> component,
+so now the evaluation produces a run-time error message:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;[&nbsp;x&nbsp;|&nbsp;(b=True,&nbsp;a=[x])&nbsp;&lt;-&nbsp;[(b=undefined,&nbsp;a=[]),&nbsp;(a=[2],b=True)]]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;Program&nbsp;error:&nbsp;{undefined}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;Prelude&gt;&nbsp;&nbsp;<br>
+
+
+</tt>Although Hugs lets you work with record values, it does not, by
+default, allow you to print them.  More accurately, it does not
+automatically provide instances of the <tt>Show</tt> class for
+record values.  So a simple attempt to print a record value
+will result in an error like the following:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;ERROR:&nbsp;Cannot&nbsp;find&nbsp;"show"&nbsp;function&nbsp;for:<br>
+&nbsp;***&nbsp;expression&nbsp;:&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)<br>
+&nbsp;***&nbsp;of&nbsp;type&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Rec&nbsp;(a::Bool,&nbsp;b::[Char],&nbsp;c::Int)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>The problem here occurs because Hugs attempts to display the
+record by applying the <tt>show</tt> function to it, and no
+version of <tt>show</tt> has been defined.  If you do want to
+be able to display record values, then you should load or
+import the <tt>Trex</tt> module---which is usually included
+in the <tt>lib/hugs</tt> directory of the Hugs distribution:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:load&nbsp;Trex<br>
+&nbsp;Trex&gt;&nbsp;(a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello",&nbsp;c&nbsp;=&nbsp;12::Int)<br>
+&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)<br>
+&nbsp;Trex&gt;&nbsp;(c&nbsp;=&nbsp;12::Int,&nbsp;a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello")<br>
+&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>Note that the fields are always displayed with their labels in
+alphabetical order.  The fact that the fields appear in a specific
+(but, frankly, arbitrary) order is very important---<tt>show</tt> is
+a normal function, so its output must be uniquely determined by its
+input, and not by the way in which that input value is written.
+The records used in the example above have exactly the same value,
+so we expect exactly the same output for each.<p>
+In a similar way, it is sometimes useful to test whether two records
+are equal by using the <tt>==</tt> operator.  Any program that requires
+this feature can obtain the necessary instances of the <tt>Eq</tt> class
+by importing the <tt>Trex</tt> library, as shown above.<p>
+Of course, like all other values in Haskell, records have types,
+and these are written using expressions of the
+form <tt>Rec&nbsp;r</tt> where <tt>Rec</tt> is a built-in type constructor
+and <tt>r</tt> represents a `row' that associates labels with
+types.  For example:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;:t&nbsp;(c&nbsp;=&nbsp;12::Int,&nbsp;a&nbsp;=&nbsp;True,&nbsp;b&nbsp;=&nbsp;"Hello")<br>
+&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)&nbsp;::&nbsp;Rec&nbsp;(a::Bool,&nbsp;b::[Char],&nbsp;c::Int)<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>The type here tells us, unsurprisingly, that the
+record <tt>(a=True,b="Hello",c=12)</tt> has three components:
+an <tt>a</tt> field containing a <tt>Bool</tt>,
+a <tt>b</tt> field containing a <tt>String</tt>, and
+a <tt>c</tt> field of type <tt>Int</tt>.
+As with record values themselves, the order of the components in a
+row is not significant:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)&nbsp;::&nbsp;Rec&nbsp;(b::String,&nbsp;c::Int,&nbsp;a::Bool)<br>
+&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>However, the type of a record must be an accurate reflection of the
+fields that appear in the corresponding value.  The following example
+produces an error because the specified type does not list all of the
+fields in the record value:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)&nbsp;::&nbsp;Rec&nbsp;(b::String,&nbsp;c::Int)<br>
+<br>
+&nbsp;ERROR:&nbsp;Type&nbsp;error&nbsp;in&nbsp;type&nbsp;signature&nbsp;expression<br>
+&nbsp;***&nbsp;term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12)<br>
+&nbsp;***&nbsp;type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Rec&nbsp;(a::Bool,&nbsp;b::[Char],&nbsp;c::a)<br>
+&nbsp;***&nbsp;does&nbsp;not&nbsp;match&nbsp;:&nbsp;Rec&nbsp;(b::String,&nbsp;c::Int)<br>
+&nbsp;***&nbsp;because&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;field&nbsp;mismatch<br>
+<br>
+&nbsp;Trex&gt;<br>
+
+
+</tt>Notice that Trex does not allow the kind of subtyping on record values
+that would allow a record like <tt>(a=True,&nbsp;b="Hello",&nbsp;c=12)</tt> to be
+treated implicitly as having type <tt>Rec&nbsp;(b::String,&nbsp;c::Int)</tt>, simply
+by `forgetting' about the <tt>a</tt> field.  Finding an elegant, efficient,
+and tractable way to support this kind of implicit coercion in a way that
+integrates properly with other aspects of the Hugs type system remains an
+interesting problem for future research.<p>
+<a name="sect7.2.2"></a>
+<h4>7.2.2<tt>&nbsp;&nbsp;</tt>Extensibility</h4>
+An important property of the Trex system is that the same label name
+can appear in many different record types, and potentially with a
+different value type in each case.  However, all of the features that we
+have seen so far deal with records of some fixed `shape', where the set of
+labels and the type of values associated with each one are fixed, and there
+is no apparent relationship between records of different type.
+In fact, all record values and record types in Trex are built-up
+incrementally, starting from an empty record and extending it with
+additional fields, one at a time.  It is for this reason that Trex
+values are often referred to as <I>extensible records</I>.<p>
+In the simplest case, any given record <tt>r</tt> can be extended with a
+new field labelled <tt>l</tt>, provided that <tt>r</tt> does not already
+include an <tt>l</tt> field.  For example, we can
+construct <tt>(a=True,&nbsp;b="Hello")</tt> by
+extending <tt>(a&nbsp;=&nbsp;True)</tt> with a field <tt>b="Hello"</tt>:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(b&nbsp;=&nbsp;"Hello"&nbsp;|&nbsp;(a&nbsp;=&nbsp;True))<br>
+&nbsp;(a=True,&nbsp;b="Hello")<br>
+&nbsp;Trex&gt;<br>
+
+
+</tt>Alternatively, we can construct the same result by
+extending <tt>(b&nbsp;=&nbsp;"Hello")</tt> with a
+field <tt>a=True</tt>:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(a&nbsp;=&nbsp;True&nbsp;|&nbsp;(b&nbsp;=&nbsp;"Hello"))<br>
+&nbsp;(a=True,&nbsp;b="Hello")<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>The syntax of the current implementation allows us to add several new
+fields at a time (the corresponding syntax for pattern matching is
+also supported):
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(a=True,&nbsp;b="Hello",&nbsp;c=12::Int&nbsp;|&nbsp;(b1="World"))<br>
+&nbsp;(a=True,&nbsp;b="Hello",&nbsp;b1="World",&nbsp;c=12)<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>On the other hand, a record cannot be extended with a field of the same
+name, even if it has a different type.  The following examples illustrate
+this:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(a=True&nbsp;|&nbsp;(a=False))<br>
+&nbsp;ERROR:&nbsp;Repeated&nbsp;label&nbsp;"a"&nbsp;in&nbsp;record&nbsp;(a=True,&nbsp;a=False)<br>
+<br>
+&nbsp;Trex&gt;&nbsp;(a=True&nbsp;|&nbsp;r)&nbsp;where&nbsp;r&nbsp;=&nbsp;(a=12::Int)<br>
+&nbsp;ERROR:&nbsp;(a::Int)&nbsp;already&nbsp;includes&nbsp;a&nbsp;"a"&nbsp;field<br>
+<br>
+&nbsp;Trex&gt;<br>
+
+
+</tt>Notice that Hugs produced two different kinds of error message here.
+In the first case, the presence of a repeated label was detected
+syntactically.  In the second example, the problem was
+detected using information about the type of the record <tt>r</tt>.<p>
+Much the same syntax can be used in patterns to decompose record values:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(\(b=bval&nbsp;|&nbsp;r)&nbsp;-&gt;&nbsp;(bval,r))&nbsp;(a=True,&nbsp;b="Hello")<br>
+&nbsp;("Hello",(a=True))<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>In the previous examples, we saw how a record could be extended with
+new fields.  As this example shows, we can use pattern matching to do
+the reverse operation, removing fields from a record.<p>
+We can also use pattern matching to understand how selector functions
+like <tt>#a</tt>, <tt>#b</tt>, and so on are implemented.  For example,
+the selector <tt>#x</tt> is equivalent to the
+function <tt>(\&nbsp;(x=value&nbsp;|&nbsp;_)&nbsp;-&gt;&nbsp;value)</tt>.
+A selector function like this is polymorphic in the sense that it can
+be used with <I>any</I>record containing an <tt>x</tt> field, regardless of
+the type associated with that particular component, or of any other fields
+that the record might contain:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;(\(x=value&nbsp;|&nbsp;_)&nbsp;-&gt;&nbsp;value)&nbsp;(x=True,&nbsp;b="Hello")<br>
+&nbsp;True<br>
+&nbsp;Trex&gt;&nbsp;(\(x=value&nbsp;|&nbsp;_)&nbsp;-&gt;&nbsp;value)&nbsp;(name="Hugs",&nbsp;age=2,&nbsp;x="None")<br>
+&nbsp;"None"<br>
+&nbsp;Trex&gt;&nbsp;<br>
+
+
+</tt>To understand how this works, it is useful to look at the type that
+Hugs assigns to this particular selector function:
+
+<tt><br>
+&nbsp;Trex&gt;&nbsp;:type&nbsp;(\(x=value&nbsp;|&nbsp;_)&nbsp;-&gt;&nbsp;value)<br>
+&nbsp;\(x=value&nbsp;|&nbsp;_)&nbsp;-&gt;&nbsp;value&nbsp;::&nbsp;r\x&nbsp;=&gt;&nbsp;Rec&nbsp;(x::a&nbsp;|&nbsp;r)&nbsp;-&gt;&nbsp;a<br>
+&nbsp;Trex&gt;<br>
+
+
+</tt>There are two important pieces of notation here that deserve further
+explanation:
+
+<UL><LI><tt>Rec&nbsp;(x::a&nbsp;|&nbsp;r)</tt> is the type of a record with
+    an <tt>x</tt> component of type <tt>a</tt>.  The <I>row
+    variable</I><tt>r</tt> represents the rest of the row;
+    that is, it represents any other fields in the record
+    apart from <tt>x</tt>.  This syntax---for record type
+    extension---was chosen to mirror the syntax that we have
+    already seen in the examples above for record
+    value extension.
+<LI>The constraint <tt>r\x</tt>  tells us that the type on the right
+    of the <tt>=&gt;</tt> symbol is only valid if "<tt>r</tt> lacks <tt>x</tt>,"
+    that is, if <tt>r</tt> is a row that does not contain an <tt>x</tt> field.
+    If you are already familiar with Haskell type classes, then you may
+    like to think of <tt>\x</tt> as a kind of class constraint,
+    written with postfix syntax, whose instances are precisely the
+    rows without an <tt>x</tt> field.
+</UL>
+For example, if we apply our selector function to a
+record <tt>(x=True,b="Hello")</tt> of type <tt>Rec&nbsp;(b::String,&nbsp;x::Bool)</tt>,
+then we instantiate the variables <tt>a</tt> and <tt>r</tt> in the type above
+to <tt>Bool</tt> and <tt>(b::String)</tt>, respectively.<p>
+In fact, the built-in selector functions have exactly the same type as
+the user-defined selector shown above:
+
+<tt><br>
+&nbsp;Prelude&gt;&nbsp;:type&nbsp;#x<br>
+&nbsp;#x&nbsp;::&nbsp;b\x&nbsp;=&gt;&nbsp;Rec&nbsp;(x::a&nbsp;|&nbsp;b)&nbsp;-&gt;&nbsp;a<br>
+&nbsp;Prelude&gt;&nbsp;<br>
+
+
+</tt>The row constraints that we see here can also occur in the type of any
+function that operates on record values if the types of those records
+are not fully determined at compile-time.  For example, given the following
+definition:
+
+<tt><br>
+&nbsp;average&nbsp;r&nbsp;=&nbsp;(#x&nbsp;r&nbsp;+&nbsp;#y&nbsp;r)&nbsp;/&nbsp;2<br>
+
+
+</tt>Hugs infers a principal type of the form:
+
+<tt><br>
+&nbsp;average&nbsp;::&nbsp;(Fractional&nbsp;a,&nbsp;b\y,&nbsp;b\x)&nbsp;=&gt;&nbsp;Rec&nbsp;(y::a,&nbsp;x::a&nbsp;|&nbsp;b)&nbsp;-&gt;&nbsp;a<br>
+
+
+</tt>However, any of the following, more specific types could be specified in
+a type declaration for the <tt>average</tt> function:
+
+<tt><br>
+&nbsp;average&nbsp;&nbsp;::&nbsp;(Fractional&nbsp;a)&nbsp;=&gt;&nbsp;Rec&nbsp;(x::a,&nbsp;y::a)&nbsp;-&gt;&nbsp;a<br>
+&nbsp;average&nbsp;&nbsp;::&nbsp;(r\x,&nbsp;r\y)&nbsp;=&gt;&nbsp;Rec&nbsp;(x::Double,&nbsp;y::Double&nbsp;|&nbsp;r)&nbsp;-&gt;&nbsp;Double<br>
+&nbsp;average&nbsp;&nbsp;::&nbsp;Rec&nbsp;(x::Double,&nbsp;y::Double)&nbsp;-&gt;&nbsp;Double<br>
+&nbsp;average&nbsp;&nbsp;::&nbsp;Rec&nbsp;(x::Double,&nbsp;y::Double,&nbsp;z::Bool)&nbsp;-&gt;&nbsp;Double<br>
+
+
+</tt>Each of these types is an instance of the principal type given above.  <p>
+These examples show an important difference between the system of
+records described here, and the record facilities provided by SML.
+In particular, SML prohibits definitions that involve records for
+which the complete set of fields cannot be determined at compile-time.
+So, the SML equivalent of the <tt>average</tt> function described above would
+be rejected because there is no way to determine if the record <tt>r</tt> will
+have any fields other than <tt>x</tt> or <tt>y</tt>.  SML programmers usually
+avoid such problems by giving a type annotation that completely specifies the
+structure of the record.  But, of course, if a definition is limited
+in this way, then it also less flexible.<p>
+With the current implementation of our type system, there is an advantage
+to knowing the full type of a record at compile-time because it allows
+the compiler to generate more efficient code.  However, unlike SML, the
+type system also offers the extra flexibility of polymorphism and
+extensibility over records if that is needed.<a name="typeexts"></a><p>
+<a name="sect7.3"></a>
+<h3>7.3<tt>&nbsp;&nbsp;</tt>Other type system extensions</h3>
+In this section, we describe several other type system extensions that
+are currently available in Hugs mode.<p>
+<a name="sect7.3.1"></a>
+<h4>7.3.1<tt>&nbsp;&nbsp;</tt>Enhanced polymorphic recursion</h4>
+As required by the Haskell 98 report, Hugs supports full polymorphic
+recursion, even for functions with overloaded types.  This means
+that Hugs will accept definitions like the following:
+
+<tt><br>
+&nbsp;p&nbsp;&nbsp;::&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;p&nbsp;x&nbsp;=&nbsp;x==x&nbsp;&amp;&amp;&nbsp;p&nbsp;[x]<br>
+
+
+</tt>(Note that the type signature here is <I>not</I> optional.) 
+In fact, Hugs goes further than is implied by the Haskell 98 report
+by using programmer supplied type signatures to reduce type checking
+dependencies within individual binding groups.  For example, the
+following definitions are acceptable, even though there is no
+explicit type signature for the function <tt>q</tt>:
+
+<tt><br>
+&nbsp;p&nbsp;&nbsp;::&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;p&nbsp;x&nbsp;=&nbsp;x==x&nbsp;&amp;&amp;&nbsp;q&nbsp;[x]<br>
+<br>
+&nbsp;q&nbsp;x&nbsp;=&nbsp;x==x&nbsp;&amp;&amp;&nbsp;p&nbsp;[x]<br>
+
+
+</tt>This is made possible by the observation that we can calculate
+a type for <tt>q</tt>, without needing to calculate the type
+of <tt>p</tt> at the same time because the type of <tt>p</tt> is
+already specified.<a name="ranktwo"></a><p>
+<a name="sect7.3.2"></a>
+<h4>7.3.2<tt>&nbsp;&nbsp;</tt>Rank 2 polymorphism</h4>
+Hugs provides a facility that allows the definition of functions
+that take polymorphic arguments.  This includes functions defined
+at the top-level, in local definitions, in class members, and in
+primitive declarations.  In addition, Hugs allows the definition of
+datatypes with polymorphic and qualified types.  The following examples
+illustrate the syntax that is used:
+
+<tt><br>
+&nbsp;amazed&nbsp;::&nbsp;(forall&nbsp;a.&nbsp;a&nbsp;-&gt;&nbsp;a)&nbsp;-&gt;&nbsp;(Bool,Char)<br>
+&nbsp;amazed&nbsp;i&nbsp;=&nbsp;(i&nbsp;True,&nbsp;i&nbsp;'a')<br>
+<br>
+&nbsp;twice&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;(forall&nbsp;b.&nbsp;b&nbsp;-&gt;&nbsp;f&nbsp;b)&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;f&nbsp;(f&nbsp;a)<br>
+&nbsp;twice&nbsp;f&nbsp;&nbsp;&nbsp;=&nbsp;f&nbsp;.&nbsp;f<br>
+
+
+
+</tt>There are a number of important points to note here.
+
+<UL><LI>In Hugs mode, <tt>forall</tt> is a reserved word.
+<LI>Quantified variables may be of any kind,
+    including <tt>*</tt> (types) or <tt>*&nbsp;-&gt;&nbsp;*</tt> (unary type
+    constructors), as in the examples above.
+<LI>Variables quantified in a <tt>forall</tt> type must appear
+    in the scope of the quantifier.  Unused quantified variables would
+    serve no useful purpose, and are perhaps most likely to occur as
+    the result of mispelling a variable name.
+<LI>Nested quantifiers are not allowed, and quantifiers can only appear
+    in the types of function arguments, not in the results.
+<LI>A function can only take polymorphic arguments if an explicit type
+    signature is provided for that function.  Any call to such a function
+    must have at least as many arguments as are needed to include the
+    rightmost argument with a quantified type.  For example, neither of
+    the functions <tt>amazed</tt> or <tt>twice</tt> defined above can be
+    partially applied.
+<LI>It is not necessary for all polymorphic arguments to appear at the
+    beginning of a type signature.  For example, the following type
+    signature is valid:
+
+<tt><br>
+&nbsp;eg&nbsp;::&nbsp;Int&nbsp;-&gt;&nbsp;(forall&nbsp;a.&nbsp;[a]&nbsp;-&gt;&nbsp;[a])&nbsp;-&gt;&nbsp;Int&nbsp;-&gt;&nbsp;[Int]<br>
+
+
+</tt>    However, as a consequence of the rules given above,
+    the <tt>eg</tt> function defined here must always be applied
+    to at least two arguments, even though the first of these
+    does not have a polymorphic type.
+<LI>In the definition of a function, there must be at least as many
+    arguments on the left hand side of the definition as are needed to
+    included the rightmost argument with a quantified type.  Only
+    variables (or a wildcard, <tt>_</tt>) can be used as arguments
+    on the left hand side of a function definition where a value of
+    polymorphic type is expected.
+<LI>Arbitrary expressions can be used for polymorphic arguments in a
+    function call, provided that they can be assigned the necessary
+    polymorphic type.  For example, all of the following expressions
+    are valid calls to the <tt>amazed</tt> function defined above:
+
+<tt><br>
+&nbsp;amazed&nbsp;(let&nbsp;i&nbsp;x&nbsp;=&nbsp;x&nbsp;in&nbsp;i)<br>
+&nbsp;amazed&nbsp;(\x&nbsp;-&gt;&nbsp;x)<br>
+&nbsp;amazed&nbsp;(id&nbsp;.&nbsp;id&nbsp;.&nbsp;id&nbsp;.&nbsp;id)<br>
+&nbsp;amazed&nbsp;(id&nbsp;id&nbsp;id&nbsp;id&nbsp;id)<br>
+
+
+</tt></UL>
+A similar syntax can be used to include polymorphic components in
+datatypes, as illustrated by the following examples:
+
+<tt><br>
+&nbsp;data&nbsp;Monad1&nbsp;m&nbsp;=&nbsp;MkMonad1&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unit1&nbsp;::&nbsp;(forall&nbsp;a.&nbsp;a&nbsp;-&gt;&nbsp;m&nbsp;a),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bind1&nbsp;::&nbsp;(forall&nbsp;a&nbsp;b.&nbsp;m&nbsp;a&nbsp;-&gt;&nbsp;(a&nbsp;-&gt;&nbsp;m&nbsp;b)&nbsp;-&gt;&nbsp;m&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;data&nbsp;Monad2&nbsp;m&nbsp;=&nbsp;MkMonad2&nbsp;(forall&nbsp;a.&nbsp;a&nbsp;-&gt;&nbsp;m&nbsp;a)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(forall&nbsp;a&nbsp;b.&nbsp;m&nbsp;a&nbsp;-&gt;&nbsp;(a&nbsp;-&gt;&nbsp;m&nbsp;b)&nbsp;-&gt;&nbsp;m&nbsp;b)<br>
+<br>
+&nbsp;listMonad1&nbsp;=&nbsp;MkMonad1&nbsp;{unit1&nbsp;=&nbsp;\x-&gt;[x],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bind1&nbsp;=&nbsp;\x&nbsp;f&nbsp;-&gt;&nbsp;concat&nbsp;(map&nbsp;f&nbsp;x)}<br>
+<br>
+&nbsp;listMonad2&nbsp;=&nbsp;MkMonad1&nbsp;(\x-&gt;[x])&nbsp;(\x&nbsp;f&nbsp;-&gt;&nbsp;concat&nbsp;(map&nbsp;f&nbsp;x))<br>
+
+
+</tt>In this case, <tt>MkMonad1</tt> and <tt>MkMonad2</tt> have types:
+
+<tt><br>
+&nbsp;(forall&nbsp;b.&nbsp;b&nbsp;-&gt;&nbsp;m&nbsp;b)&nbsp;-&gt;&nbsp;(forall&nbsp;b&nbsp;c.&nbsp;m&nbsp;b&nbsp;-&gt;&nbsp;(b-&gt;m&nbsp;c)&nbsp;-&gt;&nbsp;m&nbsp;c)&nbsp;-&gt;&nbsp;Monad1&nbsp;m<br>
+&nbsp;(forall&nbsp;b.&nbsp;b&nbsp;-&gt;&nbsp;m&nbsp;b)&nbsp;-&gt;&nbsp;(forall&nbsp;b&nbsp;c.&nbsp;m&nbsp;b&nbsp;-&gt;&nbsp;(b-&gt;m&nbsp;c)&nbsp;-&gt;&nbsp;m&nbsp;c)&nbsp;-&gt;&nbsp;Monad2&nbsp;m<br>
+
+
+</tt>respectively, while <tt>listMonad1</tt> and <tt>listMonad2</tt> have types:
+
+<tt><br>
+&nbsp;Monad1&nbsp;[]<br>
+&nbsp;Monad2&nbsp;[]<br>
+
+
+</tt>Note that an expression like <tt>(MkMonad2&nbsp;(\x-&gt;[x]))</tt> will
+not be allowed because, by the rules above, the
+constructor <tt>MkMonad2</tt> can only be used when both arguments
+are provided.  An attempt to correct this problem by eta-expansion,
+such as <tt>(\b&nbsp;-&gt;&nbsp;MkMonad2&nbsp;(\x-&gt;[x])&nbsp;b)</tt>, will also fail because
+the new variable, <tt>b</tt>, that this introduces is now lambda-bound
+and hence the type that we obtain for it will not be as general as
+the <tt>MkMonad2</tt> constructor requires.  We can, however, use an
+auxiliary function with an explicit type signature to achieve the
+desired effect:
+
+<tt><br>
+&nbsp;halfListMonad&nbsp;&nbsp;::&nbsp;(forall&nbsp;a&nbsp;b.&nbsp;[a]&nbsp;-&gt;&nbsp;(a&nbsp;-&gt;&nbsp;[b])&nbsp;-&gt;&nbsp;[b])&nbsp;-&gt;&nbsp;Monad2&nbsp;[]<br>
+&nbsp;halfListMonad&nbsp;b&nbsp;=&nbsp;MkMonad2&nbsp;(\x&nbsp;-&gt;&nbsp;[x])&nbsp;b<br>
+
+
+</tt>In the current implementation, the named update syntax for Haskell
+datatypes (in expressions like <tt>exp{field=newValue}</tt>) cannot be
+used with datatypes that include polymorphic components.<p>
+The <tt>runST</tt> primitive that is used in work with lazy state
+threads is now handled using the facilities described here to define
+it as a function:
+
+<tt><br>
+&nbsp;runST&nbsp;::&nbsp;(forall&nbsp;s.&nbsp;ST&nbsp;s&nbsp;a)&nbsp;-&gt;&nbsp;a<br>
+
+
+</tt>As a result, it is no longer necessary to build the <tt>ST</tt> type
+into the interpreter; to make use of these facilities, a program
+should instead import the <tt>ST</tt> library (or it's lazier
+variant, <tt>LazyST</tt>).
+A further consequence of this is that the <tt>ST</tt> and <tt>LazyST
+</tt>libraries cannot be used when Hugs is running in Haskell 98 mode,
+because that prevents the definition and use of values
+like <tt>runST</tt> that require rank 2 types.<a name="exscotyvar"></a><p>
+<a name="sect7.3.3"></a>
+<h4>7.3.3<tt>&nbsp;&nbsp;</tt>Type annotations in patterns</h4>
+Hugs allows patterns of the form <tt>(pat&nbsp;::&nbsp;type)</tt> to be used as type
+annotations (in the style of Standard ML).  To allow effective
+type inference, the type specified here must
+be a monotype (no <tt>forall</tt> part or class constraints are allowed), but
+it may include variables, which, with one exception noted below, have the
+same scope as the patterns in which
+they appear.  For example, the term  <tt>\(x::Int)&nbsp;-&gt;&nbsp;x</tt>  has
+type <tt>Int&nbsp;-&gt;&nbsp;Int</tt>, while the
+expression <tt>\(x::a)&nbsp;(xs::[a])&nbsp;-&gt;&nbsp;xs&nbsp;++&nbsp;[x]</tt>  has
+type <tt>a&nbsp;-&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]</tt>.
+Use of this feature is subject to the following rules:
+
+<UL><LI>It is an error for a variable to be used in a type where a more
+    specific type is inferred.  For example, <tt>(\(x::a)&nbsp;-&gt;&nbsp;not&nbsp;x)</tt> is
+    not a valid expression.
+<LI>It is an error for distinct variables to be used where the
+    types concerned are the same.  For example, the expression
+    <tt>(\(x::a)&nbsp;(y::b)&nbsp;-&gt;&nbsp;[x,y])</tt> is not valid.
+<LI>Type variables bound in a pattern may be used in type signatures
+    or further pattern type annotations within the scope of the
+    binding.  For example:
+
+<tt><br>
+&nbsp;f&nbsp;(x::a)&nbsp;=&nbsp;let&nbsp;g&nbsp;&nbsp;&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;[a]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g&nbsp;y&nbsp;&nbsp;=&nbsp;[x,y]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;&nbsp;g&nbsp;x<br>
+
+
+</tt>    In current versions of Haskell, there is no way to write a type
+    for the local function <tt>g</tt> in this example because of the convention
+    that free type variables are implicitly bound by a universal
+    quantifier.  In this example, the variable is instead bound in
+    the pattern <tt>(x::a)</tt> and so the type assigned to <tt>g</tt> is actually
+    monomorphic.
+<LI>Type signatures do not introduce bindings for type variables,
+    but may involve type variables bound in an enclosing scope.
+    For example, there is no direct relation between the
+    variable <tt>t</tt> appearing in the type signature and the
+    variable <tt>t</tt> appearing in the pattern annotation in the
+    following code:
+
+<tt><br>
+&nbsp;pair&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;t&nbsp;-&gt;&nbsp;s&nbsp;-&gt;&nbsp;(t,s)<br>
+&nbsp;pair&nbsp;x&nbsp;(y::t)&nbsp;=&nbsp;(x,y::t)<br>
+
+
+</tt>    The explanation for this is that the type signature
+    for <tt>pair</tt> (which might, in practice, be separated from
+    the definition) is not in the scope of the binding of the
+    variables <tt>x</tt> and <tt>y</tt>.
+<LI>In the current implementation, pattern type annotations that
+    include variables are allowed on the left hand side of a
+    pattern binding, but scope only over the right hand side of the
+    binding.
+</UL><p>
+<a name="sect7.3.4"></a>
+<h4>7.3.4<tt>&nbsp;&nbsp;</tt>Existential types</h4>
+Hugs supports a form of existential types in datatype definitions in
+the style originally suggested by Perry and by 
+
+ Laufer
+Existentially
+quantified type variables must be bound by an explicit <tt>forall</tt> construct
+preceding the name of the constructor in which the existentially quantified
+variables appear.  The apparently counterintuitive use of <tt>forall</tt> to
+capture existentially quantified variables becomes clearer when we look at
+an example:
+
+<tt><br>
+&nbsp;data&nbsp;Appl&nbsp;=&nbsp;forall&nbsp;a.&nbsp;MkAppl&nbsp;(a&nbsp;-&gt;&nbsp;Int)&nbsp;a&nbsp;(a&nbsp;-&gt;&nbsp;a)<br>
+
+
+</tt>and consider that the <tt>MkAppl</tt> constructor defined here
+does indeed have a fully polymorphic type:
+
+<tt><br>
+&nbsp;MkAppl&nbsp;::&nbsp;(a&nbsp;-&gt;&nbsp;Int)&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;(a&nbsp;-&gt;&nbsp;a)&nbsp;-&gt;&nbsp;Appl.<br>
+
+
+</tt>Because the variable <tt>a</tt> does not appear in the result type, the choice
+of <tt>a</tt> in any particular use of <tt>MkAppl</tt> will be hidden.  As a result,
+when a <tt>MkAppl</tt> constructor is used in a pattern match, we must be
+careful that the hidden type does not `escape' into the result type
+or into the enclosing assumptions.  For example, the following
+definitions are acceptable:
+
+<tt><br>
+&nbsp;good1&nbsp;(MkAppl&nbsp;f&nbsp;x&nbsp;i)&nbsp;=&nbsp;f&nbsp;x<br>
+&nbsp;good2&nbsp;(MkAppl&nbsp;f&nbsp;x&nbsp;i)&nbsp;=&nbsp;map&nbsp;f&nbsp;(iterate&nbsp;i&nbsp;x)<br>
+
+
+</tt>but the next two definitions are not:
+
+<tt><br>
+&nbsp;bad1&nbsp;(MkAppl&nbsp;f&nbsp;x&nbsp;i)&nbsp;=&nbsp;x<br>
+&nbsp;bad3&nbsp;y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;let&nbsp;g&nbsp;(MkAppl&nbsp;f&nbsp;x&nbsp;i)&nbsp;=&nbsp;length&nbsp;[x,y]&nbsp;+&nbsp;1&nbsp;in&nbsp;True<br>
+
+
+</tt>The facilities for type annotations in patterns that were described
+in Section <a href="exts.html#exscotyvar">7.3.3</a> can be used in conjunction with existentials, as
+in the example:
+
+<tt><br>
+&nbsp;good&nbsp;(MkAppl&nbsp;f&nbsp;(x::a)&nbsp;i)&nbsp;=&nbsp;map&nbsp;f&nbsp;(iterate&nbsp;i&nbsp;x&nbsp;::&nbsp;[a])<br>
+
+
+</tt>In this case, the typing annotations are redundant, although they do
+still provide potentially useful information for the programmer.<p>
+A datatype whose definition involves existentially quantified variables
+cannot use the standard Haskell mechanisms for <tt>deriving</tt> instances
+of standard classes like <tt>Eq</tt> and <tt>Show</tt>.  If instances of
+these classes are required, then they must be provided explicitly by
+the programmer.  It is possible, however, to attach type class
+constraints to existentially quantified variables in a datatype
+definition.  For example, we can define a type of "<tt>show</tt>"able
+values using the definition:
+
+<tt><br>
+&nbsp;data&nbsp;Showable&nbsp;=&nbsp;forall&nbsp;a.&nbsp;Show&nbsp;a&nbsp;=&gt;&nbsp;MkShowable&nbsp;a<br>
+
+
+</tt>This will mean that all of the operations of the specified classes, in
+this case just <tt>Show</tt>, are available when a value of this type is
+unpacked during pattern matching.  For example, this can be put to
+good use to define a simple instance of <tt>Show</tt> for
+the <tt>Showable</tt> datatype:
+
+<tt><br>
+&nbsp;instance&nbsp;Show&nbsp;Showable&nbsp;where<br>
+&nbsp;&nbsp;show&nbsp;(MkShowable&nbsp;x)&nbsp;=&nbsp;show&nbsp;x<br>
+
+
+</tt>This definition can now be used in examples like the following:
+
+<tt><br>
+&nbsp;Main&gt;&nbsp;map&nbsp;show&nbsp;[MkShowable&nbsp;3,&nbsp;MkShowable&nbsp;True,&nbsp;MkShowable&nbsp;'a']<br>
+&nbsp;["3",&nbsp;"True",&nbsp;"'a'"]<br>
+&nbsp;Main&gt;<br>
+<p>
+</tt><a name="sect7.3.5"></a>
+<h4>7.3.5<tt>&nbsp;&nbsp;</tt>Restricted type synonyms</h4>
+Hugs supports the use of <I>restricted type synonyms</I>, first introduced in
+Gofer, and similar to the mechanisms for defining abstract datatypes
+that were provided in several earlier languages.  The purpose of
+a restricted type synonym is to restrict the expansion
+of a type synonym to a particular set of functions.  Outside of the
+selected group of functions, the synonym constructor behaves like
+a standard datatype.  More precisely, a restricted type synonym
+definition is a top level declaration of the form:
+
+<tt><br>
+&nbsp;type&nbsp;T&nbsp;a1&nbsp;...&nbsp;am&nbsp;=&nbsp;rhs&nbsp;in&nbsp;f1,&nbsp;...,&nbsp;fn<br>
+
+
+</tt>where <tt>T</tt> is a new type constructor name
+and <tt>rhs</tt> is a type expression typically involving some of the
+(distinct) type variables <tt>a1</tt>, ..., <tt>am</tt>.  
+The major difference with a normal type synonym definition
+is that the expansion of
+the type synonym can only be used within the binding group of one
+of the functions <tt>f1</tt>, ..., <tt>fn</tt> (all of which must be
+defined by top-level definitions in the module containing
+the restricted type synonym definition).  In the definition of any
+other value, <tt>T
+</tt>is treated as if it had been introduced by a definition of the form:
+
+<tt><br>
+&nbsp;data&nbsp;T&nbsp;a1&nbsp;...&nbsp;am&nbsp;=&nbsp;...<br>
+
+
+</tt>For a simple example of this, 
+consider the following definition of a datatype of stacks in terms of
+the standard list type:
+
+<tt><br>
+&nbsp;type&nbsp;Stack&nbsp;a&nbsp;=&nbsp;[a]&nbsp;in&nbsp;emptyStack,&nbsp;push,&nbsp;pop,&nbsp;top,&nbsp;isEmpty<br>
+<br>
+&nbsp;emptyStack&nbsp;::&nbsp;Stack&nbsp;a<br>
+&nbsp;emptyStack&nbsp;&nbsp;=&nbsp;[]<br>
+<br>
+&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a<br>
+&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;(:)<br>
+<br>
+<br>
+&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a<br>
+&nbsp;pop&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;error&nbsp;"pop:&nbsp;empty&nbsp;stack"<br>
+&nbsp;pop&nbsp;(_:xs)&nbsp;&nbsp;=&nbsp;xs<br>
+<br>
+&nbsp;top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;a<br>
+&nbsp;top&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;error&nbsp;"top:&nbsp;empty&nbsp;stack"<br>
+&nbsp;top&nbsp;(x:_)&nbsp;&nbsp;&nbsp;=&nbsp;x<br>
+<br>
+&nbsp;isEmpty&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+&nbsp;isEmpty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;null<br>
+
+
+</tt>The type signatures here are particularly important.  For example,
+because <tt>emptyStack</tt> is mentioned in the definition of the restricted
+type synonym <tt>Stack</tt>, the definition of <tt>emptyStack</tt> is type
+correct.  The declared type for <tt>emptyStack</tt> is <tt>Stack&nbsp;a</tt> which
+can be expanded to <tt>[a]</tt>, agreeing with the type for the empty
+list <tt>[]</tt>.  However, in an expression outside the binding group
+of these functions, the <tt>Stack&nbsp;a</tt> type is quite distinct from
+the <tt>[a]</tt> type:
+
+<tt><br>
+&nbsp;?&nbsp;emptyStack&nbsp;++&nbsp;[1]<br>
+&nbsp;ERROR:&nbsp;Type&nbsp;error&nbsp;in&nbsp;application<br>
+&nbsp;***&nbsp;Expression&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;emptyStack&nbsp;++&nbsp;[1]<br>
+&nbsp;***&nbsp;Term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;emptyStack<br>
+&nbsp;***&nbsp;Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Stack&nbsp;b<br>
+&nbsp;***&nbsp;Does&nbsp;not&nbsp;match&nbsp;:&nbsp;[a]<br>
+&nbsp;?<br>
+
+
+</tt>The binding group of a value is to the set of values whose
+definitions are in the same mutually recursive group of bindings.
+In particular, this does not extend to class and instance declarations
+so we can define instances such as:
+
+<tt><br>
+&nbsp;instance&nbsp;Eq&nbsp;a&nbsp;=&gt;&nbsp;Eq&nbsp;(Stack&nbsp;a)&nbsp;where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;==&nbsp;s2&nbsp;|&nbsp;isEmpty&nbsp;s1&nbsp;=&nbsp;isEmpty&nbsp;s2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;isEmpty&nbsp;s2&nbsp;=&nbsp;isEmpty&nbsp;s1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;otherwise&nbsp;&nbsp;=&nbsp;top&nbsp;s1&nbsp;==&nbsp;top&nbsp;s2&nbsp;&amp;&amp;&nbsp;pop&nbsp;s1&nbsp;==&nbsp;pop&nbsp;s2<br>
+
+
+</tt>As a convenience, Hugs allows the type signatures of functions
+mentioned in the type synonym declaration to be specified within the
+definition.  Thus the above example could also have been written as:
+
+<tt><br>
+&nbsp;type&nbsp;Stack&nbsp;a&nbsp;=&nbsp;[a]&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;emptyStack&nbsp;::&nbsp;Stack&nbsp;a,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Stack&nbsp;a,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;a,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;isEmpty&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;Stack&nbsp;a&nbsp;-&gt;&nbsp;Bool<br>
+<br>
+&nbsp;emptyStack&nbsp;&nbsp;=&nbsp;[]<br>
+&nbsp;...<br>
+
+
+</tt>If a type signature is included as part of the definition of a restricted
+type synonym, then the declaration should not be repeated elsewhere in the
+module; Hugs will reject any attempt to do this by complaining about
+a repeated type signature.<a name="iparam"></a><p>
+<a name="sect7.4"></a>
+<h3>7.4<tt>&nbsp;&nbsp;</tt>Implicit parameters</h3>
+Hugs supports an experimental implementation of
+<I>Implicit Parameters</I>, which provides a technique for introducing
+dynamic binding of variables into a language with a Hindley-Milner based
+type system.  This is based on as-yet-unpublished work by Jeff Lewis,
+Erik Meijer and Mark Shields.  The prototype implementation, and much
+of the following description, was provided by Jeff Lewis.<p>
+A variable is called <I>dynamically bound</I> when it is bound by the calling
+context of a function and <I>statically bound</I> when bound by the callee's
+context.  In Haskell, all variables are statically bound.  Dynamic binding
+of variables is a notion that goes back to Lisp, but was later discarded
+in more modern incarnations, such as Scheme.  Dynamic binding can be very
+confusing in an untyped language, and unfortunately, typed languages, in
+particular Hindley-Milner typed languages like Haskell, only support static
+scoping of variables.<p>
+However, by a simple extension to the type class system of Haskell,
+we can support dynamic binding.  Basically, we express the use
+of a dynamically bound variable as a constraint on the type.
+These constraints lead to types of the form <tt>(?x::t')&nbsp;=&gt;&nbsp;t</tt>,
+which says "this function uses a dynamically-bound variable
+<tt>?x</tt> of type <tt>t'</tt>".
+For example, the following expresses the type of a sort
+function, implicitly parameterized by a comparison function
+named <tt>cmp</tt>.
+
+<tt><br>
+&nbsp;sort&nbsp;::&nbsp;(?cmp&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool)&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]<br>
+
+
+</tt>The dynamic binding constraints are just a new form of
+predicate in the type class system.<p>
+An implicit parameter is introduced by the special form <tt>?x</tt>,
+where <tt>x</tt> is any valid identifier.  Use if this construct
+also introduces new dynamic binding constraints.
+For example, the following definition shows how we can define
+an implicitly parameterized <tt>sort</tt> function in terms of an
+explicitly parameterized <tt>sortBy</tt> function:
+
+<tt><br>
+&nbsp;sortBy&nbsp;::&nbsp;(a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool)&nbsp;-&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]<br>
+<br>
+&nbsp;sort&nbsp;&nbsp;&nbsp;::&nbsp;(?cmp&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool)&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;[a]<br>
+&nbsp;sort&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sortBy&nbsp;?cmp<br>
+
+
+</tt>Dynamic binding constraints behave just like other type class constraints
+in that they are automatically propagated.  Thus, when a function is used,
+its implicit parameters are inherited by the function that called it.
+For example, our <tt>sort</tt> function might be used to pick out the least
+value in a list:
+
+<tt><br>
+&nbsp;least&nbsp;&nbsp;&nbsp;::&nbsp;(?cmp&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;a&nbsp;-&gt;&nbsp;Bool)&nbsp;=&gt;&nbsp;[a]&nbsp;-&gt;&nbsp;a<br>
+&nbsp;least&nbsp;xs&nbsp;=&nbsp;fst&nbsp;(sort&nbsp;xs)<br>
+
+
+</tt>Without lifting a finger, the <tt>?cmp</tt> parameter is propagated to
+become a parameter of <tt>least</tt> as well.
+With explicit parameters, the default is that parameters must always
+be explicit propagated.  With implicit parameters,
+the default is to always propagate them.<p>
+However, an implicit parameter differs from other type class
+constraints in the following way:  All uses of a particular implicit
+parameter must have the same type.
+This means that the type of <tt>(?x,&nbsp;?x)</tt> is <tt>(?x::a)&nbsp;=&gt;&nbsp;(a,&nbsp;a)</tt>,
+and not <tt>(?x::a,&nbsp;?x::b)&nbsp;=&gt;&nbsp;(a,&nbsp;b)</tt>, as would be the case for
+type class constraints.<p>
+An implicit parameter is bound using an expression of the
+form <tt>e&nbsp;with&nbsp;binds</tt>, or equivalently as <tt>dlet&nbsp;binds&nbsp;in&nbsp;e</tt>,
+where both <tt>with</tt> and <tt>dlet</tt> (dynamic let) are new keywords.
+These forms bind the implicit parameters arising in the body, not
+the free variables as a <tt>let</tt> or <tt>where</tt> would do.
+For example, we define the <tt>min</tt> function by binding <tt>cmp</tt>.
+
+<tt><br>
+&nbsp;min&nbsp;::&nbsp;[a]&nbsp;-&gt;&nbsp;a<br>
+&nbsp;min&nbsp;&nbsp;=&nbsp;least&nbsp;with&nbsp;?cmp&nbsp;=&nbsp;(&lt;=)<br>
+
+
+</tt>Syntactically, the <tt>binds</tt> part of a <tt>with</tt> or <tt>dlet</tt> construct
+must be a collection of simple bindings to variables (no function-style
+bindings, and no type signatures); these bindings are neither polymorphic
+or recursive.<p>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="libs.html">back</a> | <a href="windows.html">next</a>  <br><font size=2>May 22, 1999</font>

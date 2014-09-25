@@ -1,0 +1,108 @@
+
+<body bgcolor="#ffffff"> <i>The Hugs 98 User Manual</i><br> <a href="index.html">top</a> | <a href="windows.html">back</a> | <a href="avail.html">next</a>  <br><hr>
+<a name="diffs"></a><a name="sect9"></a>
+<h2>9<tt>&nbsp;&nbsp;</tt>Conformance with Haskell 98</h2>
+A number of Haskell 98 features are not yet implemented in Hugs 98.
+All known differences between the specification and implementation
+are described in this section, although there are bound to be some
+unintentional omissions.<p>
+<a name="sect9.1"></a>
+<h3>9.1<tt>&nbsp;&nbsp;</tt>Haskell 98 features not in Hugs</h3>
+
+<UL><LI>Mutually recursive modules are not supported.
+<LI>Some library functions have been moved into the Prelude.  
+This is necessary because the Prelude and the standard libraries, as
+defined in the Haskell 98 report, are mutually recursive.  This mutual
+recursion has
+been avoided by moving the following functions into the Prelude:
+
+<UL><LI>From <tt>Ix</tt>: <tt>Ix(range,&nbsp;index,&nbsp;inRange,&nbsp;rangeSize)</tt>.
+<LI>From <tt>Char</tt>: <tt>isAscii</tt>, <tt>isControl</tt>,
+<tt>isPrint</tt>, <tt>isSpace</tt>, <tt>isUpper</tt>, <tt>isLower</tt>,  
+<tt>isAlpha</tt>, <tt>isDigit</tt>, <tt>isOctDigit</tt>, <tt>isHexDigit</tt>,
+<tt>isAlphanum</tt>, <tt>digitToInt</tt>, <tt>intToDigit</tt>,
+<tt>toUpper</tt>, <tt>toLower</tt>,
+<tt>ord</tt>, and <tt>chr</tt>.
+<LI>From <tt>Ratio</tt>: <tt>Ratio</tt>, <tt>Rational</tt>, <tt>(%)</tt>,
+<tt>numerator</tt>, <tt>denominator</tt>, and <tt>approxRational</tt>.
+</UL>
+<LI>Derived <tt>Read</tt> instances do not work for some infix constructors.
+If an infix constructor has left associativity and the type appears
+recursively on the left side of the constructor, then the read instance
+will loop.
+<LI>Hugs does not allow the use of qualified names in instance
+declarations.
+<LI>Hugs does not use the Unicode character set yet.  Characters
+are currently drawn from the ISO Latin-1 set.
+<LI>Two adjacent dashes <tt>--</tt> start a one line comment; for
+strictly technical reasons, the change from Haskell 1.4 to Haskell 98
+to use maximal munch for such comments has not yet been implemented. 
+<LI>The floating point printer is not exactly as defined in the
+report.  The printed form of a 
+floating point number may re-read as a slightly different number.
+<LI>Derived instances for large tuples are not supplied.  Instances
+for tuples larger than 5 (3 in the 16 bit PC system) are not in the
+Prelude. 
+<LI>When using <tt>getArgs</tt>, only the stand-alone system passes
+arguments to the executing program.  The interactive system always uses
+an empty argument list when runnning a program.
+<LI>The syntax of sections is slightly different.  For example, the
+Haskell expression <tt>(2*3+)</tt> must instead be written
+as <tt>((2*3)+)</tt>.
+<LI>Instead of <tt>IO.hIsEOF</tt>, hugs provides <tt>IO.hugsHIsEOF</tt>.
+Whereas <tt>hIsEOF</tt> should tell you if the next call of <tt>hGetChar
+</tt>would raise an EOF error; <tt>hugsHIsEOF</tt> tells you if the last call
+of <tt>hGetCHar</tt> raised an EOF error (the same as ANSI C's <tt>feof</tt>). 
+<LI>
+We ignore entity lists in qualified imports (but unqualified
+imports are treated correctly).  For example, you can write:
+
+<tt><br>
+&nbsp;&nbsp;&nbsp;&nbsp;import&nbsp;qualified&nbsp;Prelude&nbsp;(&nbsp;foo&nbsp;)<br>
+
+
+</tt>even though <tt>foo</tt> is not exported from the Prelude and you can 
+  write:
+
+<tt><br>
+&nbsp;&nbsp;module&nbsp;M()&nbsp;where<br>
+&nbsp;&nbsp;import&nbsp;qualified&nbsp;Prelude&nbsp;()&nbsp;--&nbsp;import&nbsp;nothing<br>
+&nbsp;&nbsp;x&nbsp;=&nbsp;Prelude.length&nbsp;"abcd"<br>
+
+
+</tt><LI>The <tt>Double</tt> type is implemented as a single precision
+float (this isn't forbidden by the standard but it is unusual). 
+</UL><p>
+<a name="sect9.2"></a>
+<h3>9.2<tt>&nbsp;&nbsp;</tt>Libraries</h3>
+The following libraries are not yet available: <tt>Directory</tt>, 
+<tt>Time</tt>, <tt>CPUTime</tt>, <tt>Bit</tt>, <tt>Nat</tt>, and <tt>Signed</tt>. <p>
+In the IO library, these functions are not defined: <tt>handlePosn</tt>, 
+<tt>ReadWriteMode
+</tt>h<tt>FileSize</tt>, <tt>hIsEOF</tt>, <tt>isEOF</tt>,
+<tt>hSetBuffering</tt>, <tt>hGetBuffering</tt>,
+<tt>hSeek</tt>, <tt>hIsSeekable</tt>,
+<tt>hReady</tt>, and <tt>hLookahead</tt>.  The following non-standard
+functions are 
+exported:
+
+<tt><br>
+&nbsp;&nbsp;hugsGetCh&nbsp;::&nbsp;IO&nbsp;Char&nbsp;&nbsp;&nbsp;--&nbsp;getchar&nbsp;without&nbsp;echoing&nbsp;to&nbsp;screen<br>
+&nbsp;&nbsp;hugsHIsEOF&nbsp;::&nbsp;Handle&nbsp;-&gt;&nbsp;IO&nbsp;Bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;same&nbsp;semantics&nbsp;as&nbsp;C's&nbsp;"feof"&nbsp;(different&nbsp;from&nbsp;Haskell's&nbsp;hIsEOF)<br>
+&nbsp;&nbsp;hugsIsEOF&nbsp;&nbsp;::&nbsp;IO&nbsp;Bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;same&nbsp;semantics&nbsp;as&nbsp;C's&nbsp;"feof(stdin)"<br>
+&nbsp;&nbsp;hPutStrLn&nbsp;&nbsp;::&nbsp;String&nbsp;-&gt;&nbsp;IO&nbsp;()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;corresponds&nbsp;to&nbsp;Prelude.putStrLn<br>
+<p>
+</tt><a name="sect9.3"></a>
+<h3>9.3<tt>&nbsp;&nbsp;</tt>Haskell 98 extensions</h3>
+In addition to the features described in Section <a href="exts.html#exts">7</a>, Hugs 98
+supports some modest extensions to the Haskell language.
+
+<UL><LI>Import declarations may specify a file name instead of a
+module name. 
+<LI>The T(..) syntax is allowed for type synonyms in import and
+export lists.
+</UL>
+<hr><i>The Hugs 98 User Manual</i><br><a href="index.html">top</a> | <a href="windows.html">back</a> | <a href="avail.html">next</a>  <br><font size=2>May 22, 1999</font>

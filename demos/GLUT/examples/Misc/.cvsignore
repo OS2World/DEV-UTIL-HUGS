@@ -1,0 +1,8 @@
+*_split
+*_stub.c
+*_stub.h
+*.hs.tmp
+*.raw-hs
+ExtractContours
+FogCoordinate
+Triangulate
